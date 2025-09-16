@@ -29,7 +29,7 @@ matplotlib==3.10.6
 numpy==2.3.2
 packaging==25.0
 pillow==11.3.0
-psycopg2-binary==2.9.9
+psycopg[binary]~=3.2
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pycparser==2.22
@@ -52,3 +52,4 @@ tzdata==2025.2
 viivakoodi==0.8.0
 whitenoise==6.7.0
 zope.interface==7.2
+
