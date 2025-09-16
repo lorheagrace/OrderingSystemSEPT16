@@ -89,7 +89,7 @@ DATABASES = {
     "default": dj_database_url.config(
         default=os.getenv(
             "DATABASE_URL",
-            "postgresql://orderingsystemdb_artv_user:3SxXbWxMraWRQLg2SnsOvnk5d4OwGqV7@dpg-d34j1our433s73clk7sg-a/orderingsystemdb_artv"  # local fallback
+            "postgresql://business2_user:V0AvcriyMc5MQLtJsskFAui4kuqB7X0q@dpg-d34m3nemcj7s73d0ep80-a.singapore-postgres.render.com/business2"  # local fallback
         ),
         conn_max_age=600,
     )
