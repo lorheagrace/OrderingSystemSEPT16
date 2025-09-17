@@ -1,6 +1,9 @@
 from django.urls import reverse
 from django.shortcuts import redirect
 from MSMEOrderingWebApp.models import BusinessDetails, BusinessOwnerAccount
+import os
+from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 
 class BusinessOwnerSetupMiddleware:
     def __init__(self, get_response):
@@ -36,3 +39,32 @@ class BusinessOwnerSetupMiddleware:
                 pass
 
         return self.get_response(request)
+
+class EnsureMediaDirectoryMiddleware(MiddlewareMixin):
+    """Ensure media directory exists"""
+    
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # Ensure media directories exist
+        self.create_media_directories()
+        super().__init__(get_response)
+    
+    def create_media_directories(self):
+        """Create media directories if they don't exist"""
+        try:
+            # Create base media directory
+            os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
+            
+            # Create subdirectories
+            subdirs = ['product_images', 'business_logos', 'staff_photos']
+            for subdir in subdirs:
+                dir_path = os.path.join(settings.MEDIA_ROOT, subdir)
+                os.makedirs(dir_path, exist_ok=True)
+                
+            print(f"Media directories created/verified at: {settings.MEDIA_ROOT}")
+            
+        except Exception as e:
+            print(f"Error creating media directories: {e}")
+
+    def process_request(self, request):
+        return None
