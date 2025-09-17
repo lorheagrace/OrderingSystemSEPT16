@@ -1107,7 +1107,6 @@
 <!-- Bootstrap Bundle with Popper (required for modal functionality) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-
 <script>
 // === CLEAR LOCAL STORAGE ON HOMEPAGE ===
 document.addEventListener("DOMContentLoaded", function() {
@@ -1175,6 +1174,39 @@ function updatePlaceOrderButtonState() {
 }
 
 
+// === TIMER HELPER ===
+let deliveryFeeTimer = null;
+function startDeliveryFeeTimer(button, duration = 120) {
+    let remaining = duration;
+
+    // Create timer span if not exists
+    let timerSpan = document.getElementById("delivery-fee-timer");
+    if (!timerSpan) {
+        timerSpan = document.createElement("span");
+        timerSpan.id = "delivery-fee-timer";
+        timerSpan.style.marginLeft = "10px";
+        button.parentNode.appendChild(timerSpan);
+    }
+
+    button.disabled = true;
+    button.textContent = "Requested";
+    timerSpan.textContent = ` (wait ${remaining}s)`;
+
+    deliveryFeeTimer = setInterval(() => {
+        remaining--;
+        timerSpan.textContent = ` (wait ${remaining}s)`;
+
+        if (remaining <= 0) {
+            clearInterval(deliveryFeeTimer);
+            deliveryFeeTimer = null;
+            button.disabled = false;
+            button.textContent = "Request Delivery Fee Again";
+            timerSpan.textContent = "";
+            button.style.display = "inline-block";
+        }
+    }, 1000);
+}
+
 // === DELIVERY FEE UI ===
 function showDeliveryFeeRequest() {
     const container = document.querySelector('.cart-summary .summary-card');
@@ -1192,7 +1224,9 @@ function showDeliveryFeeRequest() {
         `;
         container.appendChild(feeContainer);
 
-        document.getElementById('request-delivery-fee-btn').addEventListener('click', function() {
+        const requestBtn = document.getElementById('request-delivery-fee-btn');
+
+        requestBtn.addEventListener('click', function () {
             this.style.display = 'none';
             document.getElementById('delivery-fee-loading').style.display = 'inline';
 
@@ -1218,6 +1252,10 @@ function showDeliveryFeeRequest() {
                 customer_email: "{{ cart_items.0.email }}",
                 order_details: orderDetails,
             }));
+
+            // Start 2 min timer
+            this.style.display = "inline-block"; // Keep visible for timer
+            startDeliveryFeeTimer(this, 120);
         });
     }
 }
@@ -1235,6 +1273,7 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
     const data = JSON.parse(event.data);
 
     if (data.type === 'delivery_fee_response') {
+        // (unchanged)
         const fee = parseFloat(data.delivery_fee);
 
         document.getElementById('delivery-fee-loading').style.display = 'none';
@@ -1250,7 +1289,14 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
         localStorage.setItem('order_type', 'delivery');
 
         updatePlaceOrderButtonState();
+
+        // Stop timer since fee responded
+        if (deliveryFeeTimer) {
+            clearInterval(deliveryFeeTimer);
+            deliveryFeeTimer = null;
+        }
     } else if (data.type === 'delivery_fee_rejected') {
+        // (unchanged + reset timer)
         document.getElementById('delivery-fee-loading').style.display = 'none';
         showDeliveryFeeModal(data.reason || "Delivery fee request is rejected.");
 
@@ -1264,6 +1310,18 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
         document.getElementById('total').textContent = subtotal.toFixed(2);
 
         updatePlaceOrderButtonState();
+
+        // Reset button
+        const requestBtn = document.getElementById("request-delivery-fee-btn");
+        if (requestBtn) {
+            requestBtn.disabled = false;
+            requestBtn.style.display = "inline-block";
+            requestBtn.textContent = "Request Delivery Fee Again";
+        }
+        if (deliveryFeeTimer) {
+            clearInterval(deliveryFeeTimer);
+            deliveryFeeTimer = null;
+        }
     }
 };
 
