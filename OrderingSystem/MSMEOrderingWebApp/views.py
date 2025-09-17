@@ -54,6 +54,7 @@ from django.utils.timezone import localdate
 from django.db.models import F
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings as django_settings
+from django.contrib.auth.hashers import make_password
 
 @csrf_exempt
 def toggle_shop_status(request):
@@ -1307,78 +1308,106 @@ def change_owner_password(request):
 
 def force_change(request):
     owner_id = request.session.get('owner_id')
+    if not owner_id:
+        messages.error(request, "Session expired. Please login again.")
+        return redirect('login')
+    
     owner = get_object_or_404(BusinessOwnerAccount, id=owner_id)
-
+    
     if request.method == 'POST':
         new_email = request.POST.get('new_email')
         new_password = request.POST.get('new_password')
-
+        
+        # Validate inputs
+        if not new_email or not new_password:
+            messages.error(request, "Both email and password are required.")
+            return redirect('force_change')
+        
+        # Email validation
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, new_email):
+            messages.error(request, "Please enter a valid email address.")
+            return redirect('force_change')
+        
         # Password validation
         if len(new_password) < 8 or not re.search(r'[A-Za-z]', new_password) \
            or not re.search(r'[0-9]', new_password) \
            or not re.search(r'[^A-Za-z0-9]', new_password):
-
             messages.error(request, "Password must be at least 8 characters long and include letters, numbers, and special characters.")
             return redirect('force_change')
-
-        # Update credentials
-        owner.email = new_email
-        owner.password = new_password 
-        owner.first_login = False
-        owner.status = 'not verified'
-
-        # Generate verification token
-        verification_token = token_urlsafe(32)
-        owner.verification_token = verification_token
-        owner.save()
-
-        verify_url = request.build_absolute_uri(
-            f"/verify-email/?{urlencode({'token': verification_token})}"
-        )
-
-        # Email content
-        subject = "Verify Your Updated Email Address"
-        text_content = f"Please verify your email by visiting: {verify_url}"
-        html_content = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
-                <div style="background-color: #f4f4f4; padding: 40px 0;">
-                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px 20px; border: 1px solid #e0e0e0;">
-                        <div style="text-align: center;">
-                            <h2 style="color: #4CAF50; font-size: 32px; font-weight: bold;">Email Verification</h2>
-                            <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-top: 10px;">
-                                You have updated your email. Please verify it to activate your account:
-                            </p>
-                        </div>
-                        <div style="text-align: center; margin-top: 30px;">
-                            <a href="{verify_url}" style="padding: 15px 30px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; font-size: 18px; font-weight: bold; display: inline-block;">
-                                VERIFY EMAIL
-                            </a>
-                        </div>
-                        <p style="text-align: center; font-size: 14px; color: #888888; margin-top: 20px;">
-                            If you did not request this change, please ignore this email.
-                        </p>
-                        <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #888888; padding: 10px 0; border-top: 2px solid #e0e0e0;">
-                            <p style="color: #333333;">Online Ordering System</p>
-                        </footer>
-                    </div>
-                </div>
-            </body>
-        </html>
-        """
-
-        # Send email using Django
+        
+        # Check if email already exists
+        if BusinessOwnerAccount.objects.filter(email=new_email).exclude(id=owner.id).exists():
+            messages.error(request, "This email is already registered.")
+            return redirect('force_change')
+        
         try:
-            email = EmailMultiAlternatives(subject, text_content, django_settings.EMAIL_HOST_USER, [new_email])
-            email.attach_alternative(html_content, "text/html")
-            email.send()
-        except Exception as e:
-            messages.error(request, f"Failed to send verification email: {e}")
+            # Update credentials
+            owner.email = new_email
+            owner.password = make_password(new_password)  # Hash the password properly
+            owner.first_login = False
+            owner.status = 'not verified'
+            
+            # Generate verification token
+            verification_token = token_urlsafe(32)
+            owner.verification_token = verification_token
+            owner.save()
+            
+            # Build verification URL
+            verify_url = request.build_absolute_uri(
+                f"/verify-email/?{urlencode({'token': verification_token})}"
+            )
+            
+            # Email content
+            subject = "Verify Your Updated Email Address"
+            text_content = f"Please verify your email by visiting: {verify_url}"
+            html_content = f"""
+            <html>
+                <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+                    <div style="background-color: #f4f4f4; padding: 40px 0;">
+                        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px 20px; border: 1px solid #e0e0e0;">
+                            <div style="text-align: center;">
+                                <h2 style="color: #4CAF50; font-size: 32px; font-weight: bold;">Email Verification</h2>
+                                <p style="color: #555555; font-size: 16px; line-height: 1.5; margin-top: 10px;">
+                                    You have updated your email. Please verify it to activate your account:
+                                </p>
+                            </div>
+                            <div style="text-align: center; margin-top: 30px;">
+                                <a href="{verify_url}" style="padding: 15px 30px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; font-size: 18px; font-weight: bold; display: inline-block;">
+                                    VERIFY EMAIL
+                                </a>
+                            </div>
+                            <p style="text-align: center; font-size: 14px; color: #888888; margin-top: 20px;">
+                                If you did not request this change, please ignore this email.
+                            </p>
+                            <footer style="margin-top: 40px; text-align: center; font-size: 14px; color: #888888; padding: 10px 0; border-top: 2px solid #e0e0e0;">
+                                <p style="color: #333333;">Online Ordering System</p>
+                            </footer>
+                        </div>
+                    </div>
+                </body>
+            </html>
+            """
+            
+            # Send email
+            email_message = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=django_settings.EMAIL_HOST_USER,
+                to=[new_email]
+            )
+            email_message.attach_alternative(html_content, "text/html")
+            email_message.send()
+            
+            messages.success(request, "Email updated successfully! Please check your email and click the verification link to activate your account.")
             return redirect('login')
-
-        messages.success(request, "Email updated. Please verify your new email to activate your account.")
-        return redirect('login')
-
+            
+        except Exception as e:
+            # Log the error for debugging
+            print(f"Error in force_change: {str(e)}")
+            messages.error(request, f"An error occurred: {str(e)}")
+            return redirect('force_change')
+    
     return render(request, 'MSMEOrderingWebApp/forcechange.html', {
         'owner': owner
     })
