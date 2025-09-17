@@ -21,6 +21,18 @@ DEBUG = os.environ.get("DEBUG", "False").lower() in ["true", "1"]
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "orderingsystemsept16.onrender.com").split(",")
 
+# CSRF Protection for HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://orderingsystemsept16.onrender.com',
+]
+
+# Add your local development origins if needed
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS.extend([
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+    ])
+
 # --------------------------------------------------
 # Applications
 # --------------------------------------------------
