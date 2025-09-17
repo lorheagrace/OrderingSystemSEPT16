@@ -92,27 +92,30 @@
     }
 
     .cart-header {
-        background-color: rgba(255, 255, 255, 0.63);
+        background-color: rgba(255, 255, 255, 0.73);
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
         padding: 25px; /* Added padding */
         border-radius: 20px; /* Make corners rounded */
-        border: 2px solid var(--accent-color);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border: 3px solid var(--accent-color);
 
     }
 
     .cart-title {
-        font-weight: 700;
-        margin: 0;
         display: flex;
-        align-items: center;
-        gap: 12px;
-        font-family: {{ customization.header_font_family|default:"Montserrat" }};
+        align-items: left;
+        justify-content: left;
+        gap: 1rem;
+        margin: 0;
+        font-family: {{ customization.header_font_family|default:"Arial" }};
         color: {{ customization.header_font_color|default:"#000000" }};
-        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 32 %}{{ customization.header_font_size|default:20 }}{% else %}32{% endif %}px;
-
+        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 30 %}{{ customization.header_font_size|default:20 }}{% else %}30{% endif %}px;
+        font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
+        font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+    
     }
 
     .cart-icon {
