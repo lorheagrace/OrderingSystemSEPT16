@@ -85,6 +85,7 @@ MIDDLEWARE = [
 
     # Custom middleware (must be early)
     'MSMEOrderingWebApp.middleware.BusinessOwnerSetupMiddleware',
+    'MSMEOrderingWebApp.middleware.EnsureMediaDirectoryMiddleware',
 
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -155,8 +156,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'MSMEOrderingWebApp/static')
 ]
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
