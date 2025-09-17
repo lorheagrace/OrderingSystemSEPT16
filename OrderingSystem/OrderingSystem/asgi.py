@@ -1,20 +1,26 @@
 import os
+import django
 from django.core.asgi import get_asgi_application
 
+# Set the Django settings module FIRST
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'OrderingSystem.settings')
 
-import django
-django.setup()  # ✅ Ensure apps are loaded
+# Setup Django BEFORE importing anything that uses Django
+django.setup()
 
-from channels.auth import AuthMiddlewareStack
+# Import channels components AFTER django.setup()
 from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
 
-
-# Import this AFTER django.setup()
+# Import your routing AFTER django.setup()
 from MSMEOrderingWebApp.routing import websocket_urlpatterns
 
+# Get the Django ASGI application
+django_asgi_app = get_asgi_application()
+
+# Configure the ASGI application
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": django_asgi_app,
     "websocket": AuthMiddlewareStack(
         URLRouter(websocket_urlpatterns)
     ),
