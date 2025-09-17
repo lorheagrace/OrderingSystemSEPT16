@@ -48,14 +48,14 @@
         }
     
         .checkout-header {
+            font-family: {{ customization.header_font_family|default:"Arial" }};
             background-color: rgba(255, 255, 255, 0.63);
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 25px; /* Added padding */
-            border-radius: 20px; /* Make corners rounded */
-            border: 2px solid var(--accent-color);
-    
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            border: 3px solid var(--accent-color);
         }
     
         .checkout-title {
@@ -66,10 +66,9 @@
             margin: 0;
             font-family: {{ customization.header_font_family|default:"Arial" }};
             color: {{ customization.header_font_color|default:"#000000" }};
-            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 30 %}{{ customization.header_font_size|default:20 }}{% else %}30{% endif %}px;
+            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 35 %}{{ customization.header_font_size|default:20 }}{% else %}35{% endif %}px;
             font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
             font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
-    
         }
     
         .checkout-subtitle {
@@ -85,9 +84,8 @@
     
     
         .checkout-icon {
-            color: var(--primary-color)
-            width: 2.5rem;
-            height: 2.5rem;
+            font-size: 1.8rem;
+            color: {{ customization.header_font_color|default:"#000000" }};
         }
     
         /* Grid Layout */
