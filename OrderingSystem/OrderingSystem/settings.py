@@ -22,7 +22,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "insecure-fallback-key")
 
 DEBUG = os.environ.get("DEBUG", "False").lower() in ["true", "1"]
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "orderingsystem-b1.onrender.com").split(",")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "orderingsystemsept16.onrender.com").split(",")
 
 # --------------------------------------------------
 # Applications
@@ -54,7 +54,7 @@ if REDIS_URL:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [os.environ.get("REDIS_URL", "redis://red-d34h8numcj7s73cscpc0:6379/0")],
+                "hosts": [os.environ.get("REDIS_URL", "redis://red-d34m5h3uibrs73algku0:6379")],
                 "hosts": [REDIS_URL],
             },
         },
