@@ -748,8 +748,8 @@
     
         function isWithinOperatingHours() {
             const now = new Date();
-            let open = parseTimeToToday(openingTime);
-            let close = parseTimeToToday(closingTime);
+            let open = parseTime(openingTime);
+            let close = parseTime(closingTime);
         
             // Handle special case: closing exactly at midnight (00:00:00)
             if (closingTime === "00:00:00") {
