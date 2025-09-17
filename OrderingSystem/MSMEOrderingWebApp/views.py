@@ -1865,7 +1865,7 @@ def dashboard(request):
 
     # Group UNSUCCESSFUL orders (Rejected + Void)
     unsuccessful_orders_raw = Checkout.objects.filter(
-        status__in=["rejected", "void"]
+        status__in=["rejected", "Void"]
     ).order_by('-created_at')
 
     grouped_unsuccessful_orders = defaultdict(list)
