@@ -590,213 +590,487 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        const email = "{{ request.session.email|default:'' }}";
-        const encodedEmail = encodeURIComponent(email);
-
-        // ✅ Utility to update the badge
-        function updateCustomerBadge(count) {
-            const badge = document.getElementById("customer-notification-badge");
-            if (!badge) return;
-
-            if (count > 0) {
-                badge.textContent = count;
-                badge.classList.remove("d-none");
-            } else {
-                badge.classList.add("d-none");
-            }
-        }
-
-        // ✅ CUSTOMER WebSocket (based on session email)
-        if (email) {
-            const socket = new WebSocket(
-                "wss://" + window.location.host + "/ws/customer-notifications/?email=" + encodedEmail
-            );
-
-            socket.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-
-                if (data.type === "send_customer_notification") {
-                    updateCustomerBadge(data.customer_count);
-
-                    // ✅ Reload notifications only if the container is safe to update dynamically
-                    const container = document.getElementById("customer-notifications");
-                    if (container && container.classList.contains("ajax-refresh")) {
-                        fetch("/partial/customer-notifications/")
-                            .then(response => response.text())
-                            .then(html => {
-                                container.innerHTML = html;
-                            });
-                    }
-                }
-            };
-        }
-
-        // ✅ GENERAL WebSocket (for business dashboard only)
-        const generalSocket = new WebSocket("wss://" + window.location.host + "/ws/notifications/");
-
-        generalSocket.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-
-            // Only update customer badge if you're not already a customer
-            if (data.type === "send_notification" && !email) {
-                updateCustomerBadge(data.customer_count);
-
-                if (window.location.pathname.toLowerCase().includes("customernotifications")) {
-                    fetch("/partial/customer-notifications/")
-                        .then(response => response.text())
-                        .then(html => {
-                            const container = document.getElementById("customer-notifications");
-                            if (container) {
-                                container.innerHTML = html;
-                            }
-                        });
+    // === CLEAR LOCAL STORAGE ON HOMEPAGE ===
+    document.addEventListener("DOMContentLoaded", function() {
+        localStorage.removeItem('order_type');
+        localStorage.removeItem('delivery_fee');
+        console.log("[CustomerHomepage] Cleared localStorage for order_type and delivery_fee");
+    });
+    
+    const userEmail = "{{ user_email|escapejs }}";
+    const deliveryFeeSocketCustomer = new WebSocket(
+        `wss://${window.location.host}/ws/delivery-fee/customer/?email=${encodeURIComponent(userEmail)}`
+    );
+    
+    deliveryFeeSocketCustomer.onopen = () => console.log("[Customer JS] WebSocket connected");
+    deliveryFeeSocketCustomer.onerror = (e) => console.error("[Customer JS] WebSocket error:", e);
+    deliveryFeeSocketCustomer.onclose = (e) => console.log("[Customer JS] WebSocket closed:", e);
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
             }
-        };
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            
-            if (window.innerWidth <= 767) {
-                // Mobile behavior
-                sidebar.classList.toggle('show');
-                overlay.classList.toggle('show');
+        }
+        return cookieValue;
+    }
+    
+    // === PLACE ORDER BUTTON ===
+    function updatePlaceOrderButtonState() {
+        const placeOrderBtn = document.querySelector('form button.checkout-btn');
+        const selectedOrderType = document.querySelector('input[name="order_type"]:checked');
+        const deliveryFeeInput = document.getElementById('delivery_fee_input');
+        const deliveryFee = deliveryFeeInput ? parseFloat(deliveryFeeInput.value) || 0 : 0;
+    
+        if (!placeOrderBtn) return;
+    
+        if (!selectedOrderType) {
+            placeOrderBtn.disabled = true;
+            placeOrderBtn.title = "Please select an order type first.";
+            placeOrderBtn.classList.add('disabled-btn');
+            return;
+        }
+    
+        if (selectedOrderType.value === 'delivery') {
+            placeOrderBtn.disabled = deliveryFee <= 0;
+            if (placeOrderBtn.disabled) {
+                placeOrderBtn.title = "Please request and receive delivery fee before placing order.";
+                placeOrderBtn.classList.add('disabled-btn');
+            } else {
+                placeOrderBtn.title = "";
+                placeOrderBtn.classList.remove('disabled-btn');
             }
         }
-
-        function toggleSidebarDesktop() {
-            if (window.innerWidth > 767) {
-                // Desktop behavior
-                const sidebar = document.getElementById('sidebar');
-                const mainContent = document.getElementById('mainContent');
-                const topNavbar = document.querySelector('.top-navbar');
-                
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('collapsed');
-                topNavbar.classList.toggle('collapsed');
-            } else {
-                // On mobile, just toggle the sidebar
-                toggleSidebar();
+    
+        else if (selectedOrderType.value === 'pickup') {
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.title = "";
+            placeOrderBtn.classList.remove('disabled-btn');
+        }
+    }
+    
+    
+    // === TIMER HELPER ===
+    let deliveryFeeTimer = null;
+    function startDeliveryFeeTimer(button, duration = 120) {
+        let remaining = duration;
+    
+        // Create timer span if not exists
+        let timerSpan = document.getElementById("delivery-fee-timer");
+        if (!timerSpan) {
+            timerSpan = document.createElement("span");
+            timerSpan.id = "delivery-fee-timer";
+            timerSpan.style.marginLeft = "10px";
+            button.parentNode.appendChild(timerSpan);
+        }
+    
+        button.disabled = true;
+        button.textContent = "Requested";
+        timerSpan.textContent = ` (wait ${remaining}s)`;
+    
+        deliveryFeeTimer = setInterval(() => {
+            remaining--;
+            timerSpan.textContent = ` (wait ${remaining}s)`;
+    
+            if (remaining <= 0) {
+                clearInterval(deliveryFeeTimer);
+                deliveryFeeTimer = null;
+                button.disabled = false;
+                button.textContent = "Request Delivery Fee Again";
+                timerSpan.textContent = "";
+                button.style.display = "inline-block";
+            }
+        }, 1000);
+    }
+    
+    // === DELIVERY FEE UI ===
+    function showDeliveryFeeRequest() {
+        const container = document.querySelector('.cart-summary .summary-card');
+        if (!container) return;
+    
+        let feeContainer = document.getElementById('delivery-fee-container');
+        if (!feeContainer) {
+            feeContainer = document.createElement('div');
+            feeContainer.id = 'delivery-fee-container';
+            feeContainer.innerHTML = `
+                <div style="height: 20px; visibility: hidden;"></div>
+                <button id="request-delivery-fee-btn" class="checkout-btn">Request Delivery Fee</button>
+                <span id="delivery-fee-loading" style="display:none;">Loading...</span>
+                <span id="delivery-fee-amount" style="display:none;"></span>
+            `;
+            container.appendChild(feeContainer);
+    
+            const requestBtn = document.getElementById('request-delivery-fee-btn');
+    
+            requestBtn.addEventListener('click', function () {
+                this.style.display = 'none';
+                document.getElementById('delivery-fee-loading').style.display = 'inline';
+    
+                const orderDetails = {
+                    customer_name: "{{ cart_items.0.first_name }} {{ cart_items.0.last_name }}",
+                    email: "{{ cart_items.0.email }}",
+                    address: `{{ cart_items.0.address|escapejs }}`,
+                    items: [
+                        {% for item in cart_items %}
+                        {
+                            product_name: "{{ item.product_name|escapejs }}",
+                            quantity: {{ item.quantity }},
+                            price: {{ item.price }},
+                        }{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    total: parseFloat(document.getElementById('total').textContent),
+                };
+    
+                console.log("[Customer JS] Sending fee request", orderDetails);
+                deliveryFeeSocketCustomer.send(JSON.stringify({
+                    action: "request_fee",
+                    customer_email: "{{ cart_items.0.email }}",
+                    order_details: orderDetails,
+                }));
+    
+                // Start 2 min timer
+                this.style.display = "inline-block"; // Keep visible for timer
+                startDeliveryFeeTimer(this, 120);
+            });
+        }
+    }
+    
+    // After delivery fee input is added dynamically
+    function initDeliveryFeeInputListener() {
+        const deliveryFeeInput = document.getElementById('delivery_fee_input');
+        if (deliveryFeeInput) {
+            deliveryFeeInput.addEventListener('input', updatePlaceOrderButtonState);
+        }
+    }
+    
+    // === DELIVERY FEE WEBSOCKET ===
+    deliveryFeeSocketCustomer.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+    
+        if (data.type === 'delivery_fee_response') {
+            // (unchanged)
+            const fee = parseFloat(data.delivery_fee);
+    
+            document.getElementById('delivery-fee-loading').style.display = 'none';
+            document.getElementById('delivery-fee-row').style.display = 'flex';
+            document.getElementById('delivery-fee-display').textContent = fee.toFixed(2);
+    
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+            document.getElementById('total').textContent = (subtotal + fee).toFixed(2);
+    
+            document.getElementById('delivery_fee_input').value = fee;
+    
+            localStorage.setItem('delivery_fee', fee);
+            localStorage.setItem('order_type', 'delivery');
+    
+            updatePlaceOrderButtonState();
+    
+            // Stop timer since fee responded
+            if (deliveryFeeTimer) {
+                clearInterval(deliveryFeeTimer);
+                deliveryFeeTimer = null;
+            }
+        } else if (data.type === 'delivery_fee_rejected') {
+            // (unchanged + reset timer)
+            document.getElementById('delivery-fee-loading').style.display = 'none';
+            showDeliveryFeeModal(data.reason || "Delivery fee request is rejected.");
+    
+            document.getElementById('delivery_fee_input').value = 0;
+            localStorage.removeItem('delivery_fee');
+    
+            const feeRow = document.getElementById('delivery-fee-row');
+            if (feeRow) feeRow.style.display = 'none';
+    
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+            document.getElementById('total').textContent = subtotal.toFixed(2);
+    
+            updatePlaceOrderButtonState();
+    
+            // Reset button
+            const requestBtn = document.getElementById("request-delivery-fee-btn");
+            if (requestBtn) {
+                requestBtn.disabled = false;
+                requestBtn.style.display = "inline-block";
+                requestBtn.textContent = "Request Delivery Fee Again";
+            }
+            if (deliveryFeeTimer) {
+                clearInterval(deliveryFeeTimer);
+                deliveryFeeTimer = null;
             }
         }
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            const mainContent = document.getElementById('mainContent');
-            const topNavbar = document.querySelector('.top-navbar');
-            
-            if (window.innerWidth > 767) {
-                // Desktop mode - remove mobile classes
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
+    };
+    
+    function showDeliveryFeeModal(message) {
+        const modal = document.getElementById('delivery-fee-modal');
+        const msgElem = document.getElementById('delivery-fee-modal-message');
+        const closeBtn = document.getElementById('delivery-fee-modal-close');
+    
+        if (!modal || !msgElem || !closeBtn) return;
+    
+        msgElem.textContent = message;
+        modal.style.display = 'flex';
+    
+        closeBtn.onclick = () => { modal.style.display = 'none'; }
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; }
+    }
+    
+    // === ORDER TYPE HANDLING ===
+    function handleOrderTypeChange() {
+        const pickupRadio = document.getElementById('pickup');
+        const deliveryRadio = document.getElementById('delivery');
+        const storeAddress = document.getElementById('store-address');
+    
+        function updateStoreAddressVisibility() {
+            storeAddress.style.display = pickupRadio.checked ? 'block' : 'none';
+        }
+    
+        pickupRadio.addEventListener('change', () => {
+            updateStoreAddressVisibility();
+            document.getElementById('delivery_fee_input').value = 0;
+            const feeContainer = document.getElementById('delivery-fee-container');
+            if (feeContainer) feeContainer.remove();
+            const feeRow = document.getElementById('delivery-fee-row');
+            if (feeRow) feeRow.style.display = 'none';
+    
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+            document.getElementById('total').textContent = subtotal.toFixed(2);
+    
+            localStorage.setItem('order_type', 'pickup');
+            localStorage.removeItem('delivery_fee');
+    
+            updatePlaceOrderButtonState();
+        });
+    
+        deliveryRadio.addEventListener('change', () => {
+            showDeliveryFeeRequest();
+            initDeliveryFeeInputListener();
+            localStorage.setItem('order_type', 'delivery');
+            updatePlaceOrderButtonState();
+        });
+    
+        updateStoreAddressVisibility();
+    }
+    
+    // === CART ITEM QUANTITY UPDATE ===
+    function updateCartItem(cartId, newQty) {
+        const cartItem = document.querySelector(`div.cart-item[data-cart-id='${cartId}']`);
+        const priceElement = cartItem.querySelector('.price-value');
+    
+        cartItem.classList.add('updating');
+        priceElement.classList.add('updating');
+    
+        fetch(`/update-cart/${cartId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: JSON.stringify({ quantity: newQty })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                priceElement.textContent = data.updated_price;
+                document.getElementById("subtotal").textContent = data.new_subtotal;
+                document.getElementById("total").textContent = data.new_subtotal;
             } else {
-                // Mobile mode - remove desktop collapsed state
-                sidebar.classList.remove('collapsed');
-                mainContent.classList.remove('collapsed');
-                topNavbar.classList.remove('collapsed');
+                alert("Unable to update cart. Please try again.");
+                console.error("Cart update failed:", data.error);
             }
+        })
+        .catch(error => {
+            console.error("Network error:", error);
+            alert("Connection error. Please check your internet and try again.");
+        })
+        .finally(() => {
+            cartItem.classList.remove('updating');
+            priceElement.classList.remove('updating');
+            updatePlaceOrderButtonState();
         });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(e) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            
-            if (window.innerWidth <= 767 && 
-                sidebar.classList.contains('show') && 
-                !sidebar.contains(e.target) && 
-                !mobileMenuBtn.contains(e.target)) {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
+    }
+    
+    // === INIT CART QUANTITY LISTENERS & ANIMATION ===
+    function initCartQuantityListeners() {
+        document.querySelectorAll(".qty-input").forEach(input => {
+            input.addEventListener("change", function () {
+                const cartId = this.dataset.cartId;
+                const newQty = Math.max(1, parseInt(this.value) || 1);
+                this.value = newQty;
+                updateCartItem(cartId, newQty);
+            });
+            input.addEventListener("input", function() {
+                if (this.value < 1) this.value = 1;
+            });
+        });
+    
+        document.querySelectorAll(".qty-increase").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const cartId = this.dataset.cartId;
+                const input = document.querySelector(`input[data-cart-id='${cartId}']`);
+                const newQty = Math.min(99, (parseInt(input.value) || 1) + 1);
+                input.value = newQty;
+                updateCartItem(cartId, newQty);
+            });
+        });
+    
+        document.querySelectorAll(".qty-decrease").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const cartId = this.dataset.cartId;
+                const input = document.querySelector(`input[data-cart-id='${cartId}']`);
+                const newQty = Math.max(1, (parseInt(input.value) || 1) - 1);
+                input.value = newQty;
+                updateCartItem(cartId, newQty);
+            });
+        });
+    
+        // Subtle animation
+        document.querySelectorAll('.cart-item').forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                item.style.transition = 'all 0.4s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }
+    
+    // === DELETE ITEM MODAL ===
+    function initDeleteButtons() {
+        let formToDelete = null;
+    
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const productName = this.closest('.cart-item').querySelector('.product-name').textContent;
+                formToDelete = this.closest('form');
+    
+                document.getElementById('product-to-remove').textContent = `"${productName}"`;
+                const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                modal.show();
+    
+                document.getElementById('confirmDeleteBtn').onclick = function () {
+                    if (formToDelete) formToDelete.submit();
+                };
+            });
+        });
+    }
+    
+    // === INITIALIZATION ===
+    document.addEventListener('DOMContentLoaded', function() {
+        handleOrderTypeChange();
+        initDeleteButtons();
+        initCartQuantityListeners();
+    
+        // Restore saved order type & delivery fee
+        const savedOrderType = localStorage.getItem('order_type');
+        const savedDeliveryFee = localStorage.getItem('delivery_fee');
+    
+        const subtotalElement = document.getElementById('subtotal');
+        const totalElement = document.getElementById('total');
+    
+        if (subtotalElement && totalElement) {
+            let subtotal = parseFloat(subtotalElement.textContent) || 0;
+            let deliveryFee = 0;
+    
+            const deliveryFeeInput = document.getElementById('delivery_fee_input');
+    
+            // Only restore delivery fee if input exists
+            if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee) {
+                deliveryFee = parseFloat(savedDeliveryFee);
+                deliveryFeeInput.value = deliveryFee;
+                initDeliveryFeeInputListener(); // Add listener if needed
             }
-        });
-    </script>
-    {% if business %}
-    <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const openingTime = "{{ opening_time }}";
-        const closingTime = "{{ closing_time }}";
-        const startDay = "{{ business.start_day }}";  // e.g., "Monday"
-        const endDay = "{{ business.end_day }}";      // e.g., "Friday"
+    
+            totalElement.textContent = (subtotal + deliveryFee).toFixed(2);
+    
+            // Restore radio button
+            if (savedOrderType) {
+                const radio = document.querySelector(`input[name="order_type"][value="${savedOrderType}"]`);
+                if (radio) radio.checked = true;
+            }
+        }
+    
+        updatePlaceOrderButtonState();
+    });
+    
+    function setScheduledDate() {
+        const scheduledRadio = document.getElementById("order_scheduled");
+        const datetimeInput = document.getElementById("scheduled_date");
+        const hiddenInput = document.getElementById("scheduled_at_input"); // Updated ID
+    
+        if (scheduledRadio && scheduledRadio.checked && datetimeInput && hiddenInput) {
+            hiddenInput.value = datetimeInput.value;
+            console.log("Scheduled date set:", datetimeInput.value); // Debug log
+        } else {
+            if (hiddenInput) hiddenInput.value = "";
+        }
         
-        let forceClosed = {{ business.force_closed|yesno:"true,false" }}; // from backend
-    
-        const weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    
-        function parseTime(t) {
-            const [h, m, s] = t.split(":").map(Number);
-            const now = new Date();
-            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, s, 0);
+        // Also set order type
+        const orderTypeInput = document.getElementById('order_type_input');
+        const selectedOrderType = document.querySelector('input[name="order_type"]:checked');
+        if (orderTypeInput && selectedOrderType) {
+            orderTypeInput.value = selectedOrderType.value;
         }
+    }
     
-        function isWithinOperatingDays() {
-            const now = new Date();
-            const todayIndex = now.getDay();
-            const startIndex = weekdays.indexOf(startDay);
-            const endIndex = weekdays.indexOf(endDay);
+    document.addEventListener("DOMContentLoaded", function () {
+        const scheduledRadio = document.getElementById("order_scheduled");
+        const nowRadio = document.getElementById("order_now");
+        const schedulePicker = document.getElementById("schedulePicker");
     
-            if (startIndex <= endIndex) {
-                return todayIndex >= startIndex && todayIndex <= endIndex;
-            } else {
-                return todayIndex >= startIndex || todayIndex <= endIndex;
-            }
-        }
-    
-        function isWithinOperatingHours() {
-            const now = new Date();
-            let open = parseTime(openingTime);
-            let close = parseTime(closingTime);
-    
-            if (close <= open) close.setDate(close.getDate() + 1); // overnight
-            return now >= open && now <= close;
-        }
-    
-        function isShopClosed() {
-            // 🚨 Forced closed overrides schedule
-            if (forceClosed === true) return true;
-    
-            return !(isWithinOperatingDays() && isWithinOperatingHours());
-        }
-    
-        function updateCartLink() {
-            const cartLink = document.querySelector('a[aria-label="Cart"]');
-            if (!cartLink) return;
-    
-            if (isShopClosed()) {
-                cartLink.onclick = e => e.preventDefault();
-                cartLink.title = "Shop is currently closed";
-                cartLink.classList.add("disabled");
-            } else {
-                cartLink.onclick = null;
-                cartLink.title = "";
-                cartLink.classList.remove("disabled");
-            }
-        }
-    
-        // Initial check
-        updateCartLink();
-    
-        // Recheck every second
-        setInterval(updateCartLink, 1000);
-    
-        // --- Poll backend every 3s to refresh forceClosed ---
-        setInterval(() => {
-            fetch("{% url 'toggle_shop_status' %}", { method: "GET" })
-            .then(res => res.json())
-            .then(data => {
-                const newForceClosed = data.force_closed;
-                if (forceClosed !== newForceClosed) {
-                    forceClosed = newForceClosed;
-                    updateCartLink();  // immediately reapply new state
+        if (scheduledRadio && schedulePicker) {
+            scheduledRadio.addEventListener("change", function () {
+                if (this.checked) {
+                    schedulePicker.style.display = "block";
                 }
-            })
-            .catch(() => {});
-        }, 3000);
+            });
     
+            if (nowRadio) {
+                nowRadio.addEventListener("change", function () {
+                    if (this.checked) {
+                        schedulePicker.style.display = "none";
+                    }
+                });
+            }
+        }
+    });
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        const scheduledRadio = document.getElementById("order_scheduled");
+        const nowRadio = document.getElementById("order_now");
+        const schedulePicker = document.getElementById("schedulePicker");
+        const scheduledDateInput = document.getElementById("scheduled_date");
+        const hiddenScheduledDate = document.getElementById("scheduled_date_input");
+        const checkoutForm = document.querySelector(".checkout-btn").closest("form");
+    
+        if (scheduledRadio && schedulePicker) {
+            scheduledRadio.addEventListener("change", () => {
+                if (scheduledRadio.checked) {
+                    schedulePicker.style.display = "block";
+                }
+            });
+            nowRadio.addEventListener("change", () => {
+                if (nowRadio.checked) {
+                    schedulePicker.style.display = "none";
+                }
+            });
+        }
+    
+        checkoutForm.addEventListener("submit", function () {
+            if (scheduledRadio.checked && scheduledDateInput.value) {
+                hiddenScheduledDate.value = scheduledDateInput.value;
+            } else {
+                hiddenScheduledDate.value = "";
+            }
+        });
     });
     </script>
     {% endif %}    
