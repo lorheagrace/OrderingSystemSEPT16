@@ -609,7 +609,7 @@
         // ✅ CUSTOMER WebSocket (based on session email)
         if (email) {
             const socket = new WebSocket(
-                "ws://" + window.location.host + "/ws/customer-notifications/?email=" + encodedEmail
+                "wss://" + window.location.host + "/ws/customer-notifications/?email=" + encodedEmail
             );
 
             socket.onmessage = function(event) {
