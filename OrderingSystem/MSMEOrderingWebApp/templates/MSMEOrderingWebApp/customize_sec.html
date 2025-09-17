@@ -953,6 +953,24 @@
     </form>
 </div>
 
+<!-- Reset Confirmation Modal -->
+<div class="modal fade" id="resetModal" tabindex="-1" aria-labelledby="resetModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="resetModalLabel">Confirm Reset</h5>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to reset the customizations to defaults? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="save-button" data-bs-dismiss="modal">Cancel</button>
+        <button id="confirmResetBtn" type="button" class="save-button">Yes, Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 
 function checkWordLimit(textarea, maxWords) {
@@ -1948,14 +1966,15 @@ function initializeCustomizeButton() {
     setFormState(false);
 
     customizeBtn.addEventListener('click', function() {
-        console.log('Button clicked');  // Debugging step
         if (customizeBtn.innerText.includes('Customize')) {
             customizeBtn.innerHTML = '<i class="fas fa-undo"></i> Reset to Defaults';
-            setFormState(true); // Enable the form elements
+            setFormState(true);
         } else {
-            // Show confirmation dialog
-            if (confirm("Are you sure you want to reset the customizations to defaults?")) {
-                // Send the request to reset customizations to defaults
+            // Show Bootstrap confirmation modal
+            const resetModal = new bootstrap.Modal(document.getElementById('resetModal'));
+            resetModal.show();
+
+            document.getElementById('confirmResetBtn').onclick = function() {
                 fetch('/reset_customization/', {
                     method: 'POST',
                     headers: {
@@ -1967,18 +1986,34 @@ function initializeCustomizeButton() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
+                        // ✅ Reset all form fields automatically
+                        if (data.defaults) {
+                            for (const [key, value] of Object.entries(data.defaults)) {
+                                let field = document.querySelector(`[name="${key}"]`);
+                                if (field) {
+                                    if (field.type === "checkbox" || field.type === "radio") {
+                                        field.checked = value;
+                                    } else {
+                                        field.value = value;
+                                    }
+                                }
+                            }
+                        }
+
                         setFormState(false);
                         customizeBtn.innerHTML = '<i class="fas fa-edit"></i> Customize';
-                        alert(data.message);
+                        showToast(data.message);
                     } else {
-                        alert(data.message);
+                        showToast(data.message);
                     }
+                    resetModal.hide(); // Close modal after reset
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while resetting to defaults.');
+                    showToast('An error occurred while resetting to defaults.');
+                    resetModal.hide();
                 });
-            }
+            };
         }
     });
 }
