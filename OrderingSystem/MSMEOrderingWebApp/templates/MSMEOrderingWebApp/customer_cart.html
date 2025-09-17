@@ -64,7 +64,7 @@
 
     .cart-content {
         display: grid;
-        grid-template-columns: 1fr 350px; /* Two columns: one for cart items and one for the order summary */
+        grid-template-columns: 1fr 400px;
         gap: 30px;
     }
 
@@ -72,18 +72,7 @@
         position: sticky;
         top: 20px;
         grid-column: 2; /* Places it in the second column (right side) */
-    }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .cart-content {
-            grid-template-columns: 1fr; /* Stack items and summary on smaller screens */
-            gap: 20px;
-        }
-
-        .cart-summary {
-            grid-column: 1; /* Stack the summary under the items */
-        }
     }
 
     .cart-container {
@@ -131,15 +120,38 @@
         font-weight: 600;
         font-family: {{ customization.body_font_family|default:"Arial" }};
         font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 15 %}{{ customization.body_font_size|default:12 }}{% else %}15{% endif %}px;
-
     }
 
     .cart-content {
         display: grid;
-        grid-template-columns: 1fr 350px;
+        grid-template-columns: 1fr 350px; /* default: 2 columns */
         gap: 30px;
         align-items: start;
     }
+
+
+    /* Tablets and small desktops (992px–1199px) */
+    @media (min-width: 992px) and (max-width: 1199px) {
+        .cart-content {
+            grid-template-columns: 1fr; /* stack */
+            gap: 25px;
+        }
+        .cart-summary {
+            grid-column: 1;
+        }
+    }
+
+    /* Medium screens (768px–991px) */
+    @media (min-width: 768px) and (max-width: 991px) {
+        .cart-content {
+            grid-template-columns: 1fr; /* stack */
+            gap: 20px;
+        }
+        .cart-summary {
+            grid-column: 1;
+        }
+    }
+
 
     .cart-items {
         display: flex;
@@ -319,6 +331,7 @@
     }
 
     .delete-btn {
+        width: fit-content;
         background: #fee2e2;
         color: #dc2626;
         border: 1px solid #fecaca;
@@ -625,8 +638,8 @@
         
         .item-actions {
             grid-column: 1 / -1;
-            justify-content: flex-start;
-            margin-top: 12px;
+            justify-content: flex-end;
+            width: 100%;
         }
         
         .item-controls {
@@ -637,7 +650,7 @@
         
         .cart-header {
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
             gap: 12px;
         }
         
@@ -649,13 +662,24 @@
             position: relative;
             top: auto;
         }
+        .item-count {
+            width: 100%;
+            text-align: center;
+        }
+
     }
 
     @media (max-width: 480px) {
         .cart-container {
-            padding: 16px;
+            padding: 10px;
         }
         
+        .cart-header {
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
         .cart-item {
             padding: 16px;
             grid-template-columns: 1fr;
@@ -664,7 +688,7 @@
         
         .item-image {
             justify-self: center;
-            margin-bottom: 12px;
+            margin-bottom: 5px;
         }
         
         .item-controls {
@@ -676,6 +700,20 @@
         .qty-wrapper {
             justify-self: center;
         }
+        .item-count {
+            width: 100%;
+            text-align: center;
+        }
+
+        .item-actions {
+            justify-content:center;
+            width: 100%;
+        }
+        
+        .delete-btn {
+            font-size: 0.85rem;
+        }
+            
     }
     .option-grid {
         display: flex;
@@ -833,6 +871,88 @@
         opacity: 0.7;
         pointer-events: none;
     }
+
+    /* Overlay */
+    #delivery-fee-modal {
+        display: none; /* hidden by default */
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 10000;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        backdrop-filter: blur(4px);
+    }
+
+    /* Modal Box */
+    #delivery-fee-modal .modal-box {
+        background: #fff;
+        padding: 24px 28px;
+        border-radius: 16px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        animation: fadeInScale 0.3s ease;
+        position: relative;
+    }
+
+    #delivery-fee-modal .modal-box h4 {
+        margin-bottom: 12px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        font-family: {{ customization.header_font_family|default:"Arial" }};
+         color: {{ customization.header_font_color|default:"#000000" }};
+    }
+
+    /* Message */
+    #delivery-fee-modal-message {
+        font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16
+        {% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+        color: {{ customization.body_font_color|default:"#374151" }};
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+
+    #delivery-fee-modal-close {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: {{ customization.button_text_color|default:'#ffffff' }}
+        font-family: {{ customization.header_font_family|default:"Montserrat" }};
+        border-radius: {{ customization.button_rounded_corner|default:1 }}px;
+    
+    }
+
+    #delivery-fee-modal-close:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    #delivery-fee-modal-close:active {
+        transform: translateY(0);
+    }
+
+    /* Animation */
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
 </style>
 
 <div class="cart-container">
@@ -847,212 +967,210 @@
     </div>
 
     {% if cart_items %}
-        <div class="cart-content">
-            <!-- Cart items section -->
-            <div class="cart-items">
-                {% for item in cart_items %}
-                <div class="cart-item" data-cart-id="{{ item.id }}">
-                    <div class="item-image">
-                        {% if item.product and item.product.image %}
-                            <img src="{{ item.product.image.url }}" alt="{{ item.product_name }}" loading="lazy">
-                        {% else %}
-                            <div style="
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                width: 100%;
-                                height: 100%;
-                                border-radius: 8px;
-                                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
-                                color: #fff;
-                                font-weight: 700;
-                                font-size: 1.8rem;
-                                text-transform: uppercase;
-                            ">
-                                {{ item.product_name|first }}
-                            </div>
-                        {% endif %}
+        <div class="row cart-content">
+            <!-- Cart Items -->
+            <div>
+                <div class="cart-items">
+                    {% for item in cart_items %}
+                    <div class="cart-item" data-cart-id="{{ item.id }}">
+                        <div class="item-image">
+                            {% if item.product and item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product_name }}" loading="lazy">
+                            {% else %}
+                                <div style="
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 100%;
+                                    height: 100%;
+                                    border-radius: 8px;
+                                    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+                                    color: #fff;
+                                    font-weight: 700;
+                                    font-size: 1.8rem;
+                                    text-transform: uppercase;
+                                ">
+                                    {{ item.product_name|first }}
+                                </div>
+                            {% endif %}
+                        </div>
 
-                    </div>
-
-
-                    <div class="item-details">
-                        <h3 class="product-name">{{ item.product_name }}</h3>
-                        <div class="item-controls">
-                            <div class="quantity-controls">
-                                {% if item.product %}
-                                    <label class="product_price">Unit Price: ₱{{ item.product.price }}</label>
-                                {% else %}
-                                    <label class="product_price">Unit Price: ₱0.00</label>
-                                {% endif %}
-                                <div class="qty-wrapper">
-                                    <button type="button" class="qty-btn qty-decrease" data-cart-id="{{ item.id }}">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" 
-                                        id="qty-{{ item.id }}"
-                                        class="qty-input" 
-                                        value="{{ item.quantity }}" 
-                                        min="1" 
-                                        max="99"
-                                        step="1"
-                                        data-cart-id="{{ item.id }}"
-                                        oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-                                    <button type="button" class="qty-btn qty-increase" data-cart-id="{{ item.id }}">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                        <div class="item-details">
+                            <h3 class="product-name">{{ item.product_name }}</h3>
+                            <div class="item-controls">
+                                <div class="quantity-controls">
+                                    {% if item.product %}
+                                        <label class="product_price">Unit Price: ₱{{ item.product.price }}</label>
+                                    {% else %}
+                                        <label class="product_price">Unit Price: ₱0.00</label>
+                                    {% endif %}
+                                    <div class="qty-wrapper">
+                                        <button type="button" class="qty-btn qty-decrease" data-cart-id="{{ item.id }}">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" 
+                                            id="qty-{{ item.id }}"
+                                            class="qty-input" 
+                                            value="{{ item.quantity }}" 
+                                            min="1" 
+                                            max="99"
+                                            step="1"
+                                            data-cart-id="{{ item.id }}"
+                                            oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                                        <button type="button" class="qty-btn qty-increase" data-cart-id="{{ item.id }}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="price-section">
+                                    <span class="price-label">Price:</span>
+                                    <span class="price">₱<span class="price-value" data-cart-id="{{ item.id }}">{{ item.price }}</span></span>
                                 </div>
                             </div>
-                            
+                        </div>
 
-                            <div class="price-section">
-                                <span class="price-label">Price:</span>
-                                <span class="price">₱<span class="price-value" data-cart-id="{{ item.id }}">{{ item.price }}</span></span>
-                            </div>
+                        <div class="item-actions">
+                            <form method="post" action="{% url 'delete_cart_item' item.id %}" class="delete-form">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn" title="Remove item">
+                                    <i class="fas fa-trash delete-icon"></i>
+                                    <span>Remove</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
-
-                    <div class="item-actions">
-                        <form method="post" action="{% url 'delete_cart_item' item.id %}" class="delete-form">
-                            {% csrf_token %}
-                            <button type="submit" class="delete-btn" title="Remove item">
-                                <i class="fas fa-trash delete-icon"></i>
-                                <span>Remove</span>
-                            </button>
-                        </form>
-                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
 
-            <!-- Order Type Section -->
-            <div class="form-section">
-                <div class="section-header">
-                    <h3>
-                        <i class="fa-solid fa-truck me-2"></i> Order Type
-                    </h3>
-                </div>
-                <div class="option-grid">
-                    <!-- Pickup option -->
-                    <label class="radio-option">
-                        <input type="radio" name="order_type" value="pickup" id="pickup"
-                            {% if 'Pickup' not in business.services_offered %}disabled{% endif %}>
-                        <div class="radio-card">
-                            <i class="fa-solid fa-store"></i>
-                            <div class="option-content">
-                                <span class="option-title">Customer Pickup</span>
-                                <span class="option-desc">Pick up at store</span>
-                            </div>
-                        </div>
-                    </label>
-
-                    <!-- Delivery option -->
-                    <label class="radio-option">
-                        <input type="radio" name="order_type" value="delivery" id="delivery"
-                            {% if 'Delivery' not in business.services_offered %}disabled{% endif %}>
-                        <div class="radio-card">
-                            <i class="fa-solid fa-truck"></i>
-                            <div class="option-content">
-                                <span class="option-title">Home Delivery</span>
-                                <span class="option-desc">Deliver to address</span>
-                            </div>
-                        </div>
-                    </label>
-                </div>
-
-                <!-- Show message if both are disabled -->
-                {% if 'Pickup' not in business.services_offered and 'Delivery' not in business.services_offered %}
-                <div class="text-center fw-bold mt-3">
-                    Please check back later — no services are enabled at the moment.
-                </div>
-                {% endif %}
-
-                <div id="store-address" class="mt-3 ms-2" style="display: none;">
-                    <i class="fa-solid fa-location-dot text-danger me-2"></i>
-                    <span>{{ business.store_address }}</span>
-                </div>
-                <div>
-                    <span id="order_type_error" class="text-danger" style="display:none;">This field is required.</span>
-                </div>
-
-                <!-- Order Time Section -->
-                {% if 'Scheduled' in business.services_offered %}
-                <div class="mt-4">
+            <!-- Order Type & Summary -->
+            <div>
+                <div class="form-section">
                     <div class="section-header">
                         <h3>
-                            <i class="fa-solid fa-clock me-2"></i> Order Time
+                            <i class="fa-solid fa-truck me-2"></i> Order Type
                         </h3>
                     </div>
-
                     <div class="option-grid">
+                        <!-- Pickup option -->
                         <label class="radio-option">
-                            <input type="radio" name="order_time" value="now" id="order_now" checked>
+                            <input type="radio" name="order_type" value="pickup" id="pickup"
+                                {% if 'Pickup' not in business.services_offered %}disabled{% endif %}>
                             <div class="radio-card">
-                                <i class="fa-solid fa-bolt"></i>
+                                <i class="fa-solid fa-store"></i>
                                 <div class="option-content">
-                                    <span class="option-title">Order Now</span>
-                                    <span class="option-desc">Immediate processing</span>
+                                    <span class="option-title">Customer Pickup</span>
+                                    <span class="option-desc">Pick up at store</span>
                                 </div>
                             </div>
                         </label>
 
+                        <!-- Delivery option -->
                         <label class="radio-option">
-                            <input type="radio" name="order_time" value="scheduled" id="order_scheduled">
+                            <input type="radio" name="order_type" value="delivery" id="delivery"
+                                {% if 'Delivery' not in business.services_offered %}disabled{% endif %}>
                             <div class="radio-card">
-                                <i class="fa-solid fa-calendar-day"></i>
+                                <i class="fa-solid fa-truck"></i>
                                 <div class="option-content">
-                                    <span class="option-title">Scheduled</span>
-                                    <span class="option-desc">Pick date & time</span>
+                                    <span class="option-title">Home Delivery</span>
+                                    <span class="option-desc">Deliver to address</span>
                                 </div>
                             </div>
                         </label>
                     </div>
 
-                    <!-- Date & Time Picker (hidden until Scheduled selected) -->
-                    <div id="schedulePicker" class="mt-3" style="display:none;">
-                        <label for="scheduled_date" class="form-label">Select Date & Time:</label>
-                        <input type="datetime-local" id="scheduled_date" name="scheduled_date" class="form-control">
+                    <!-- Show message if both are disabled -->
+                    {% if 'Pickup' not in business.services_offered and 'Delivery' not in business.services_offered %}
+                    <div class="text-center fw-bold mt-3">
+                        Please check back later — no services are enabled at the moment.
+                    </div>
+                    {% endif %}
+
+                    <div id="store-address" class="mt-3 ms-2" style="display: none;">
+                        <i class="fa-solid fa-location-dot text-danger me-2"></i>
+                        <span>{{ business.store_address }}</span>
+                    </div>
+                    <div>
+                        <span id="order_type_error" class="text-danger" style="display:none;">This field is required.</span>
+                    </div>
+
+                    <!-- Order Time Section -->
+                    {% if 'Scheduled' in business.services_offered %}
+                    <div class="mt-4">
+                        <div class="section-header">
+                            <h3>
+                                <i class="fa-solid fa-clock me-2"></i> Order Time
+                            </h3>
+                        </div>
+
+                        <div class="option-grid">
+                            <label class="radio-option">
+                                <input type="radio" name="order_time" value="now" id="order_now" checked>
+                                <div class="radio-card">
+                                    <i class="fa-solid fa-bolt"></i>
+                                    <div class="option-content">
+                                        <span class="option-title">Order Now</span>
+                                        <span class="option-desc">Immediate processing</span>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="radio-option">
+                                <input type="radio" name="order_time" value="scheduled" id="order_scheduled">
+                                <div class="radio-card">
+                                    <i class="fa-solid fa-calendar-day"></i>
+                                    <div class="option-content">
+                                        <span class="option-title">Scheduled</span>
+                                        <span class="option-desc">Pick date & time</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Date & Time Picker -->
+                        <div id="schedulePicker" class="mt-3" style="display:none;">
+                            <label for="scheduled_date" class="form-label">Select Date & Time:</label>
+                            <input type="datetime-local" id="scheduled_date" name="scheduled_date" class="form-control">
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Order Summary -->
+                    <div class="cart-summary">
+                        <div class="summary-card">
+                            <h3 class="summary-title">Order Summary</h3>
+                        
+                            <div class="summary-line">
+                                <span class="summary-label">Items ({{ cart_items|length }}):</span>
+                                <span class="summary-value">₱<span id="subtotal">{{ subtotal }}</span></span>
+                            </div>
+                        
+                            <!-- Delivery Fee Row -->
+                            <div class="summary-line" id="delivery-fee-row" style="display:none;">
+                                <span class="summary-label">Delivery Fee:</span>
+                                <span class="summary-value">₱<span id="delivery-fee-display">0.00</span></span>
+                            </div>
+                        
+                            <div class="summary-line total-line">
+                                <span class="summary-label">Total:</span>
+                                <span class="summary-value total-value">₱<span id="total">{{ subtotal }}</span></span>
+                            </div>
+                        
+                            <form method="get" action="{% url 'customer_checkout' %}" onsubmit="setScheduledDate()">
+                                <input type="hidden" name="order_type" id="order_type_input">
+                                <input type="hidden" name="scheduled_date" id="scheduled_date_input">
+                                <input type="hidden" name="delivery_fee" id="delivery_fee_input" value="0">
+                                <input type="hidden" name="scheduled_at" id="scheduled_at_input">
+
+                                <button type="submit" class="checkout-btn">
+                                    <i class="fas fa-credit-card checkout-icon"></i>
+                                    Proceed to Checkout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-                {% endif %}
-
-
-                <!-- Order Summary Section -->
-                <div class="cart-summary">
-                    <div class="summary-card">
-                        <h3 class="summary-title">Order Summary</h3>
-                    
-                        <div class="summary-line">
-                            <span class="summary-label">Items ({{ cart_items|length }}):</span>
-                            <span class="summary-value">₱<span id="subtotal">{{ subtotal }}</span></span>
-                        </div>
-                    
-                        <!-- New Delivery Fee Row -->
-                        <div class="summary-line" id="delivery-fee-row" style="display:none;">
-                            <span class="summary-label">Delivery Fee:</span>
-                            <span class="summary-value">₱<span id="delivery-fee-display">0.00</span></span>
-                        </div>
-                    
-                        <div class="summary-line total-line">
-                            <span class="summary-label">Total:</span>
-                            <span class="summary-value total-value">₱<span id="total">{{ subtotal }}</span></span>
-                        </div>
-                    
-                        <form method="get" action="{% url 'customer_checkout' %}" onsubmit="setScheduledDate()">
-                            <input type="hidden" name="order_type" id="order_type_input">
-                            <input type="hidden" name="scheduled_date" id="scheduled_date_input">
-                            <input type="hidden" name="delivery_fee" id="delivery_fee_input" value="0">
-                            <!-- Add this missing field: -->
-                            <input type="hidden" name="scheduled_at" id="scheduled_at_input">
-
-                            <button type="submit" class="checkout-btn">
-                                <i class="fas fa-credit-card checkout-icon"></i>
-                                Proceed to Checkout
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>    
+            </div>
         </div>
     {% else %}
         <div class="empty-cart">
@@ -1068,6 +1186,7 @@
         </div>
     {% endif %}
 </div>
+
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
@@ -1093,19 +1212,21 @@
 </div>
 
 <!-- Delivery Fee Modal -->
-<div id="delivery-fee-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:10000; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
-    <div style="background:white; padding:20px; border-radius:8px; max-width:400px; width:90%; text-align:center; position:relative;">
+<div id="delivery-fee-modal">
+    <div class="modal-box">
         <h4>Delivery Fee Update</h4>
         <p id="delivery-fee-modal-message"></p>
-        <button id="delivery-fee-modal-close" style="margin-top:15px; padding:5px 15px; cursor:pointer;">OK</button>
+        <button id="delivery-fee-modal-close">OK</button>
     </div>
 </div>
+
 
   <!-- jQuery (needed for $("#...").modal()) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <!-- Bootstrap Bundle with Popper (required for modal functionality) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
 <script>
 // === CLEAR LOCAL STORAGE ON HOMEPAGE ===
@@ -1295,9 +1416,6 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
             clearInterval(deliveryFeeTimer);
             deliveryFeeTimer = null;
         }
-       const timerSpan = document.getElementById("delivery-fee-timer");
-       if (timerSpan) timerSpan.textContent = "";
-     
     } else if (data.type === 'delivery_fee_rejected') {
         // (unchanged + reset timer)
         document.getElementById('delivery-fee-loading').style.display = 'none';
