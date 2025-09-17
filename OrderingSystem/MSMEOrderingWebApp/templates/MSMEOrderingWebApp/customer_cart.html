@@ -919,18 +919,21 @@
     }
 
     #delivery-fee-modal-close {
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        border: none;
-        padding: 10px 20px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: {{ customization.button_text_color|default:'#ffffff' }}
-        font-family: {{ customization.header_font_family|default:"Montserrat" }};
-        border-radius: {{ customization.button_rounded_corner|default:1 }}px;
-    
-    }
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            width: 100%;
+            text-align: center;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: {{ customization.button_text_color|default:'#ffffff' }};
+            font-family: {{ customization.header_font_family|default:"Montserrat" }};
+            border-radius: {{ customization.button_rounded_corner|default:1 }}px;
+        
+        }
 
     #delivery-fee-modal-close:hover {
         transform: translateY(-2px);
