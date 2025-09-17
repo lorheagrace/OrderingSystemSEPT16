@@ -4284,62 +4284,76 @@ def mark_as_delivered(request):
     messages.success(request, f"Order #{order_code} marked as delivered.")
     return redirect('deliveryrider_home')
 
-@login_required_session
+@login_required
 def business_notifications(request):
-    # Mark unseen pending orders as seen
+    """
+    Show all pending orders for the business and send counts to WebSocket clients.
+    """
+
+    # Mark all unseen pending orders as seen
     Checkout.objects.filter(status="pending", is_seen_by_owner=False).update(is_seen_by_owner=True)
 
-    # WebSocket badge update - count unique order_code + group_id combinations
-    raw_pending = Checkout.objects.filter(status="pending")
-    unique_orders = set()
-    for order in raw_pending:
-        composite_key = f"{order.order_code}_{order.group_id}" if order.group_id else order.order_code
-        unique_orders.add(composite_key)
-    
-    pending_count = len(unique_orders)
-    unseen_count = Checkout.objects.filter(status="pending", is_seen_by_owner=False).count()
+    # Fetch all pending orders (after updating is_seen_by_owner)
+    raw_pending = Checkout.objects.filter(status="pending").order_by('-created_at')
 
+    # Build unique composite keys for counting
+    unique_keys = {
+        f"{o.order_code}_{o.group_id}" if o.group_id else o.order_code
+        for o in raw_pending
+    }
+    pending_count = len(unique_keys)
+
+    # unseen_count is now always zero after update, so fetch it before update if needed
+    # or just keep a separate query if you want to display "just-marked-as-seen"
+    unseen_count = 0
+
+    # Send badge counts to WebSocket clients
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        "notifications", {
+        "notifications",
+        {
             "type": "send_pending_count",
             "unseen_count": unseen_count,
             "pending_count": pending_count,
-        }
+        },
     )
 
-    # Group orders by order_code AND group_id
-    raw_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
-    grouped_orders = defaultdict(list)
-    
-    for order in raw_orders:
-        composite_key = f"{order.order_code}_{order.group_id}" if order.group_id else order.order_code
-        grouped_orders[composite_key].append(order)
+    # Group orders by composite key
+    grouped = defaultdict(list)
+    for order in raw_pending:
+        key = f"{order.order_code}_{order.group_id}" if order.group_id else order.order_code
+        grouped[key].append(order)
 
-    # Convert to display format with clean order codes
-    final_orders = []
-    for composite_key, items in grouped_orders.items():
-        clean_order_code = composite_key.split('_')[0] if '_' in composite_key else composite_key
-        total_price = sum(float(item.price) for item in items)
-        final_orders.append({
-            "order_code": clean_order_code,
+    # Convert groups to display-ready dicts
+    final_orders = [
+        {
+            "order_code": key.split('_')[0],   # keep clean order code only
             "items": items,
             "first": items[0],
-            "total_price": total_price
-        })
+            "total_price": sum(float(item.price or 0) for item in items),
+        }
+        for key, items in grouped.items()
+    ]
 
-    # Sort by most recent created_at
-    final_orders.sort(key=lambda x: x['first'].created_at if x['first'].created_at else datetime.min, reverse=True)
+    # Sort groups by most recent `created_at`
+    final_orders.sort(
+        key=lambda x: x["first"].created_at or datetime.min,
+        reverse=True,
+    )
 
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
 
-    return render(request, 'MSMEOrderingWebApp/business_notification.html', {
-        'grouped_orders': final_orders,
-        'business': business,
-        'customization': customization,
-        'title': 'Notifications'
-    })
+    return render(
+        request,
+        "MSMEOrderingWebApp/business_notification.html",
+        {
+            "grouped_orders": final_orders,
+            "business": business,
+            "customization": customization,
+            "title": "Notifications",
+        },
+    )
 
 @login_required_session
 def customer_home(request):
