@@ -729,17 +729,17 @@
 
         .timer-container {
             margin-top: -4px;
-            margin-bottom: 12px;
+            margin-bottom: 5px;
             font-size: 0.8rem;
             font-weight: 500;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: left;
+            align-items: left;
             gap: 6px;
         }
     
         .timer-label {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             font-family: "{{ customization.header_font_family|default:"Arial" }}";
             color: {{ customization.button_text_color|default:'#ffffff' }};
@@ -749,14 +749,15 @@
     
     
         .timer-display {
-            font-weight: 700;
+            fontsize: 12px;
+            font-weight: 600;
             font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
             color: {{ customization.body_font_color|default:"#000000" }};
-            
+            color: {{ customization.button_text_color|default:'#ffffff' }};   
         }
         .timer-icon {
-            width: 14px;
-            height: 14px;
+            width: 13px;
+            height: 13px;
             border: 2px solid {{ customization.body_font_color|default:"#000000" }};
             border-top: 2px solid transparent; /* creates spinner effect */
             border-radius: 50%;
@@ -1235,7 +1236,7 @@
             const modalHtml = `
             <div class="delivery-fee-modal" id="${modalId}">
                 <div class="delivery-modal-content">
-                    <div class="delivery-modal-header" style="flex-direction: column; text-align: center;">
+                    <div class="delivery-modal-header" style="flex-direction: column; text-align: left;">
                         <h4>Delivery Fee Request</h4>
                         <div class="timer-container">
                             <span class="timer-label">Time remaining:</span>
