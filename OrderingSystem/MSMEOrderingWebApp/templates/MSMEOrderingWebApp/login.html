@@ -1070,13 +1070,13 @@
         event.preventDefault();
         const sendEmailBtn = document.getElementById("sendEmailBtn");
         const spinnerContainer = document.getElementById("spinner-container");
-
+    
         sendEmailBtn.disabled = true;
         sendEmailBtn.style.display = "none";
         spinnerContainer.style.display = "flex";
-
+    
         const email = document.getElementById("forgot-email").value;
-
+    
         fetch("{% url 'forgot_password' %}", {
             method: "POST",
             headers: { "X-CSRFToken": "{{ csrf_token }}", "Content-Type": "application/x-www-form-urlencoded" },
@@ -1088,22 +1088,22 @@
                 closeModal('forgotPasswordModal');
                 openModal('otpModal');
             } else {
-                alert(data.message);
+                showToast(data.message);   // 🔹 replaced alert
             }
         })
-        .catch(err => alert("Error: " + err))
+        .catch(err => showToast("Error: " + err))  // 🔹 replaced alert
         .finally(() => {
             sendEmailBtn.disabled = false;
             sendEmailBtn.style.display = "block";
             spinnerContainer.style.display = "none";
         });
     }
-
+    
     function submitOtpForm(event) {
         event.preventDefault();
         const email = document.getElementById("forgot-email").value;
         const otp_code = document.getElementById("otp-code").value;
-
+    
         fetch("{% url 'forgot_passwordotp' %}", {
             method: "POST",
             headers: { "X-CSRFToken": "{{ csrf_token }}", "Content-Type": "application/x-www-form-urlencoded" },
@@ -1115,10 +1115,10 @@
                 closeModal('otpModal');
                 openModal('changePasswordModal');
             } else {
-                alert(data.message);
+                showToast(data.message);   // 🔹 replaced alert
             }
         })
-        .catch(err => alert("Error: " + err));
+        .catch(err => showToast("Error: " + err));  // 🔹 replaced alert
     }
 
     function showToast(message, type = "error") {
