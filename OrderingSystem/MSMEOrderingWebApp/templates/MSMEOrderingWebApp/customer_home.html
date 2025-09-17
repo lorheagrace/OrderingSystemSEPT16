@@ -2196,8 +2196,14 @@ document.addEventListener("DOMContentLoaded", () => {
         let open = parseTimeToToday(openingTime);
         let close = parseTimeToToday(closingTime);
 
+        // If closing is on or before opening → treat as next day
         if (close <= open) {
-            close.setDate(close.getDate() + 1); // overnight support
+            close.setDate(close.getDate() + 1);
+            // Special case: if past midnight but before closing
+            if (now < open) {
+                // shift "open" back to yesterday
+                open.setDate(open.getDate() - 1);
+            }
         }
 
         return now >= open && now <= close;
