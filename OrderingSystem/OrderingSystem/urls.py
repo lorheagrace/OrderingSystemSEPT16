@@ -6,6 +6,8 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('MSMEOrderingWebApp.urls')),
     path('', views.login_view, name='login'),
     path('MSMEOrderingWebApp/', include('MSMEOrderingWebApp.urls')),
     path('admin/', admin.site.urls),
@@ -37,5 +39,8 @@ urlpatterns = [
     path("toggle-shop-status/", views.toggle_shop_status, name="toggle_shop_status"),
     ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files in both development AND production
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Also serve static files if needed
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
