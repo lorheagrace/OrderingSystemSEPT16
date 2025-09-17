@@ -1113,9 +1113,10 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("[CustomerHomepage] Cleared localStorage for order_type and delivery_fee");
 });
 
-const protocol = window.location.protocol === "https:" ? "wss" : "ws";
 const userEmail = "{{ user_email|escapejs }}";
-const deliveryFeeSocketCustomer = new WebSocket(`${protocol}://${window.location.host}/ws/delivery-fee/customer/?email=${encodeURIComponent(userEmail)}`);
+const deliveryFeeSocketCustomer = new WebSocket(
+    `wss://${window.location.host}/ws/delivery-fee/customer/?email=${encodeURIComponent(userEmail)}`
+);
 
 deliveryFeeSocketCustomer.onopen = () => console.log("[Customer JS] WebSocket connected");
 deliveryFeeSocketCustomer.onerror = (e) => console.error("[Customer JS] WebSocket error:", e);
