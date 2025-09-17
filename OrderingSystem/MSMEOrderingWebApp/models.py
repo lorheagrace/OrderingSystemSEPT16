@@ -399,9 +399,9 @@ class Customization(models.Model):
 
     # New Fields Added
     input_rounded_corner = models.IntegerField(default=1)  # Rounding of input corners
-    primary_color = models.CharField(max_length=7, default='#0000EE')  # Primary color
-    secondary_color = models.CharField(max_length=7, default='#FF5733')  # Secondary color
-    accent_color = models.CharField(max_length=7, default='#FF5733')  # Accent color
+    primary_color = models.CharField(max_length=7, default='#000000')  # Primary color
+    secondary_color = models.CharField(max_length=7, default="#1F1F1F")  # Secondary color
+    accent_color = models.CharField(max_length=7, default="#6D6D6D")  # Accent color
     button_rounded_corner = models.IntegerField(default=1)  # Rounding of button corners
     button_text_color = models.CharField(max_length=7, default='#ffffff')
     input_border_width = models.IntegerField(default=1)
