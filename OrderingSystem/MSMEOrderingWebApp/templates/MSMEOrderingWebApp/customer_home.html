@@ -2195,17 +2195,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const now = new Date();
         let open = parseTimeToToday(openingTime);
         let close = parseTimeToToday(closingTime);
-
-        // If closing is on or before opening → treat as next day
-        if (close <= open) {
+    
+        // Handle special case: closing exactly at midnight (00:00:00)
+        if (closingTime === "00:00:00") {
+            // midnight means "end of the current day"
+            close = new Date(open);
+            close.setHours(23, 59, 59, 999);
+        }
+        else if (close <= open) {
+            // Overnight support
             close.setDate(close.getDate() + 1);
-            // Special case: if past midnight but before closing
             if (now < open) {
-                // shift "open" back to yesterday
                 open.setDate(open.getDate() - 1);
             }
         }
-
+    
         return now >= open && now <= close;
     }
 
