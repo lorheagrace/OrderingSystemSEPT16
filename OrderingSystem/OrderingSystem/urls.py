@@ -3,6 +3,8 @@ from django.urls import path, include
 from MSMEOrderingWebApp import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
+from django.urls import re_path
 
 
 urlpatterns = [
@@ -39,8 +41,16 @@ urlpatterns = [
     path("toggle-shop-status/", views.toggle_shop_status, name="toggle_shop_status"),
     ]
 
-# Serve media files in both development AND production
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# Also serve static files if needed
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    # Production media serving
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*), serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+        re_path(r'^static/(?P<path>.*), serve, {
+            'document_root': settings.STATIC_ROOT,
+        }),
+    ]
