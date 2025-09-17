@@ -477,8 +477,9 @@
         .delivery-modal-header {
             display: flex;
             align-items: center;
+            flex-direction: column; 
             justify-content: center;
-            gap: 12px;
+            gap: 6px;
             margin-bottom: 15px;
             padding: 20px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
@@ -1234,7 +1235,7 @@
             const modalHtml = `
             <div class="delivery-fee-modal" id="${modalId}">
                 <div class="delivery-modal-content">
-                    <div class="delivery-modal-header">
+                    <div class="delivery-modal-header" style="flex-direction: column; text-align: center;">
                         <h4>Delivery Fee Request</h4>
                         <div class="timer-container">
                             <span class="timer-label">Time remaining:</span>
@@ -1244,6 +1245,7 @@
                             <span class="timer-icon"></span>
                         </div>
                     </div>
+
                     
                     <div class="delivery-modal-section">
                         <p class="delivery-modal-label">Customer</p>
