@@ -856,7 +856,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         
-    <script>
+<script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.querySelector('.sidebar-overlay');
@@ -1058,9 +1058,10 @@
         const protocol = window.location.protocol === "https:" ? "wss" : "ws";
         const deliveryFeeSocketOwner = new WebSocket(`${protocol}://${window.location.host}/ws/delivery-fee/owners/`);
 
-        // Queue to hold requests
+        // Queue to hold requests (FIFO - First In, First Out)
         const deliveryFeeQueue = [];
         let isModalOpen = false;
+        let currentModalTimer = null;
 
         deliveryFeeSocketOwner.onopen = () => console.log("[Owner JS] WebSocket connected");
         deliveryFeeSocketOwner.onerror = (e) => console.error("[Owner JS] WebSocket error:", e);
@@ -1082,19 +1083,49 @@
                     .catch((error) => {
                         console.error("Error playing audio: ", error);
                     });
-                // Add request to queue and try to show modal
+                
+                // Add request to queue (FIFO) and try to show modal
                 deliveryFeeQueue.push(data);
                 showNextModal();
             }
         };
 
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function closeCurrentModal() {
+            if (currentModalTimer) {
+                clearInterval(currentModalTimer);
+                currentModalTimer = null;
+            }
+            
+            const activeModal = document.querySelector('.delivery-fee-modal');
+            const backdrop = document.getElementById('modalBackdrop');
+            
+            if (activeModal) {
+                activeModal.remove();
+            }
+            if (backdrop) {
+                backdrop.remove();
+            }
+            
+            document.body.style.overflow = '';
+            isModalOpen = false;
+            
+            // Process next modal in queue
+            showNextModal();
+        }
+
         function showNextModal() {
             if (isModalOpen) return;  // modal already showing, wait
-
             if (deliveryFeeQueue.length === 0) return; // no requests waiting
 
             isModalOpen = true;
 
+            // Get the first request from queue (FIFO)
             const data = deliveryFeeQueue.shift();
             const container = document.getElementById('modalContainer');
             const { customer_email, order_details } = data;
@@ -1118,6 +1149,10 @@
                 <div class="delivery-modal-content">
                     <div class="delivery-modal-header">
                         <h4>Delivery Fee Request</h4>
+                        <div class="timer-container">
+                            <span class="timer-label">Time remaining:</span>
+                            <span class="timer-display" id="timer_${modalId}">2:00</span>
+                        </div>
                     </div>
                     
                     <div class="delivery-modal-section">
@@ -1175,6 +1210,33 @@
             // Disable page scroll while modal open
             document.body.style.overflow = 'hidden';
 
+            // Start 2-minute timer
+            let timeLeft = 120; // 2 minutes in seconds
+            const timerDisplay = document.getElementById(`timer_${modalId}`);
+            
+            currentModalTimer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = formatTime(timeLeft);
+                
+                // Change color when less than 30 seconds left
+                if (timeLeft <= 30) {
+                    timerDisplay.style.color = '#ff4444';
+                } else if (timeLeft <= 60) {
+                    timerDisplay.style.color = '#ff8800';
+                }
+                
+                // Auto-close when timer reaches 0
+                if (timeLeft <= 0) {
+                    console.log("[Owner JS] Timer expired, auto-rejecting request");
+                    deliveryFeeSocketOwner.send(JSON.stringify({
+                        action: "reject_fee",
+                        customer_email: customer_email,
+                        reason: "Delivery fee request timed out (no response within 2 minutes)"
+                    }));
+                    closeCurrentModal();
+                }
+            }, 1000);
+
             // Copy address button
             modal.querySelector('.delivery-copyAddressBtn').onclick = () => {
                 const addressText = modal.querySelector('.modalAddress').textContent.trim();
@@ -1191,8 +1253,10 @@
             modal.querySelector('.submitDeliveryFeeBtn').onclick = () => {
                 const feeInput = modal.querySelector(`#deliveryFeeInput_${modalId}`);
                 const fee = feeInput.value.trim();
-                if (fee === '') {
-                    alert('Please enter a delivery fee');
+                
+                // Allow 0 as a valid input
+                if (fee === '' || isNaN(fee) || parseFloat(fee) < 0) {
+                    alert('Please enter a valid delivery fee (0 or greater)');
                     return;
                 }
 
@@ -1203,11 +1267,7 @@
                     delivery_fee: fee,
                 }));
 
-                modal.remove();
-                document.body.style.overflow = ''; // ✅ Restore scrolling
-                backdrop.remove(); // ✅ Remove backdrop
-                isModalOpen = false;
-                showNextModal();
+                closeCurrentModal();
             };
 
             // Reject button
@@ -1218,14 +1278,9 @@
                     reason: "Delivery fee request is rejected, location is out of coverage area"
                 }));
 
-                modal.remove();
-                document.body.style.overflow = ''; // ✅ Restore scrolling
-                backdrop.remove(); // ✅ Remove backdrop
-                isModalOpen = false;
-                showNextModal();
+                closeCurrentModal();
             };
         }
-
     </script>
     
 </body>
