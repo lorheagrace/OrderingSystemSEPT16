@@ -1416,6 +1416,8 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
             clearInterval(deliveryFeeTimer);
             deliveryFeeTimer = null;
         }
+        const timerSpan = document.getElementById("delivery-fee-timer");
+        if (timerSpan) timerSpan.textContent = "";
     } else if (data.type === 'delivery_fee_rejected') {
         // (unchanged + reset timer)
         document.getElementById('delivery-fee-loading').style.display = 'none';
