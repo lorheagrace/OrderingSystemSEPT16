@@ -632,7 +632,7 @@
         }
 
         // ✅ GENERAL WebSocket (for business dashboard only)
-        const generalSocket = new WebSocket("ws://" + window.location.host + "/ws/notifications/");
+        const generalSocket = new WebSocket("wss://" + window.location.host + "/ws/notifications/");
 
         generalSocket.onmessage = function(event) {
             const data = JSON.parse(event.data);
