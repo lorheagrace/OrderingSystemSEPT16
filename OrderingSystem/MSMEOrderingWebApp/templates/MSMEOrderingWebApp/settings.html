@@ -1379,6 +1379,76 @@
         right: auto;
     }
 
+    .modal {
+        padding: 20px;
+        backdrop-filter: blur(10px);
+        background: rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* Modal dialog container */
+    .modal-dialog {
+        
+        margin: 1.75rem auto;
+        max-width: 500px;
+        transform: scale(0.9);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal.show .modal-dialog {
+        transform: scale(1);
+    }
+
+    /* Modal content with modern styling */
+    .modal-content {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        overflow: hidden;
+        position: relative;
+    }
+
+
+    /* Modal header styling */
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        font-family:  {{ customization.header_font_family|default:"Montserrat" }};
+        border-bottom: 1px solid var(--accent-color);
+    }
+
+    .modal-title {
+        font-weight: 700;
+        color: {{ customization.button_text_color|default:'#ffffff' }};
+        text-shadow: var(--text-shadow);
+    }
+
+    .modal-title2 {
+        font-weight: 700;
+        color: var(--primary-color);
+        text-shadow: var(--text-shadow);
+        font-family:  {{ customization.header_font_family|default:"Montserrat" }};
+    }
+
+    /* Modal body styling */
+    .modal-body {
+        padding: 24px 32px;
+        font-family:  {{ customization.body_font_family|default:"Montserrat" }};
+        border-radius: 16px;
+        border: none;
+    }
+
+
+    /* Modal footer styling */
+    .modal-footer {
+        border-top: 1px solid var(--primary-color);
+        padding: 10px;
+        background: #fafbfc;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }    
+
     </style>
 
 </head>
