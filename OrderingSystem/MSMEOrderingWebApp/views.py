@@ -4284,7 +4284,6 @@ def mark_as_delivered(request):
     messages.success(request, f"Order #{order_code} marked as delivered.")
     return redirect('deliveryrider_home')
 
-@login_required
 def business_notifications(request):
     """
     Show all pending orders for the business and send counts to WebSocket clients.
