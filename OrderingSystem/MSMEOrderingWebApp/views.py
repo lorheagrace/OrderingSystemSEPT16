@@ -1069,10 +1069,9 @@ def get_or_create_customization():
 def reset_customization(request):
     if request.method == 'POST':
         try:
-            # Fetch the customization object
             customization = Customization.objects.get(id=1)
 
-            # Reset all fields to default values
+            # General Background
             customization.general_background_type = 'solid'
             customization.general_solid_color = '#ffffff'
             customization.general_gradient_color_1 = '#ffffff'
@@ -1082,7 +1081,7 @@ def reset_customization(request):
             customization.general_radial_shape = None
             customization.general_radial_position = None
 
-            # Reset other customization fields similarly...
+            # Login Background
             customization.login_background_type = 'solid'
             customization.login_solid_color = '#ffffff'
             customization.login_gradient_color_1 = '#ffffff'
@@ -1092,6 +1091,7 @@ def reset_customization(request):
             customization.login_radial_shape = None
             customization.login_radial_position = None
 
+            # Register Background
             customization.register_background_type = 'solid'
             customization.register_solid_color = '#ffffff'
             customization.register_gradient_color_1 = '#ffffff'
@@ -1101,6 +1101,7 @@ def reset_customization(request):
             customization.register_radial_shape = None
             customization.register_radial_position = None
 
+            # Navigation Background
             customization.navigation_background_type = 'solid'
             customization.navigation_solid_color = '#ffffff'
             customization.navigation_gradient_color_1 = '#ffffff'
@@ -1110,42 +1111,45 @@ def reset_customization(request):
             customization.navigation_radial_shape = None
             customization.navigation_radial_position = None
             customization.navigation_text_color = '#000000'
-            customization.navigation_hover_color = '#a8a8a8'
+            customization.navigation_hover_color = '#4b4b4b'
             customization.navigation_border_color = '#cccccc'
 
-            # Reset font and button settings
+            # Fonts
             customization.header_font_family = 'Arial'
             customization.header_font_size = 24
             customization.header_font_color = '#000000'
             customization.header_font_style = 'normal'
 
             customization.body_font_family = 'Arial'
-            customization.body_font_size = 16
+            customization.body_font_size = 14
             customization.body_font_color = '#000000'
 
-            # Reset other elements like button and input settings
+            # Buttons & Inputs
             customization.button_text_color = '#ffffff'
             customization.input_rounded_corner = 1
             customization.primary_color = '#000000'
-            customization.secondary_color = '#424242'
-            customization.accent_color = '#303030'
+            customization.secondary_color = '#1F1F1F'
+            customization.accent_color = '#6D6D6D'
             customization.button_rounded_corner = 1
             customization.input_border_width = 1
             customization.input_border_style = 'solid'
 
-            # Remove any uploaded images
+            # Remove uploaded images
             customization.general_background_image.delete(save=False)
             customization.login_background_image.delete(save=False)
             customization.register_background_image.delete(save=False)
-
-            # Remove homepage images if they exist
             customization.homepage_image_1.delete(save=False)
             customization.homepage_image_2.delete(save=False)
             customization.homepage_image_3.delete(save=False)
             customization.homepage_image_4.delete(save=False)
             customization.homepage_image_5.delete(save=False)
 
-            # Save the reset customization settings
+            # Best Sellers & Dynamic text reset
+            customization.show_best_sellers = True
+            customization.best_sellers_title = 'Best Sellers'
+            customization.best_sellers_description = "Our most popular products loved by customers."
+            customization.dynamic_description = "Shop with us today and find what you love!"
+
             customization.save()
 
             return JsonResponse({'status': 'success', 'message': 'Customization has been reset to defaults.'})
