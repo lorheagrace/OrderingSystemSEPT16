@@ -4290,7 +4290,7 @@ def mark_as_delivered(request):
     messages.success(request, f"Order #{order_code} marked as delivered.")
     return redirect('deliveryrider_home')
 
-ef business_notifications(request):
+def business_notifications(request):
     # Mark unseen pending orders as seen
     Checkout.objects.filter(status="pending", is_seen_by_owner=False).update(is_seen_by_owner=True)
 
