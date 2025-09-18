@@ -1802,7 +1802,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // Track if we're currently restoring to prevent conflicts
     let isRestoring = false;
     
-    console.log('=== SETTINGS SCRIPT LOADED ===');
+    // Hide the file input completely
+    if (logoInput) {
+        logoInput.style.display = 'none';
+    }
     
     // ---------- Functions ----------
 
@@ -1832,7 +1835,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // SAFE field restoration - avoids file inputs completely
     function safeRestoreFields() {
-        console.log('🔄 Restoring editable fields...');
         let restoredCount = 0;
 
         const allFields = [
@@ -1852,19 +1854,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     const savedValue = localStorage.getItem(key);
                     if (savedValue !== null) {
                         field.checked = savedValue === 'true';
-                        console.log(`🔄 Restored checkbox/radio ${key}: ${field.checked}`);
                         restoredCount++;
                     }
                 } else if (field.type !== 'file') {
                     const savedValue = localStorage.getItem(key);
                     if (savedValue !== null) {
                         field.value = savedValue;
-                        console.log(`🔄 Restored field ${key}: "${field.value}"`);
                         restoredCount++;
                     }
                 }
             } catch (error) {
-                console.error(`❌ Error restoring field ${field.name}:`, error);
+                // Silent error handling
             }
         });
 
@@ -1875,7 +1875,6 @@ document.addEventListener("DOMContentLoaded", function () {
             savedServices.forEach(service => {
                 if (service && service.trim()) addServiceInput(service);
             });
-            console.log(`🔄 Restored ${savedServices.length} services`);
         }
 
         // Restore onsite checkbox visibility
@@ -1883,13 +1882,11 @@ document.addEventListener("DOMContentLoaded", function () {
             wrapper.style.display = onsiteCheckbox.checked ? 'block' : 'none';
         }
 
-        console.log(`✅ Restored ${restoredCount} fields`);
         return restoredCount;
     }
 
     function saveEditableFields() {
         if (isRestoring) return;
-        console.log('💾 Saving editable fields...');
 
         const allFields = [
             ...Array.from(document.getElementsByTagName('input')),
@@ -1902,41 +1899,35 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!field.name || field.name.trim() === '') return;
 
             try {
-                // Use unique key: prefer ID, fallback to name
                 const key = field.id || field.name;
 
                 if (field.type === 'checkbox' || field.type === 'radio') {
                     localStorage.setItem(key, field.checked);
-                    console.log(`💾 Saved checkbox/radio ${key}: ${field.checked}`);
                 } else if (field.type !== 'file') {
                     localStorage.setItem(key, field.value);
-                    console.log(`💾 Saved field ${key}: "${field.value}"`);
                 }
             } catch (error) {
-                console.error(`❌ Error saving field ${field.name}:`, error);
+                // Silent error handling
             }
         });
 
-        // Save dynamic services separately
         saveServices();
-        console.log('✅ All editable fields saved');
-        }
+    }
 
-        function saveServices() {
-            if (isRestoring) return;
+    function saveServices() {
+        if (isRestoring) return;
 
-            const services = [];
-            if (serviceList) {
-                serviceList.querySelectorAll('input[name="specific_services[]"]').forEach(inp => {
-                    const val = inp.value.trim();
-                    if (val && !services.includes(val)) {
-                        services.push(val);
-                    }
-                });
-            }
-            localStorage.setItem('specific_services', JSON.stringify(services));
-            console.log(`💾 Saved ${services.length} services:`, services);
+        const services = [];
+        if (serviceList) {
+            serviceList.querySelectorAll('input[name="specific_services[]"]').forEach(inp => {
+                const val = inp.value.trim();
+                if (val && !services.includes(val)) {
+                    services.push(val);
+                }
+            });
         }
+        localStorage.setItem('specific_services', JSON.stringify(services));
+    }
 
     function addServiceInput(value = '') {
         if (!serviceList) return;
@@ -1974,8 +1965,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function toggleEditMode(isEditing) {
-        console.log(`🔄 Toggle edit mode: ${isEditing}`);
-
         const allFields = [
             ...Array.from(document.getElementsByTagName('input')),
             ...Array.from(document.getElementsByTagName('textarea')),
@@ -1984,18 +1973,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         allFields.forEach(field => {
             if (field.classList.contains('editable-field')) {
-                // ✅ Allow file inputs to toggle too
                 field.disabled = !isEditing;
             }
         });
 
-        // ✅ Specifically enable/disable logo upload
-        if (logoInput) {
-            logoInput.disabled = !isEditing;
-            logoInput.style.pointerEvents = isEditing ? 'auto' : 'none';
-            logoInput.style.opacity = isEditing ? '1' : '0.5';
-        }
-        
         // Update service buttons
         document.querySelectorAll('.removeServiceBtn').forEach(btn => {
             btn.disabled = !isEditing;
@@ -2042,20 +2023,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ---------- COMPLETE STATE RESTORATION ----------
     function restoreCompleteState() {
-        console.log('🚀 Starting complete state restoration...');
-        console.log('📦 LocalStorage contents:', {
-            logo_preview: !!localStorage.getItem('logo_preview'),
-            settings_edit_mode: localStorage.getItem('settings_edit_mode'),
-            specific_services: localStorage.getItem('specific_services')
-        });
-        
         isRestoring = true;
         
         try {
             // Step 1: Clear existing dynamic content
             if (serviceList) {
                 serviceList.innerHTML = '';
-                console.log('🧹 Cleared existing services');
             }
             
             // Step 2: Restore form fields using SAFE method
@@ -2064,23 +2037,20 @@ document.addEventListener("DOMContentLoaded", function () {
             // Step 3: Handle onsite checkbox specifically
             if (onsiteCheckbox && wrapper) {
                 wrapper.style.display = onsiteCheckbox.checked ? 'block' : 'none';
-                console.log(`🏢 Onsite services: ${onsiteCheckbox.checked ? 'enabled' : 'disabled'}`);
             }
 
             // Step 4: Restore services
-            if (serviceList) serviceList.innerHTML = ''; // Clear existing
+            if (serviceList) serviceList.innerHTML = '';
             const savedServices = JSON.parse(localStorage.getItem('specific_services') || '[]');
             savedServices.forEach(service => {
                 if (service && service.trim()) addServiceInput(service);
             });
-            console.log(`📋 Restored ${savedServices.length} services`);
 
             // Step 5: Restore edit mode
             const savedEditMode = localStorage.getItem('settings_edit_mode') === 'true';
             const sessionEditMode = sessionStorage.getItem('returnToSettingsEditMode') === 'true';
             const shouldBeEditing = savedEditMode || sessionEditMode;
             
-            console.log(`✏️ Edit mode - saved: ${savedEditMode}, session: ${sessionEditMode}, final: ${shouldBeEditing}`);
             toggleEditMode(shouldBeEditing);
             
             // Clean up session storage
@@ -2088,47 +2058,35 @@ document.addEventListener("DOMContentLoaded", function () {
                 sessionStorage.removeItem('returnToSettingsEditMode');
             }
             
-            // Step 6: Restore logo preview (separate from other fields)
+            // Step 6: Restore logo preview
             const savedLogo = localStorage.getItem('logo_preview');
-            if (savedLogo && logoPreview && uploadPlaceholder && logoInput) {
-                console.log('🖼️ Restoring logo preview...');
+            if (savedLogo && logoPreview && uploadPlaceholder) {
                 setTimeout(() => {
                     logoPreview.src = savedLogo;
                     logoPreview.style.display = 'block';
                     uploadPlaceholder.style.display = 'none';
-
-                    // Make the file input clickable over the logo
-                    logoInput.style.position = 'absolute';
-                    logoInput.style.top = '0';
-                    logoInput.style.left = '0';
-                    logoInput.style.width = '100%';
-                    logoInput.style.height = '100%';
-                    logoInput.style.opacity = '0';
-                    logoInput.style.cursor = 'pointer';
                     
-                    console.log('✅ Logo preview restored and input clickable for replacement');
+                    // Make the logo preview clickable to trigger file upload
+                    logoPreview.style.cursor = 'pointer';
+                    logoPreview.addEventListener('click', function() {
+                        if (logoInput && !logoInput.disabled) {
+                            logoInput.click();
+                        }
+                    });
                 }, 50);
             }
-
-            
-            console.log('✅ State restoration completed successfully');
             
         } catch (error) {
-            console.error('❌ Error during state restoration:', error);
-            console.error('Stack:', error.stack);
             toggleEditMode(false);
         } finally {
             setTimeout(() => {
                 isRestoring = false;
-                console.log('🔓 Restoration guard removed');
             }, 200);
         }
     }
 
     // ---------- Event Listeners Setup ----------
     function setupEventListeners() {
-        console.log('🔗 Setting up event listeners...');
-        
         // Onsite checkbox
         if (onsiteCheckbox) {
             onsiteCheckbox.addEventListener("change", function () {
@@ -2148,13 +2106,22 @@ document.addEventListener("DOMContentLoaded", function () {
             addServiceBtn.addEventListener("click", () => addServiceInput());
         }
 
+        // Make upload placeholder clickable to trigger file upload
+        if (uploadPlaceholder && logoInput) {
+            uploadPlaceholder.style.cursor = 'pointer';
+            uploadPlaceholder.addEventListener('click', function() {
+                if (!logoInput.disabled) {
+                    logoInput.click();
+                }
+            });
+        }
+
         // Logo upload
         if (logoInput) {
             logoInput.addEventListener('change', function () {
                 const file = this.files[0];
                 if (!file) return;
 
-                console.log('📤 Starting logo upload...');
                 const formData = new FormData();
                 formData.append("logo", file);
 
@@ -2165,23 +2132,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .then(res => res.json())
                 .then(data => {
-                    console.log('📤 Upload response:', data);
                     if (data.success) {
                         if (logoPreview && uploadPlaceholder) {
                             logoPreview.src = data.logo_url;
                             logoPreview.style.display = 'block';
+                            logoPreview.style.cursor = 'pointer';
                             uploadPlaceholder.style.display = 'none';
+                            
+                            // Make the new logo preview clickable
+                            logoPreview.addEventListener('click', function() {
+                                if (!logoInput.disabled) {
+                                    logoInput.click();
+                                }
+                            });
                         }
                         
                         localStorage.setItem('logo_preview', data.logo_url);
-                        console.log('💾 Logo saved to localStorage');
                         showToast('Logo uploaded successfully!', 'success');
                     } else {
                         showToast('Error uploading logo: ' + data.error, 'danger');
                     }
                 })
                 .catch(error => {
-                    console.error('❌ Upload error:', error);
                     showToast('Upload failed. Try again.', 'danger');
                 });
             });
@@ -2232,10 +2204,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             modalInstance.hide();
                             form.reset();
 
-                            // Automatically refresh the page after modal hides
                             setTimeout(() => {
                                 location.reload();
-                            }, 200); // small delay to ensure modal is fully hidden
+                            }, 200);
                         }
                     })
                     .catch(() => showToast("Something went wrong. Please try again.", "danger"));
@@ -2243,7 +2214,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // ----------------- Password toggle -----------------
+        // Password toggle
         document.querySelectorAll('.toggle-password').forEach(toggle => {
             toggle.addEventListener('click', function () {
                 const targetId = this.dataset.target;
@@ -2262,13 +2233,11 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        // ----------------- Fix modal scroll after close -----------------
+        // Fix modal scroll after close
         const changePasswordModalEl = document.getElementById('changePasswordModal');
         if (changePasswordModalEl) {
             changePasswordModalEl.addEventListener('hidden.bs.modal', () => {
-                // Remove any leftover backdrops
                 document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
-                // Remove scroll lock
                 document.body.classList.remove('modal-open');
             });
         }
@@ -2278,18 +2247,12 @@ document.addEventListener("DOMContentLoaded", function () {
             settingsForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                console.log('📝 Form submitted - saving state...');
                 saveEditableFields();
                 saveServices();
 
-                // Submit the form
                 this.submit();
 
-                // Clean up and reset
                 toggleEditMode(false);
-
-                // Keep specific_services so services remain displayed after save
-                // localStorage.removeItem('specific_services');  <-- REMOVE this line
 
                 const allFields = [
                     ...Array.from(document.getElementsByTagName('input')),
@@ -2304,23 +2267,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
 
                 localStorage.removeItem('settings_edit_mode');
-                console.log('🧹 Cleaned up localStorage after form submission (except services)');
             });
         }
-        
-        console.log('✅ Event listeners setup complete');
     }
 
     // ---------- Initialize Everything ----------
-    console.log('🎬 Initializing settings page...');
-    
     setTimeout(() => {
         try {
             setupEventListeners();
             restoreCompleteState();
-            console.log('🎉 Settings page initialization complete');
         } catch (error) {
-            console.error('❌ Initialization error:', error);
+            // Silent error handling
         }
     }, 100);
     
