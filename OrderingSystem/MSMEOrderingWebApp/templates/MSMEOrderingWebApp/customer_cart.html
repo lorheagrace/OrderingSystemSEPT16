@@ -1421,35 +1421,40 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
         }
         const timerSpan = document.getElementById("delivery-fee-timer");
         if (timerSpan) timerSpan.textContent = "";
-    } else if (data.type === 'delivery_fee_rejected') {
-        // (unchanged + reset timer)
-     
-        document.getElementById('delivery-fee-loading').style.display = 'none';
-        showDeliveryFeeModal(data.reason || "Delivery fee request is rejected.");
-
-        document.getElementById('delivery_fee_input').value = 0;
-        localStorage.removeItem('delivery_fee');
-
-        const feeRow = document.getElementById('delivery-fee-row');
-        if (feeRow) feeRow.style.display = 'none';
-
-        const subtotal = parseFloat(document.getElementById('subtotal').textContent);
-        document.getElementById('total').textContent = subtotal.toFixed(2);
-
-        updatePlaceOrderButtonState();
-
-        // Reset button
-        const requestBtn = document.getElementById("request-delivery-fee-btn");
-        if (requestBtn) {
-            requestBtn.disabled = false;
-            requestBtn.style.display = "inline-block";
-            requestBtn.textContent = "Request Delivery Fee Again";
+        } else if (data.type === 'delivery_fee_rejected') {
+            // (unchanged + reset timer)
+            document.getElementById('delivery-fee-loading').style.display = 'none';
+            showDeliveryFeeModal(data.reason || "Delivery fee request is rejected.");
+        
+            document.getElementById('delivery_fee_input').value = 0;
+            localStorage.removeItem('delivery_fee');
+        
+            const feeRow = document.getElementById('delivery-fee-row');
+            if (feeRow) feeRow.style.display = 'none';
+        
+            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+            document.getElementById('total').textContent = subtotal.toFixed(2);
+        
+            updatePlaceOrderButtonState();
+        
+            // Reset button
+            const requestBtn = document.getElementById("request-delivery-fee-btn");
+            if (requestBtn) {
+                requestBtn.disabled = false;
+                requestBtn.style.display = "inline-block";
+                requestBtn.textContent = "Request Delivery Fee Again";
+            }
+            
+            // Clear the timer
+            if (deliveryFeeTimer) {
+                clearInterval(deliveryFeeTimer);
+                deliveryFeeTimer = null;
+            }
+            
+            // ADD THESE LINES HERE:
+            const timerSpan = document.getElementById("delivery-fee-timer");
+            if (timerSpan) timerSpan.textContent = "";
         }
-        if (deliveryFeeTimer) {
-            clearInterval(deliveryFeeTimer);
-            deliveryFeeTimer = null;
-        }
-    }
 };
 
 function showDeliveryFeeModal(message) {
