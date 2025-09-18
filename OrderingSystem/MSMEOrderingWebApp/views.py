@@ -650,29 +650,27 @@ def update_order_status_progress(request):
 def partial_pending_orders(request):
     customization = get_or_create_customization()
     pending_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
-    
-    # Use consistent grouping logic
+
+    # Group by order_code AND group_id
     grouped = defaultdict(list)
     for order in pending_orders:
-        # Use date-based grouping like in other views
-        order_date = order.created_at.date() if order.created_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        composite_key = f"{order.order_code}_{order.group_id}" if order.group_id else order.order_code
         grouped[composite_key].append(order)
-    
+
     # Convert to display format with clean order codes
     grouped_orders = []
     for composite_key, items in grouped.items():
         clean_order_code = composite_key.split('_')[0] if '_' in composite_key else composite_key
         grouped_orders.append({
             'order_code': clean_order_code,
-            'first': items[0],  # This ensures proof_of_payment is accessible
+            'first': items[0],
             'items': items,
-            'total_price': sum(float(item.price) for item in items)
+            'total_price': sum(item.price for item in items)
         })
-    
+
     # Sort by most recent created_at
     grouped_orders.sort(key=lambda x: x['first'].created_at if x['first'].created_at else datetime.min, reverse=True)
-    
+
     html = render_to_string("partials/pending_orders_list.html", {
         'grouped_orders': grouped_orders,
         'customization': customization,
@@ -4208,6 +4206,7 @@ def cashier_notifications(request):
         'title': 'Notifications'
     })
 
+
 def deliveryrider_home(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
@@ -4291,23 +4290,38 @@ def mark_as_delivered(request):
     messages.success(request, f"Order #{order_code} marked as delivered.")
     return redirect('deliveryrider_home')
 
-def business_notifications(request):
-    """
-    Show all pending orders for the business and send counts to WebSocket clients.
-    """
-    # Mark all unseen pending orders as seen
+ef business_notifications(request):
+    # Mark unseen pending orders as seen
     Checkout.objects.filter(status="pending", is_seen_by_owner=False).update(is_seen_by_owner=True)
+
+    # WebSocket badge update - count unique order_code + group_id combinations
+    raw_pending = Checkout.objects.filter(status="pending")
+    unique_orders = set()
+    for order in raw_pending:
+        composite_key = f"{order.order_code}_{order.group_id}" if order.group_id else order.order_code
+        unique_orders.add(composite_key)
     
-    # Use EXACT same logic as cashier_notifications
+    pending_count = len(unique_orders)
+    unseen_count = Checkout.objects.filter(status="pending", is_seen_by_owner=False).count()
+
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "notifications", {
+            "type": "send_pending_count",
+            "unseen_count": unseen_count,
+            "pending_count": pending_count,
+        }
+    )
+
+    # Group orders by order_code AND group_id
     raw_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
     grouped_orders = defaultdict(list)
     
     for order in raw_orders:
-        order_date = order.created_at.date() if order.created_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        composite_key = f"{order.order_code}_{order.group_id}" if order.group_id else order.order_code
         grouped_orders[composite_key].append(order)
-    
-    # Convert to display format with clean order codes (EXACT same as cashier)
+
+    # Convert to display format with clean order codes
     final_orders = []
     for composite_key, items in grouped_orders.items():
         clean_order_code = composite_key.split('_')[0] if '_' in composite_key else composite_key
@@ -4318,42 +4332,19 @@ def business_notifications(request):
             "first": items[0],
             "total_price": total_price
         })
-    
-    # Sort by most recent date (EXACT same as cashier)
+
+    # Sort by most recent created_at
     final_orders.sort(key=lambda x: x['first'].created_at if x['first'].created_at else datetime.min, reverse=True)
-    
-    # Build unique composite keys for WebSocket counting
-    unique_keys = {
-        f"{o.order_code}_{o.created_at.date()}" if o.created_at else o.order_code
-        for o in raw_orders
-    }
-    pending_count = len(unique_keys)
-    unseen_count = 0
-    
-    # Send badge counts to WebSocket clients
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        "notifications",
-        {
-            "type": "send_pending_count",
-            "unseen_count": unseen_count,
-            "pending_count": pending_count,
-        },
-    )
-    
+
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
-    
-    return render(
-        request,
-        "MSMEOrderingWebApp/business_notification.html",
-        {
-            "grouped_orders": final_orders,
-            "business": business,
-            "customization": customization,
-            "title": "Notifications",
-        },
-    )
+
+    return render(request, 'MSMEOrderingWebApp/business_notification.html', {
+        'grouped_orders': final_orders,
+        'business': business,
+        'customization': customization,
+        'title': 'Notifications'
+    })
 	
 @login_required_session
 def customer_home(request):
