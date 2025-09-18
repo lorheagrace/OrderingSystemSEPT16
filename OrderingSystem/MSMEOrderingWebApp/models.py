@@ -171,19 +171,6 @@ class BusinessDetails(models.Model):
             extra_km = distance_km - 1
             return self.base_fare + (extra_km * self.additional_fare_per_km)
     
-    def is_open_now(self):
-        """Return True if business is open based on force_closed + schedule"""
-        if self.force_closed:
-            return False
-
-        now = timezone.localtime().time()  # current local time
-
-        if self.opening_time and self.closing_time:
-            if self.opening_time <= now <= self.closing_time:
-                return True
-        return False        
-
-    
 class Cart(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
