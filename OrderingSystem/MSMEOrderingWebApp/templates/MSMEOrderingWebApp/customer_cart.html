@@ -1423,6 +1423,7 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
         if (timerSpan) timerSpan.textContent = "";
     } else if (data.type === 'delivery_fee_rejected') {
         // (unchanged + reset timer)
+     
         document.getElementById('delivery-fee-loading').style.display = 'none';
         showDeliveryFeeModal(data.reason || "Delivery fee request is rejected.");
 
@@ -1436,6 +1437,13 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
         document.getElementById('total').textContent = subtotal.toFixed(2);
 
         updatePlaceOrderButtonState();
+        // 🔹 Clear the timer when rejected
+        if (deliveryFeeTimer) {
+            clearInterval(deliveryFeeTimer);
+            deliveryFeeTimer = null;
+        }
+        const timerSpan = document.getElementById("delivery-fee-timer");
+        if (timerSpan) timerSpan.textContent = "";
 
         // Reset button
         const requestBtn = document.getElementById("request-delivery-fee-btn");
