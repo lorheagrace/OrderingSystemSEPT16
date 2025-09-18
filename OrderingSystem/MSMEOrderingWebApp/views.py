@@ -56,21 +56,28 @@ from django.core.mail import EmailMultiAlternatives
 from django.conf import settings as django_settings
 from django.contrib.auth.hashers import make_password
 
-@csrf_exempt
 def toggle_shop_status(request):
     business = BusinessDetails.objects.first()  # adjust if multi-business
 
+    if not business:
+        return JsonResponse({"error": "Business not found"}, status=404)
+
     if request.method == "POST":
-        # Toggle forced closed
+        # Toggle forced closed manually
         business.force_closed = not business.force_closed
         business.save()
-        return JsonResponse({"force_closed": business.force_closed})
+        return JsonResponse({
+            "force_closed": business.force_closed,
+            "status": "Open" if business.is_open_now() else "Closed"
+        })
 
     elif request.method == "GET":
-        # Return current force_closed status
-        return JsonResponse({"force_closed": business.force_closed})
+        # Return current status (including schedule)
+        return JsonResponse({
+            "force_closed": business.force_closed,
+            "status": "Open" if business.is_open_now() else "Closed"
+        })
 
-    return JsonResponse({"error": "Invalid request"}, status=400)
 
 def route_home(request):
     user_type = request.session.get('user_type')
