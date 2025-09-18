@@ -4298,13 +4298,34 @@ def business_notifications(request):
     # Mark all unseen pending orders as seen
     Checkout.objects.filter(status="pending", is_seen_by_owner=False).update(is_seen_by_owner=True)
     
-    # Fetch all pending orders (after updating is_seen_by_owner)
-    raw_pending = Checkout.objects.filter(status="pending").order_by('-created_at')
+    # Use EXACT same logic as cashier_notifications
+    raw_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
+    grouped_orders = defaultdict(list)
     
-    # Build unique composite keys for counting
+    for order in raw_orders:
+        order_date = order.created_at.date() if order.created_at else None
+        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        grouped_orders[composite_key].append(order)
+    
+    # Convert to display format with clean order codes (EXACT same as cashier)
+    final_orders = []
+    for composite_key, items in grouped_orders.items():
+        clean_order_code = composite_key.split('_')[0] if '_' in composite_key else composite_key
+        total_price = sum(float(item.price) for item in items)
+        final_orders.append({
+            "order_code": clean_order_code,
+            "items": items,
+            "first": items[0],
+            "total_price": total_price
+        })
+    
+    # Sort by most recent date (EXACT same as cashier)
+    final_orders.sort(key=lambda x: x['first'].created_at if x['first'].created_at else datetime.min, reverse=True)
+    
+    # Build unique composite keys for WebSocket counting
     unique_keys = {
-        f"{o.order_code}_{o.group_id}" if o.group_id else o.order_code
-        for o in raw_pending
+        f"{o.order_code}_{o.created_at.date()}" if o.created_at else o.order_code
+        for o in raw_orders
     }
     pending_count = len(unique_keys)
     unseen_count = 0
@@ -4320,30 +4341,6 @@ def business_notifications(request):
         },
     )
     
-    # Group orders by composite key (same as cashier logic)
-    grouped_orders = defaultdict(list)
-    
-    for order in raw_pending:
-        # Use the same grouping logic as cashier
-        order_date = order.created_at.date() if order.created_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
-        grouped_orders[composite_key].append(order)
-    
-    # Convert to display format with clean order codes (same as cashier)
-    final_orders = []
-    for composite_key, items in grouped_orders.items():
-        clean_order_code = composite_key.split('_')[0] if '_' in composite_key else composite_key
-        total_price = sum(float(item.price) for item in items)
-        final_orders.append({
-            "order_code": clean_order_code,
-            "items": items,
-            "first": items[0],  # This ensures first item with proof_of_payment is available
-            "total_price": total_price
-        })
-    
-    # Sort by most recent date (same as cashier)
-    final_orders.sort(key=lambda x: x['first'].created_at if x['first'].created_at else datetime.min, reverse=True)
-    
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
     
@@ -4357,7 +4354,7 @@ def business_notifications(request):
             "title": "Notifications",
         },
     )
-
+	
 @login_required_session
 def customer_home(request):
     business = BusinessDetails.objects.first()
