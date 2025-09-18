@@ -1777,40 +1777,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const toggleBtn = document.getElementById("toggleShopBtn");
 
-    toggleBtn.addEventListener("click", function(e) {
-        e.preventDefault();
-
-        fetch("{% url 'toggle_shop_status' %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "X-CSRFToken": "{{ csrf_token }}"
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success !== false) {
-                // Update button text & style instantly
-                if (data.status === "Open") {
-                    toggleBtn.classList.remove("btn-danger");
-                    toggleBtn.classList.add("btn-success");
-                    toggleBtn.innerHTML = '<i class="fas fa-store"></i> Shop Open';
-                } else {
-                    toggleBtn.classList.remove("btn-success");
-                    toggleBtn.classList.add("btn-danger");
-                    toggleBtn.innerHTML = '<i class="fas fa-store-slash"></i> Shop Closed';
-                }
-            } else {
-                alert("Error: " + data.error);
-            }
-        })
-        .catch(err => console.error("Error:", err));
-    });
-});
-    
 document.addEventListener("DOMContentLoaded", function () {
     const onsiteCheckbox = document.getElementById("onsite");
     const wrapper = document.getElementById("onsiteServicesWrapper");
