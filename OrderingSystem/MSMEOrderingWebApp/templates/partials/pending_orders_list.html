@@ -459,12 +459,15 @@
                                 {% endif %}
                                 {{ group.first.payment_method|capfirst }}
                             </div>
-                            {% if group.first.payment_method|lower != "cash" and group.first.proof_of_payment %}
-                                <button class="btn btn-proof btn-modern" data-bs-toggle="modal" data-bs-target="#proofModal" data-img-url="{{ group.first.proof_of_payment.url }}">
-                                    <i class="fas fa-image"></i>
-                                    View Proof
+                            {% if group.first.proof_of_payment %}
+                                <button class="btn btn-proof btn-modern" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#proofModal" 
+                                        data-img-url="{{ group.first.proof_of_payment.url }}">
+                                    <i class="fas fa-image"></i> View Proof
                                 </button>
                             {% endif %}
+
                         </div>
                         <div class="action-buttons">
                             <button class="btn btn-accept btn-modern"
