@@ -55,7 +55,7 @@
 
 .notifications-header {
     font-family: {{ customization.header_font_family|default:"Arial" }};
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    background: white;
     border-radius: var(--border-radius);
     padding: 2rem;
     margin-bottom: 25px;
@@ -76,6 +76,7 @@
 }
 
 .page-title {
+    color: var(--primary-color);
     font-size: 2.5rem;
     font-weight: 700;
     margin: 0 0 0.5rem 0;
@@ -85,11 +86,13 @@
 }
 
 .page-title i {
+    color: var(--primary-color);
     font-size: 2rem;
     opacity: 0.9;
 }
 
 .page-subtitle {
+    color: var(--primary-color);
     font-size: 1.1rem;
     margin: 0;
     opacity: 0.9;
