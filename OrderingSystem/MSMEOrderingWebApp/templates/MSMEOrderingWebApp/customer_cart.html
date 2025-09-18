@@ -1437,14 +1437,7 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
         document.getElementById('total').textContent = subtotal.toFixed(2);
 
         updatePlaceOrderButtonState();
-        // 🔹 Clear the timer when rejected
-        if (deliveryFeeTimer) {
-            clearInterval(deliveryFeeTimer);
-            deliveryFeeTimer = null;
-        }
-        const timerSpan = document.getElementById("delivery-fee-timer");
-        if (timerSpan) timerSpan.textContent = "";
-        }
+
         // Reset button
         const requestBtn = document.getElementById("request-delivery-fee-btn");
         if (requestBtn) {
