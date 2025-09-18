@@ -1461,17 +1461,12 @@
             <form method="POST" action="{% url 'settings' %}" enctype="multipart/form-data" id="settingsForm">
                 {% csrf_token %}
 
-            <!-- 🔘 Open/Close Shop Button -->
-            <div class="d-flex justify-content-start mb-3">
-                <button id="toggleShopBtn" 
-                        class="save-button {% if business.is_open_now %}btn-success{% else %}btn-danger{% endif %}">
-                    {% if business.is_open_now %}
-                        <i class="fas fa-store"></i> Shop Open
-                    {% else %}
-                        <i class="fas fa-store-slash"></i> Shop Closed
-                    {% endif %}
-                </button>
-            </div>
+            <!-- 🔘 Close/Open Shop Button -->
+                <div class="d-flex justify-content-start mb-2">
+                    <button type="button" class="save-button btn-warning" id="toggleShopBtn">
+                        {% if business.force_closed %}Open Shop{% else %}Close Shop{% endif %}
+                    </button>
+                </div>
 
         <!-- Business Profile Card -->
         <div class="settings-card">
