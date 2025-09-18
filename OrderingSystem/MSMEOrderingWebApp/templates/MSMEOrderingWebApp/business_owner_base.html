@@ -1086,14 +1086,13 @@
             console.error("WebSocket closed unexpectedly");
         };
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const proofModal = document.getElementById('proofModal');
-            proofModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const imageUrl = button.getAttribute('data-img-url');
-                const proofImage = proofModal.querySelector('#proofImage');
-                proofImage.src = imageUrl;
-            });
+        document.addEventListener("click", function (event) {
+            if (event.target.closest("[data-bs-target='#proofModal']")) {
+                const button = event.target.closest("[data-bs-target='#proofModal']");
+                const imageUrl = button.getAttribute("data-img-url");
+                const proofImage = document.querySelector("#proofModal #proofImage");
+                proofImage.src = imageUrl || "";
+            }
         });
 
         const protocol = window.location.protocol === "https:" ? "wss" : "ws";
