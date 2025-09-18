@@ -1460,21 +1460,26 @@
         <div class="main-container">
             <form method="POST" action="{% url 'settings' %}" enctype="multipart/form-data" id="settingsForm">
                 {% csrf_token %}
-        
-               <!-- 🔘 Close/Open Shop Toggle -->
+
+                <!-- 🔘 Close/Open Shop Toggle -->
                 <div class="d-flex justify-content-start mb-3">
                     <div class="shop-toggle-container">
                         <label class="shop-toggle-label">
                             <span class="shop-status-text">
-                                {% if business.force_closed %}Shop Closed{% else %}Shop Open{% endif %}
+                                {% if business.is_open_now %}
+                                    Shop Open
+                                {% else %}
+                                    Shop Closed
+                                {% endif %}
                             </span>
                             <div class="toggle-switch">
-                                <input type="checkbox" id="toggleShopBtn" {% if not business.force_closed %}checked{% endif %}>
+                                <input type="checkbox" id="toggleShopBtn" {% if business.is_open_now %}checked{% endif %}>
                                 <span class="toggle-slider"></span>
                             </div>
                         </label>
                     </div>
                 </div>
+
           
         
         
@@ -1787,6 +1792,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
+
+    
 document.addEventListener("DOMContentLoaded", function () {
     const onsiteCheckbox = document.getElementById("onsite");
     const wrapper = document.getElementById("onsiteServicesWrapper");
