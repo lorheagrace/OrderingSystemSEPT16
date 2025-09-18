@@ -1999,10 +1999,13 @@ function initializeCustomizeButton() {
                                 }
                             }
                         }
-
+                
                         setFormState(false);
                         customizeBtn.innerHTML = '<i class="fas fa-edit"></i> Customize';
                         showToast(data.message);
+                
+                        // 🔄 Refresh page to apply reset changes
+                        location.reload();
                     } else {
                         showToast(data.message);
                     }
