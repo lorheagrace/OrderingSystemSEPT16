@@ -720,8 +720,6 @@ def reject_order(request, order_code):
             orders = Checkout.objects.filter(
                 order_code=order_code,
                 group_id=group_id,
-                created_at__gte=day_start,
-                created_at__lt=day_end
             )
 
             if not orders.exists():
