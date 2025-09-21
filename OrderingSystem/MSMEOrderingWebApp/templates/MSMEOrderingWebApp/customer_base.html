@@ -157,24 +157,26 @@
         }
 
         .sidebar-header{
-            line-height: 20px;
-            font-weight: 800;
-            font-family: {{ customization.header_font_family|default:"Montserrat" }};
+            line-height: 20px;;
+            text-shadow: 2px 2px 5px black;
+            font-family: "{{ customization.header_font_family|default:"Arial" }}";
+            color: {{ customization.header_font_color|default:"#000000" }};
+            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
+            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
         }
 
         .sidebar-logo {
             display: flex;
             align-items: center;
             gap: 12px;
+            font-size: 1.25rem;
             padding: 15px;
             border-bottom: 2px solid;
             border-color: var(--primary-color);
             cursor: pointer;
-            text-shadow: 1px 1px 6px rgba(37, 37, 37, 0.377);
+            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.377);
             font-family: {{ customization.header_font_family|default:"Arial" }};
             color: {{ customization.navigation_text_color|default:"#000000" }};
-            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 20 %}{{ customization.header_font_size|default:15 }}{% else %}20{% endif %}px;
-
         }
 
         .sidebar-logo img {
@@ -234,17 +236,23 @@
 
         .sidebar-nav a:hover,
         .sidebar-nav a.active {
-            border-radius: 0%;
             border-left: 5px solid;
             background-color: {{ customization.navigation_hover_color|default:"#a8a8a8" }};
             border-color: {{ customization.navigation_border_color|default:"#cccccc" }};
         }
+
+        .sidebar-label{
+            font-family: {{ customization.header_font_family|default:"Arial" }};
+            color: {{ customization.navigation_text_color|default:"#000000" }};
+        }
+
 
         .sidebar-nav i {
             font-size: larger;
             width: 30px;
             text-align: center;
             flex-shrink: 0;
+            color: {{ customization.navigation_text_color|default:"#000000" }};
 
         }
 
@@ -546,19 +554,19 @@
         
         <nav class="sidebar-nav">
             <ul class="list-unstyled ps-0">
-                <li class="mb-1">
+                <li>
                     <a href="{% url 'customer_home' %}" 
-                    class="d-flex align-items-center text-white text-decoration-none px-3 py-2 rounded sidebar-link {% if request.resolver_match.url_name == 'customer_home' %}active{% endif %}">
-                        <i class="bi bi-house-door me-3 fs-5"></i>
-                        <span class="sidebar-label fw-semibold">Home</span>
+                    class="{% if request.resolver_match.url_name == 'customer_home' %}active{% endif %}">
+                        <i class="bi bi-house-door"></i>
+                        <span class="sidebar-label">Home</span>
                     </a>
                 </li>
 
-                <li class="mb-1">
+                <li>
                     <a href="{% url 'customer_reviews' %}" 
-                    class="d-flex align-items-center text-white text-decoration-none px-3 py-2 rounded sidebar-link {% if request.resolver_match.url_name == 'customer_reviews' %}active{% endif %}">
-                        <i class="bi bi-file-earmark-text me-3 fs-5"></i>
-                        <span class="sidebar-label fw-semibold">Reviews</span>
+                    class="{% if request.resolver_match.url_name == 'customer_reviews' %}active{% endif %}">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span class="sidebar-label">Reviews</span>
                     </a>
                 </li>
             </ul>
@@ -567,8 +575,8 @@
         
         <div class="sidebar-footer">
             <a href="{% url 'logout' %}" class="logout-btn">
-                <i class="bi bi-box-arrow-right fs-5 me-3"></i>
-                <span class="sidebar-label fw-semibold">Log Out</span>
+                <i class="bi bi-box-arrow-right"></i>
+                <span class="sidebar-label">Log Out</span>
             </a>
 
 
