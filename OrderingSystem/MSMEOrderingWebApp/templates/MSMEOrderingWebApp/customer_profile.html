@@ -180,6 +180,8 @@
 
     .info-section {
         padding: 2rem;
+        display: flex;
+        flex-direction: column;
     }
 
     .info-card {
@@ -204,7 +206,7 @@
         gap: 0.5rem;
         font-family: {{ customization.header_font_family|default:"Montserrat" }};
         color: {{ customization.header_font_color|default:"#000000" }};
-        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 25 %}{{ customization.header_font_size|default:20 }}{% else %}25{% endif %}px;
+        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 30 %}{{ customization.header_font_size|default:20 }}{% else %}30{% endif %}px;
         font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
         font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
 
@@ -333,6 +335,9 @@
     }
 
     @media (max-width: 768px) {
+        .profile-container {
+            padding: 0;
+        }
         .profile-title {
             font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 25 %}{{ customization.header_font_size|default:20 }}{% else %}25{% endif %}px;
         }
@@ -533,7 +538,7 @@
 
     @media (max-width: 768px) {
         body {
-            padding: 1rem 0.5rem;
+            padding: 0;
         }
 
         .section-title {
@@ -554,10 +559,6 @@
         .table td {
             padding: 0.75rem 0.5rem;
             font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 12 %}{{ customization.body_font_size|default:10 }}{% else %}12{% endif %}px;
-        }
-
-        .py-4 {
-            padding: 3rem 1rem;
         }
     }
 </style>
@@ -582,7 +583,7 @@
                 <div class="info-section">
                     <div class="row">
                         <!-- Image Upload Section - Left Side -->
-                        <div class="col-lg-4 col-md-5">
+                        <div class="col-lg-4 col-md-12">
                             <div class="info-card text-center">
                                 <h3 class="section-title justify-content-center">
                                     <i class="fas fa-camera"></i>
@@ -612,7 +613,7 @@
                         </div>
 
                         <!-- Personal Information Section - Right Side -->
-                        <div class="col-lg-8 col-md-7">
+                        <div class="col-lg-8 col-md-12">
                             <div class="info-card">
                                 <h3 class="section-title">
                                     <i class="fas fa-user-edit"></i>
