@@ -952,64 +952,70 @@
         const variations = productVariations[productName] || [];
 
         document.getElementById('modalProductName').textContent = productName;
-        
+
         // Create variation items with quantity selectors
         const variationContainer = document.getElementById('variationContainer');
         variationContainer.innerHTML = "";
-        
+
         variations.forEach((variation, index) => {
-        const col = document.createElement('div');
-        col.className = 'col-12 col-md-6 col-lg-4'; // 3 per row on large, 2 on md, 1 on small
+            const col = document.createElement('div');
+            col.className = 'col-12 col-md-6 col-lg-4'; // 3 per row on large, 2 on md, 1 on small
 
-        const variationItem = document.createElement('div');
-        variationItem.className = 'variation-item';
-        variationItem.dataset.price = variation.price;
-        variationItem.dataset.name = variation.name;
-        variationItem.dataset.index = index;
+            const variationItem = document.createElement('div');
+            variationItem.className = 'variation-item';
+            variationItem.dataset.price = variation.price;
+            variationItem.dataset.name = variation.name;
+            variationItem.dataset.index = index;
 
-        variationItem.innerHTML = `
-            <div class="variation-header">
-                <div class="variation-name">${variation.name}</div>
-                <div class="variation-price">₱${parseFloat(variation.price).toFixed(2)}</div>
-            </div>
-            <div class="mb-2">
-                <span class="product-stocks">Stocks: ${variation.stocks}</span>
-            </div>
-            <div class="quantity-selector row g-2 mb-1">
-                <!-- Quantity label -->
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="quantity-label d-flex align-items-center h-100 mb-md-0">
-                        Quantity:
+            variationItem.innerHTML = `
+                <div class="variation-header">
+                    <div class="variation-name">${variation.name}</div>
+                    <div class="variation-price">₱${parseFloat(variation.price).toFixed(2)}</div>
+                </div>
+                <div class="mb-2">
+                    ${variation.track_stocks ? `<span class="product-stocks">Stocks: ${variation.stocks}</span>` : ''}
+                </div>
+                <div class="quantity-selector row g-2 mb-1">
+                    <!-- Quantity label -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="quantity-label d-flex align-items-center h-100 mb-md-0">
+                            Quantity:
+                        </div>
+                    </div>
+                    <!-- Quantity controls -->
+                    <div class="col-12 col-md-6 col-lg-9">
+                        <div class="d-flex align-items-center justify-content-start">
+                            <button class="quantity-btn btn btn-outline-primary rounded-circle me-2" onclick="updateVariationQuantity(${index}, -1)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input 
+                                type="number" 
+                                class="quantity-input form-control text-center mx-2" 
+                                value="0" 
+                                min="0" 
+                                max="${variation.stocks}" 
+                                onchange="setVariationQuantity(${index}, this.value)"
+                                id="quantity-${index}">
+                            <button class="quantity-btn btn btn-outline-primary rounded-circle ms-2" onclick="updateVariationQuantity(${index}, 1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <!-- Quantity controls -->
-                <div class="col-12 col-md-6 col-lg-9">
-                    <div class="d-flex align-items-center justify-content-start">
-                        <button class="quantity-btn btn btn-outline-primary rounded-circle me-2" onclick="updateVariationQuantity(${index}, -1)">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <input type="number" class="quantity-input form-control text-center mx-2" value="0" min="0" max="${variation.stocks}" 
-                            onchange="setVariationQuantity(${index}, this.value)"
-                            id="quantity-${index}">
-                        <button class="quantity-btn btn btn-outline-primary rounded-circle ms-2" onclick="updateVariationQuantity(${index}, 1)">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                <div class="variation-total">
+                    Subtotal: ₱<span id="subtotal-${index}">0.00</span>
                 </div>
-            </div>
-            <div class="variation-total">
-                Subtotal:₱<span id="subtotal-${index}">0.00</span>
-            </div>
-        `;
+            `;
 
-        col.appendChild(variationItem);
-        variationContainer.appendChild(col);
-    });
+            col.appendChild(variationItem);
+            variationContainer.appendChild(col);
+        });
 
         updateModalSummary();
         const modal = new bootstrap.Modal(document.getElementById('addToCartModal'));
         modal.show();
     }
+
 
     function updateVariationQuantity(index, change) {
         const quantityInput = document.getElementById(`quantity-${index}`);
