@@ -1053,17 +1053,48 @@
             return cookieValue;
         }
 
-        // Function to play the notification sound
+        // Function to play the notification sound everywhere
         function playNotificationSound() {
             const modalSound = document.getElementById('modalSound');
+
+            if (!modalSound) {
+                console.warn("Custom sound not found, trying fallback...");
+                fallbackNotification();
+                return;
+            }
+
             modalSound.play()
                 .then(() => {
-                    console.log("Audio played successfully");
+                    console.log("Custom notification sound played successfully");
                 })
                 .catch((error) => {
-                    console.error("Error playing audio: ", error);
+                    console.warn("Custom sound blocked/unavailable, using fallback:", error);
+                    fallbackNotification();
                 });
         }
+
+        // Fallback: system/device default + vibration
+        function fallbackNotification() {
+            try {
+                // Try system beep (may trigger native notification sound)
+                const beep = new Audio();
+                beep.play().catch(err => {
+                    console.error("Fallback beep blocked:", err);
+                });
+
+                // Vibrate if supported
+                if ("vibrate" in navigator) {
+                    navigator.vibrate([200, 100, 200]); 
+                    // pattern: buzz 200ms, pause 100ms, buzz 200ms
+                    console.log("Device vibration triggered");
+                } else {
+                    console.log("Vibration not supported on this device");
+                }
+            } catch (e) {
+                console.error("No audio/vibration support:", e);
+            }
+        }
+
 
         const badge = document.getElementById('notification-badge');
         const socket = new WebSocket("wss://" + window.location.host + "/ws/notifications/");
