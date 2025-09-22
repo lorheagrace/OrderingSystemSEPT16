@@ -3343,7 +3343,11 @@ def toggle_availability(request, product_id):
     if request.method == 'POST':
         product.available = not product.available
         product.save()
-    return redirect('inventory') 
+
+        # Show a toast (Django messages)
+        state = "available" if product.available else "unavailable"
+        messages.success(request, f"Product “{product.name}” is now {state}.")
+    return redirect('inventory')
 
 from django.db.models import Sum
 from decimal import Decimal
