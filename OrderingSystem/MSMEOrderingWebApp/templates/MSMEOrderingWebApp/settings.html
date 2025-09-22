@@ -1789,9 +1789,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const editButton = document.getElementById("editDetails");
     const saveButton = document.getElementById("saveDetails");
     
-    
     // Track if we're currently restoring to prevent conflicts
     let isRestoring = false;
+    
+    // Hide the file input completely
+    if (logoInput) {
+        logoInput.style.display = 'none';
+    }
     
     // ---------- Functions ----------
 
@@ -1818,54 +1822,6 @@ document.addEventListener("DOMContentLoaded", function () {
         toastContainer.appendChild(toast);
         setTimeout(() => toast.remove(), 5000);
     }
-
-    // ---------- LOGO UPLOAD ----------
-    if (uploadArea && logoInput) {
-        uploadArea.addEventListener('click', () => {
-            if (!logoInput.disabled) logoInput.click();
-        });
-    }
-    if (uploadPlaceholder && logoInput) {
-        uploadPlaceholder.addEventListener('click', () => {
-            if (!logoInput.disabled) logoInput.click();
-        });
-    }
-    if (logoInput) {
-        logoInput.addEventListener('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                logoPreview.src = event.target.result;
-                logoPreview.style.display = 'block';
-                uploadPlaceholder.style.display = 'none';
-            };
-            reader.readAsDataURL(file);
-
-            // Upload to server
-            const formData = new FormData();
-            formData.append("logo", file);
-
-            fetch("{% url 'upload_logo' %}", {
-                method: "POST",
-                body: formData,
-                headers: { "X-Requested-With": "XMLHttpRequest" }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    logoPreview.src = data.logo_url;
-                    localStorage.setItem('logo_preview', data.logo_url);
-                    showToast('Logo uploaded successfully!', 'success');
-                } else {
-                    showToast('Error uploading logo: ' + data.error, 'danger');
-                }
-            })
-            .catch(() => showToast('Upload failed. Try again.', 'danger'));
-        });
-    }
-
 
     // Function to clear localStorage after successful save
     function clearFormLocalStorage() {
