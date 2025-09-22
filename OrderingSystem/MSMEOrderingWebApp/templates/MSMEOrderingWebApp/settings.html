@@ -1777,7 +1777,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
-
 document.addEventListener("DOMContentLoaded", function () {
     const onsiteCheckbox = document.getElementById("onsite");
     const wrapper = document.getElementById("onsiteServicesWrapper");
@@ -1822,6 +1821,80 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         toastContainer.appendChild(toast);
         setTimeout(() => toast.remove(), 5000);
+    }
+
+    // Function to clear localStorage after successful save
+    function clearFormLocalStorage() {
+        try {
+            // Clear all editable field values
+            const allFields = [
+                ...Array.from(document.getElementsByTagName('input')),
+                ...Array.from(document.getElementsByTagName('textarea')),
+                ...Array.from(document.getElementsByTagName('select'))
+            ];
+
+            allFields.forEach(field => {
+                if (field.classList.contains('editable-field') && field.name) {
+                    const key = field.id || field.name;
+                    localStorage.removeItem(key);
+                }
+            });
+
+            // Clear specific items
+            localStorage.removeItem('specific_services');
+            localStorage.removeItem('settings_edit_mode');
+            localStorage.removeItem('logo_preview');
+            
+            console.log('localStorage cleared successfully after save');
+            
+        } catch (error) {
+            console.error('Error clearing localStorage:', error);
+        }
+    }
+
+    // SAFE field restoration - avoids file inputs completely and excludes services
+    function safeRestoreFieldsExceptServices() {
+        let restoredCount = 0;
+
+        const allFields = [
+            ...Array.from(document.getElementsByTagName('input')),
+            ...Array.from(document.getElementsByTagName('textarea')),
+            ...Array.from(document.getElementsByTagName('select'))
+        ];
+
+        allFields.forEach(field => {
+            if (!field.classList.contains('editable-field')) return;
+            if (!field.name || field.name.trim() === '') return;
+            // Skip service fields - they'll be handled separately
+            if (field.name === 'specific_services[]') return;
+
+            try {
+                const key = field.id || field.name;
+
+                if (field.type === 'checkbox' || field.type === 'radio') {
+                    const savedValue = localStorage.getItem(key);
+                    if (savedValue !== null) {
+                        field.checked = savedValue === 'true';
+                        restoredCount++;
+                    }
+                } else if (field.type !== 'file') {
+                    const savedValue = localStorage.getItem(key);
+                    if (savedValue !== null) {
+                        field.value = savedValue;
+                        restoredCount++;
+                    }
+                }
+            } catch (error) {
+                // Silent error handling
+            }
+        });
+
+        // Restore onsite checkbox visibility
+        if (onsiteCheckbox && wrapper) {
+            wrapper.style.display = onsiteCheckbox.checked ? 'block' : 'none';
+        }
+
+        return restoredCount;
     }
 
     // SAFE field restoration - avoids file inputs completely
@@ -2017,27 +2090,49 @@ document.addEventListener("DOMContentLoaded", function () {
         isRestoring = true;
         
         try {
-            // Step 1: Clear existing dynamic content
-            if (serviceList) {
-                serviceList.innerHTML = '';
-            }
+            // Step 1: Restore form fields using SAFE method (but skip services for now)
+            const restoredFields = safeRestoreFieldsExceptServices();
             
-            // Step 2: Restore form fields using SAFE method
-            const restoredFields = safeRestoreFields();
-            
-            // Step 3: Handle onsite checkbox specifically
+            // Step 2: Handle onsite checkbox specifically
             if (onsiteCheckbox && wrapper) {
                 wrapper.style.display = onsiteCheckbox.checked ? 'block' : 'none';
             }
 
-            // Step 4: Restore services
-            if (serviceList) serviceList.innerHTML = '';
-            const savedServices = JSON.parse(localStorage.getItem('specific_services') || '[]');
-            savedServices.forEach(service => {
-                if (service && service.trim()) addServiceInput(service);
-            });
+            // Step 3: Handle services restoration properly
+            if (serviceList) {
+                // Get existing services from database (already rendered in template)
+                const existingServices = [];
+                serviceList.querySelectorAll('input[name="specific_services[]"]').forEach(inp => {
+                    const val = inp.value.trim();
+                    if (val) existingServices.push(val);
+                });
 
-            // Step 5: Restore edit mode
+                // Get localStorage services (user additions during current session)
+                const savedServices = JSON.parse(localStorage.getItem('specific_services') || '[]');
+                
+                // Only add NEW services from localStorage that aren't already in database
+                const newServices = savedServices.filter(service => 
+                    service && service.trim() && !existingServices.includes(service.trim())
+                );
+
+                // Add the new services to the existing ones
+                newServices.forEach(service => {
+                    addServiceInput(service);
+                });
+
+                // Apply edit mode to existing services too
+                const isEditing = localStorage.getItem('settings_edit_mode') === 'true';
+                serviceList.querySelectorAll('input[name="specific_services[]"]').forEach(inp => {
+                    inp.disabled = !isEditing;
+                });
+                serviceList.querySelectorAll('.removeServiceBtn').forEach(btn => {
+                    btn.disabled = !isEditing;
+                    btn.style.pointerEvents = isEditing ? 'auto' : 'none';
+                    btn.style.opacity = isEditing ? '1' : '0.5';
+                });
+            }
+
+            // Step 4: Restore edit mode
             const savedEditMode = localStorage.getItem('settings_edit_mode') === 'true';
             const sessionEditMode = sessionStorage.getItem('returnToSettingsEditMode') === 'true';
             const shouldBeEditing = savedEditMode || sessionEditMode;
@@ -2049,7 +2144,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 sessionStorage.removeItem('returnToSettingsEditMode');
             }
             
-            // Step 6: Restore logo preview
+            // Step 5: Restore logo preview
             const savedLogo = localStorage.getItem('logo_preview');
             if (savedLogo && logoPreview && uploadPlaceholder) {
                 setTimeout(() => {
@@ -2095,6 +2190,24 @@ document.addEventListener("DOMContentLoaded", function () {
         // Add service button
         if (addServiceBtn) {
             addServiceBtn.addEventListener("click", () => addServiceInput());
+        }
+
+        // Add event listeners to existing database services
+        if (serviceList) {
+            serviceList.querySelectorAll('.removeServiceBtn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.input-group').remove();
+                    saveServices();
+                });
+            });
+
+            serviceList.querySelectorAll('input[name="specific_services[]"]').forEach(input => {
+                input.addEventListener('input', function() {
+                    if (!isRestoring) {
+                        saveServices();
+                    }
+                });
+            });
         }
 
         // Make upload placeholder clickable to trigger file upload
@@ -2233,31 +2346,72 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // Form submission
+        // UPDATED Form submission with AJAX and proper localStorage clearing
         if (settingsForm) {
             settingsForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-
+                
+                // Save current data before submission
                 saveEditableFields();
                 saveServices();
-
-                this.submit();
-
-                toggleEditMode(false);
-
-                const allFields = [
-                    ...Array.from(document.getElementsByTagName('input')),
-                    ...Array.from(document.getElementsByTagName('textarea')),
-                    ...Array.from(document.getElementsByTagName('select'))
-                ];
-
-                allFields.forEach(field => {
-                    if (field.classList.contains('editable-field') && field.type !== 'file' && field.name) {
-                        localStorage.removeItem(field.name);
+                
+                // Show loading state
+                if (saveButton) {
+                    const originalText = saveButton.textContent;
+                    saveButton.textContent = 'Saving...';
+                    saveButton.disabled = true;
+                }
+                
+                // Create FormData from the form
+                const formData = new FormData(this);
+                
+                // Submit via AJAX to detect success/failure
+                fetch(this.action || window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Clear localStorage only on successful save
+                        clearFormLocalStorage();
+                        
+                        // Reset edit mode
+                        toggleEditMode(false);
+                        
+                        // Show success message
+                        showToast(data.message || 'Settings saved successfully!', 'success');
+                        
+                        // Optional: reload page after a short delay to show fresh data
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                        
+                    } else {
+                        // Handle save error
+                        showToast('Error saving settings: ' + (data.error || 'Unknown error'), 'danger');
+                        
+                        // Re-enable edit mode on error
+                        toggleEditMode(true);
+                    }
+                })
+                .catch(error => {
+                    console.error('Save error:', error);
+                    showToast('Failed to save settings. Please try again.', 'danger');
+                    
+                    // Re-enable edit mode on error
+                    toggleEditMode(true);
+                })
+                .finally(() => {
+                    // Reset button state
+                    if (saveButton) {
+                        saveButton.textContent = 'Save Details';
+                        saveButton.disabled = false;
                     }
                 });
-
-                localStorage.removeItem('settings_edit_mode');
             });
         }
     }
