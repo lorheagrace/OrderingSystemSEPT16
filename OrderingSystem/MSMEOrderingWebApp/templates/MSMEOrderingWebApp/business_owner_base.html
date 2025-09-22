@@ -1053,6 +1053,28 @@
             return cookieValue;
         }
 
+        let audioUnlocked = false;
+
+        // Unlock audio on first user interaction
+        function unlockAudio() {
+            const modalSound = document.getElementById('modalSound');
+            if (modalSound && !audioUnlocked) {
+                modalSound.muted = true; // play silently
+                modalSound.play().then(() => {
+                    modalSound.pause();
+                    modalSound.currentTime = 0;
+                    modalSound.muted = false;
+                    audioUnlocked = true;
+                    console.log("🔓 Audio unlocked");
+                }).catch(err => console.warn("Audio unlock failed:", err));
+            }
+        }
+
+        // Listen once for user interaction
+        ["click", "keydown", "touchstart"].forEach(event =>
+            document.addEventListener(event, unlockAudio, { once: true })
+        );
+
         // Function to play the notification sound everywhere
         function playNotificationSound() {
             const modalSound = document.getElementById('modalSound');
