@@ -1308,15 +1308,17 @@
                                                     <td class="align-middle">
                                                         <div class="btn-group btn-group-sm" role="group">
                                                             <a onclick="openEditModal(
-                                                                    '{{ product.id }}', 
-                                                                    '{{ product.price }}', 
-                                                                    '{{ product.variation_name }}', 
-                                                                    '{{ product.name|escapejs }}', 
-                                                                    'product', 
-                                                                    '{{ product.stocks }}', 
-                                                                    '{{ product.track_stocks|yesno:'true,false' }}',
+                                                                    '{{ product.id }}',
+                                                                    '{{ product.price }}',
+                                                                    '{{ product.variation_name }}',
+                                                                    '{{ product.name|escapejs }}',
+                                                                    'product',
+                                                                    '{{ product.stocks }}',
+                                                                    '{{ product.track_stocks }}',
                                                                     `{{ product.description|default_if_none:''|escapejs }}`
-                                                                )" class="btn btn-outline-primary btn-sm">
+                                                                )" 
+                                                               class="btn btn-outline-primary btn-sm">
+                                                                <i class="fas fa-edit"></i>
                                                             </a>
                                                             <a href="#"
                                                             class="btn btn-outline-danger btn-sm"
