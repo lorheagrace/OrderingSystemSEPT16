@@ -3206,7 +3206,7 @@ def inventory(request):
             image = request.FILES.get('product_image')
             skip_image = request.POST.get('disable_image')  
             name = request.POST.get('product_name')
-			description = request.POST.get('product_description')
+            description = request.POST.get('product_description')  
             category_id = request.POST.get('product_category')
             default_price = request.POST.get('default_price')
             default_stocks = request.POST.get('product_stocks')
@@ -3218,7 +3218,6 @@ def inventory(request):
             if not skip_image and not image:
                 messages.error(request, "Product image is required unless you skip image upload.")
                 return render_with_form_data()
-
 
             if not name or not category_id:
                 messages.error(request, "Please fill in all required fields: Product Name and Category.")
@@ -3244,7 +3243,7 @@ def inventory(request):
                         category=category,
                         image=image if not skip_image else None,
                         name=name,
-						description=description,
+                        description=description,  
                         variation_name=vname,
                         price=vprice,
                         stocks=vstocks,
@@ -3263,7 +3262,7 @@ def inventory(request):
                     category=category,
                     image=image if not skip_image else None,
                     name=name,
-					description=description,
+                    description=description,  
                     variation_name='Default',
                     price=default_price,
                     stocks=default_stocks if enable_stocks else 0,
@@ -3281,6 +3280,7 @@ def inventory(request):
         'business': business
     }
     return render(request, 'MSMEOrderingWebApp/inventory.html', context)
+
 
 @login_required_session
 def edit_product_price(request):
