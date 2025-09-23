@@ -1241,7 +1241,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 const userEmail = "{{ user_email|escapejs }}";
 const deliveryFeeSocketCustomer = new WebSocket(
-    `ws://${window.location.host}/ws/delivery-fee/customer/?email=${encodeURIComponent(userEmail)}`
+    `wss://${window.location.host}/ws/delivery-fee/customer/?email=${encodeURIComponent(userEmail)}`
 );
 
 deliveryFeeSocketCustomer.onopen = () => console.log("[Customer JS] WebSocket connected");
@@ -1300,16 +1300,9 @@ function updatePlaceOrderButtonState() {
 
 // === TIMER HELPER ===
 let deliveryFeeTimer = null;
-
 function startDeliveryFeeTimer(button, duration = 120) {
-    const now = Date.now();
-    const expiryTime = now + duration * 1000;
-    localStorage.setItem("deliveryFeeExpiry", expiryTime); // save expiry timestamp
+    let remaining = duration;
 
-    runDeliveryFeeTimer(button, expiryTime);
-}
-
-function runDeliveryFeeTimer(button, expiryTime) {
     // Create timer span if not exists
     let timerSpan = document.getElementById("delivery-fee-timer");
     if (!timerSpan) {
@@ -1319,39 +1312,24 @@ function runDeliveryFeeTimer(button, expiryTime) {
         button.parentNode.appendChild(timerSpan);
     }
 
-    function updateTimer() {
-        const remaining = Math.max(0, Math.floor((expiryTime - Date.now()) / 1000));
-        if (remaining > 0) {
-            button.disabled = true;
-            button.textContent = "Requested";
-            timerSpan.textContent = ` (wait ${remaining}s)`;
-        } else {
+    button.disabled = true;
+    button.textContent = "Requested";
+    timerSpan.textContent = ` (wait ${remaining}s)`;
+
+    deliveryFeeTimer = setInterval(() => {
+        remaining--;
+        timerSpan.textContent = ` (wait ${remaining}s)`;
+
+        if (remaining <= 0) {
             clearInterval(deliveryFeeTimer);
             deliveryFeeTimer = null;
-            localStorage.removeItem("deliveryFeeExpiry"); // clear saved expiry
             button.disabled = false;
             button.textContent = "Request Delivery Fee Again";
             timerSpan.textContent = "";
             button.style.display = "inline-block";
-            const loadingSpan = document.getElementById("delivery-fee-loading");
-            if (loadingSpan) loadingSpan.style.display = "none"
         }
-    }
-
-    updateTimer();
-    if (deliveryFeeTimer) clearInterval(deliveryFeeTimer);
-    deliveryFeeTimer = setInterval(updateTimer, 1000);
+    }, 1000);
 }
-
-// === Restore timer on reload ===
-document.addEventListener("DOMContentLoaded", function () {
-    const requestBtn = document.getElementById("request-delivery-fee-btn");
-    const expiryTime = parseInt(localStorage.getItem("deliveryFeeExpiry"), 10);
-
-    if (requestBtn && expiryTime && Date.now() < expiryTime) {
-        runDeliveryFeeTimer(requestBtn, expiryTime);
-    }
-});
 
 // === DELIVERY FEE UI ===
 function showDeliveryFeeRequest() {
@@ -1654,23 +1632,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const deliveryFeeInput = document.getElementById('delivery_fee_input');
 
-        // Restore if delivery
+        // Only restore delivery fee if input exists
         if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee) {
             deliveryFee = parseFloat(savedDeliveryFee);
             deliveryFeeInput.value = deliveryFee;
-            initDeliveryFeeInputListener();
-
-            // 👇 Ensure button + request UI is restored
-            showDeliveryFeeRequest();
+            initDeliveryFeeInputListener(); // Add listener if needed
         }
 
         totalElement.textContent = (subtotal + deliveryFee).toFixed(2);
 
         // Restore radio button
         if (savedOrderType) {
-            const radio = document.querySelector(
-                `input[name="order_type"][value="${savedOrderType}"]`
-            );
+            const radio = document.querySelector(`input[name="order_type"][value="${savedOrderType}"]`);
             if (radio) radio.checked = true;
         }
     }
