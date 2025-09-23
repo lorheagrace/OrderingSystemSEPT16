@@ -1223,15 +1223,25 @@
                                                     <td class="align-middle" style="background-color: #f0f0f0ff;"><small>{{ product.last_updated|date:"m/d/y • h:i A" }}</small></td>
                                                     <td class="align-middle" style="background-color: #f0f0f0de;">
                                                         <div class="btn-group btn-group-sm" role="group">
-                                                            <a onclick="openEditModal('{{ product.id }}', '{{ product.price }}', '{{ product.variation_name }}', '{{ product.name|escapejs }}', 'product', '{{ product.stocks }}', '{{ product.track_stocks }}')" class="btn btn-outline-primary btn-sm">
+                                                            <a onclick="openEditModal(
+                                                                    '{{ product.id }}',
+                                                                    '{{ product.price }}',
+                                                                    '{{ product.variation_name|escapejs }}',
+                                                                    '{{ product.name|escapejs }}',
+                                                                    'product',
+                                                                    '{{ product.stocks }}',
+                                                                    '{{ product.track_stocks }}',
+                                                                    '{{ product.description|default_if_none:""|escapejs }}'  <!-- ✅ pass description -->
+                                                                )"
+                                                                class="btn btn-outline-primary btn-sm">
                                                                 <i class="fas fa-edit"></i>
                                                             </a>
                                                             <a href="#"
-                                                            class="btn btn-outline-danger btn-sm"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#deleteModal"
-                                                            data-url="{% url 'delete_product' product.id %}"
-                                                            data-name="{{ product.name }}">
+                                                               class="btn btn-outline-danger btn-sm"
+                                                               data-bs-toggle="modal"
+                                                               data-bs-target="#deleteModal"
+                                                               data-url="{% url 'delete_product' product.id %}"
+                                                               data-name="{{ product.name }}">
                                                                 <i class="fas fa-trash"></i>
                                                             </a>
                                                         </div>
@@ -1384,6 +1394,10 @@
                             <div class="mb-3" id="editProductStocksGroup">
                                 <label for="editProductStocks" class="form-label">Stocks</label>
                                 <input type="number" class="form-control" name="new_stocks" id="editProductStocks" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProductDescription" class="form-label">Description</label>
+                                <textarea class="form-control" name="new_description" id="editProductDescription" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -1812,21 +1826,21 @@
     }
 
     // Open Product Edit Modal
-    function openEditModal(productId, price, variation, name, type, stocks, trackStocks) {
+    function openEditModal(productId, price, variation, name, type, stocks, trackStocks, description) {
         document.getElementById("editProductId").value = productId;
         document.getElementById("editType").value = type;
         document.getElementById("editProductName").value = name;
         document.getElementById("editVariationName").value = variation;
         document.getElementById("editProductPrice").value = price;
         document.getElementById("editProductStocks").value = stocks;
-
+        document.getElementById("editProductDescription").value = description || "";  // ✅ new
+    
         const stockGroup = document.getElementById("editProductStocksGroup");
         const stockInput = document.getElementById("editProductStocks");
-
+    
         let ts = String(trackStocks).trim().toLowerCase();
-
         const isTrackingEnabled = (ts === "true" || ts === "1" || ts === "yes" || ts === "on" || ts === "checked");
-
+    
         if (!isTrackingEnabled) {
             stockGroup.style.display = "none";
             stockInput.required = false;
@@ -1834,7 +1848,7 @@
             stockGroup.style.display = "block";
             stockInput.required = true;
         }
-
+    
         const modal = new bootstrap.Modal(document.getElementById("editModal"));
         modal.show();
     }
