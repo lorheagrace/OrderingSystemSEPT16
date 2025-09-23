@@ -3293,7 +3293,7 @@ def edit_product_price(request):
         try:
             product = Products.objects.get(id=product_id)
 
-            # Track changes
+            # ✅ Track price changes
             if new_price is not None and str(product.price) != str(new_price):
                 ProductEditHistory.objects.create(
                     product=product,
@@ -3303,6 +3303,7 @@ def edit_product_price(request):
                 )
                 product.price = new_price
 
+            # ✅ Track stocks changes
             if new_stocks is not None and str(product.stocks) != str(new_stocks):
                 ProductEditHistory.objects.create(
                     product=product,
@@ -3312,6 +3313,7 @@ def edit_product_price(request):
                 )
                 product.stocks = new_stocks
 
+            # ✅ Track description changes
             if new_description is not None and str(product.description or "") != str(new_description):
                 ProductEditHistory.objects.create(
                     product=product,
@@ -3328,6 +3330,7 @@ def edit_product_price(request):
             messages.error(request, "Product not found.")
 
     return redirect('inventory')
+
 
 
 def delete_product(request, product_id):
