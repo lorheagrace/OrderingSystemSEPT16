@@ -1654,18 +1654,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const deliveryFeeInput = document.getElementById('delivery_fee_input');
 
-        // Only restore delivery fee if input exists
+        // Restore if delivery
         if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee) {
             deliveryFee = parseFloat(savedDeliveryFee);
             deliveryFeeInput.value = deliveryFee;
-            initDeliveryFeeInputListener(); // Add listener if needed
+            initDeliveryFeeInputListener();
+
+            // 👇 Ensure button + request UI is restored
+            showDeliveryFeeRequest();
         }
 
         totalElement.textContent = (subtotal + deliveryFee).toFixed(2);
 
         // Restore radio button
         if (savedOrderType) {
-            const radio = document.querySelector(`input[name="order_type"][value="${savedOrderType}"]`);
+            const radio = document.querySelector(
+                `input[name="order_type"][value="${savedOrderType}"]`
+            );
             if (radio) radio.checked = true;
         }
     }
