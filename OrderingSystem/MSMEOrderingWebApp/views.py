@@ -3288,6 +3288,7 @@ def edit_product_price(request):
         product_id = request.POST.get('product_id')
         new_price = request.POST.get('new_price')
         new_stocks = request.POST.get('new_stocks')
+        new_description = request.POST.get('new_description')  # ✅ new field
 
         try:
             product = Products.objects.get(id=product_id)
@@ -3310,6 +3311,15 @@ def edit_product_price(request):
                     new_value=new_stocks,
                 )
                 product.stocks = new_stocks
+
+            if new_description is not None and str(product.description or "") != str(new_description):
+                ProductEditHistory.objects.create(
+                    product=product,
+                    field="description",
+                    old_value=product.description or "",
+                    new_value=new_description,
+                )
+                product.description = new_description
 
             product.save()
             messages.success(request, "Product updated successfully.")
