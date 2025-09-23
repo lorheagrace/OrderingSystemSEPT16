@@ -1106,30 +1106,6 @@
 
     // Timer sync interval (check server time every 5 seconds)
     let timerSyncInterval = null;
-    let queueTimerInterval = null;
-    function startQueueTimer() {
-        if (queueTimerInterval) return;
-        queueTimerInterval = setInterval(() => {
-            const now = Date.now();
-            for (let i = deliveryFeeQueue.length - 1; i >= 0; i--) {
-                const req = deliveryFeeQueue[i];
-                if (req.serverTimeRemaining !== undefined && req.lastSyncTime) {
-                    const timeSinceSync = Math.floor((now - req.lastSyncTime) / 1000);
-                    req.localTimeLeft = Math.max(0, req.serverTimeRemaining - timeSinceSync);
-                } else {
-                    req.localTimeLeft = Math.max(0, Math.floor((req.expiresAt - now) / 1000));
-                }
-                if (req.localTimeLeft <= 0) {
-                    console.log("[Owner JS] Queued request expired:", req.requestId);
-                    deliveryFeeQueue.splice(i, 1);
-                }
-            }
-            if (deliveryFeeQueue.length === 0) {
-                clearInterval(queueTimerInterval);
-                queueTimerInterval = null;
-            }
-        }, 1000);
-    }
 
     deliveryFeeSocketOwner.onopen = () => {
         console.log("[Owner JS] WebSocket connected");
@@ -1174,7 +1150,6 @@
             
             // Add request to queue (FIFO) and try to show modal
             deliveryFeeQueue.push(requestData);
-            startQueueTimer(); // 🔹 start background ticking
             showNextModal();
             
             // Start timer sync if not already running
