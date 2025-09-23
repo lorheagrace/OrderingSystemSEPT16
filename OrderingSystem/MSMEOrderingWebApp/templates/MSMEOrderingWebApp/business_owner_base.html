@@ -1,1051 +1,1985 @@
-{% load static %}
+{% extends 'MSMEOrderingWebApp/customer_base.html' %}
+{% block title %}Homepage{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Business Owner Panel{% endblock %}</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap-icons.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Font Awesome Free (only supports solid and regular limited set) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% block content %}
 
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Caudex:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Clash+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Aleo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Arapey:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Brawler:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Rokkitt:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    {% load static %}
-    
-        <style>
-        :root {
-            --sidebar-width: 250px;
-            --navbar-height: 70px;
-            --navbar-bg: #ffffff;
-            --content-bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --hover-bg: #f1f1f1;
-            --primary-color: {{ customization.primary_color|default:'#FF5733' }};
-            --secondary-color: {{ customization.secondary_color|default:'#FF5733' }};
-            --accent-color: {{ customization.accent_color|default:'#FF5733' }};
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: transparent;
-            overflow-x: hidden;
-        }
-
-        /* Top Navbar */
-        .top-navbar {
-            position: fixed;
-            top: 0;
-            left: var(--sidebar-width);
-            right: 0;
-            height: var(--navbar-height);
-            background-color: var(--navbar-bg);
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 1030;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-            transition: left 0.3s ease;
-        }
-
-        .top-navbar.collapsed {
-            left: 80px;
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-family: {{ customization.header_font_family|default:"Arial" }};
-            color: {{ customization.header_font_color|default:"#000000" }};
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .navbar-brand span {
-            display: inline-block;
-        }
-
-        .sidebar.collapsed + .content-wrapper .top-navbar .navbar-brand span {
-            display: none;
-        }
-
-        .navbar-nav {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .navbar-nav a {
-            color: var(--secondary-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Hover and Active Style */
-        .navbar-nav a:hover,
-        .navbar-nav a.active {
-            color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--primary-color), 0 0 8px var(--primary-color);
-            background-color: rgba(255, 255, 255, 0.05);
-            z-index: 2;
-        }
+ <!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caudex:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Clash+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Aleo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Arapey:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Brawler:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rokkitt:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 
-        
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            z-index: 1040;
-            transition: width 0.3s ease, transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-            {% if customization.navigation_background_type == 'solid' %}
-                background-color: {{ customization.navigation_solid_color|default:"#ffffff" }} !important;
-            {% elif customization.navigation_background_type == 'gradient' %}
-                background: linear-gradient({{ customization.navigation_gradient_direction|default:"to right" }},
-                    {{ customization.navigation_gradient_color_1|default:"#ffffff" }},
-                    {{ customization.navigation_gradient_color_2|default:"#000000" }}) !important;
-                    {{ customization.navigation_gradient_color_3|default:"#000000" }}) !important;
-            {% else %}
-                background-color: #ffffff !important;
+<style>
+    :root {
+        --primary-color: {{ customization.primary_color|default:'#FF5733' }};
+        --secondary-color: {{ customization.secondary_color|default:'#FF5733' }};
+        --accent-color: {{ customization.accent_color|default:'#FF5733' }};
+        --glass-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+    }
+
+    body {
+        min-height: 100vh;
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+    {% if customization.general_background_type == 'solid' %}
+    body {
+        background-color: {{ customization.general_solid_color|default:"#ffffff" }};
+    }
+    {% elif customization.general_background_type == 'gradient' %}
+    body {
+        background: linear-gradient(
+            {{ customization.general_gradient_direction|default:"to right" }},
+            {{ customization.general_gradient_color_1|default:"#ffffff" }},
+            {{ customization.general_gradient_color_2|default:"#000000" }}
+            {% if customization.general_gradient_color_3 %}
+                , {{ customization.general_gradient_color_3 }}
             {% endif %}
-        }
-
-        .sidebar.collapsed {
-            width: 80px;
-        }
-
-        .sidebar-header{
-            line-height: 20px;;
-            text-shadow: 2px 2px 5px black;
-            font-family: "{{ customization.header_font_family|default:"Arial" }}";
-            color: {{ customization.header_font_color|default:"#000000" }};
-            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
-            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
-        }
-        
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.25rem;
-            padding: 15px;
-            border-bottom: 2px solid;
-            border-color: var(--primary-color);
-            cursor: pointer;
-            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.377);
-            font-family: {{ customization.header_font_family|default:"Arial" }};
-            color: {{ customization.navigation_text_color|default:"#000000" }};
-        }
-
-        .logo-text {
-            white-space: normal;
-            word-break: break-word;
-            display: block;
-            max-width: 100%;
-            line-height: 1.2;
-        }
+        );
+    }
+    {% elif customization.general_background_type == 'image' %}
+    body {
+        background-image: url("{{ customization.general_background_image.url }}");
+    }
+    {% endif %}
 
 
-        .sidebar-logo img {
-            width: auto;
-            height: 50px;
-            transition: width 0.3s ease, height 0.3s ease;
-        }
+    /* Banner Section */
+    .banner-section {
+        padding: 0%;
+        position: relative;
+        height: 60vh;
+        min-height: 400px;
+        max-height: 600px;
+        border-radius: 10px;
+        margin-bottom: 40px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.349);
+    }
 
-        .sidebar-logo span {
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            white-space: wrap;
-        }
+    .slide.welcome-slide {
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--secondary-color)); /* Gradient with Accent Color */
+        margin-top: 0;
+    }
 
-        .sidebar.collapsed .sidebar-logo img {
-            width: 45px;
-            height: 45px;
-        }
 
-        .sidebar.collapsed .sidebar-logo span {
+    /* Banner Content */
+    .banner-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: rgba(0,0,0,0.3);
+        backdrop-filter: blur(5px);
+        color: white;
+        text-align: center;
+        z-index: 3;
+    }
+
+    .banner-text h1 {
+        margin-bottom: 1rem;
+        line-height: 1.2;
+        color: white;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+        animation: slideInDown 1s ease-out;
+        font-family: "{{ customization.header_font_family|default:"Arial" }}";
+        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' > 50 %}50{% else %}{{ customization.header_font_size|default:36 }}{% endif %}px;
+        font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}600{% endif %};
+        font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+    }
+
+    .banner-text p {
+        font-weight: 500;
+        margin: 0;
+        opacity: 0.95;
+        color: white;
+        line-height: 1.5;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+        animation: slideInUp 1s ease-out 0.3s both;
+        font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 20 %}20
+        {% else %}{{ customization.body_font_size|default:16 }}{% endif %}px;
+    }
+
+    .banner-cta {
+        background: rgba(255,255,255,0.2);
+        border: 2px solid rgba(255,255,255,0.4);
+        color: white;
+        padding: 14px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        animation: slideInUp 1s ease-out 0.6s both;
+        font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+        text-decoration: none;
+        display: inline-block;
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:12 }}{% else %}16{% endif %}px;
+
+    }
+
+    .banner-cta:hover {
+        background: rgba(255,255,255,0.25);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Slideshow Controls */
+    .slideshow-indicators {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 4;
+    }
+
+    .indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255,255,255,0.8);
+    }
+
+    .indicator.active {
+        background: rgba(255,255,255,0.9);
+        transform: scale(1.2);
+        box-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+    
+    /* Slideshow Navigation Arrows */
+    .slideshow-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.3);
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .slideshow-nav:hover {
+        background: rgba(0,0,0,0.6);
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    .slideshow-nav.prev {
+        left: 15px;
+    }
+    
+    .slideshow-nav.next {
+        right: 15px;
+    }
+    
+    .slideshow-nav i {
+        pointer-events: none;
+    }
+
+    /* Animations */
+    @keyframes slideInDown {
+        from {
             opacity: 0;
-            visibility: hidden;
+            transform: translateY(-30px);
         }
-
-        .sidebar.collapsed .logo-text {
-            visibility: hidden;
-            display: none !important;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
+    }
 
-
-        /* Sidebar Navigation */
-        .sidebar-nav {
-            flex: 1;
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
         }
-
-        .sidebar-nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            width: 100%;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
+    }
 
-        .sidebar-nav li {
-            margin: 2px 0;
+    /* Search Section */
+    .search-section {
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 40px;
+        border-bottom: 2px solid;
+        border-top: 2px solid;
+        border-color: var(--primary-color);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .search-input-group {
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .search-input-group .form-control {
+        font-weight: 500;
+        padding: 15px 25px;
+        background: white;
+        border-right: transparent;
+        box-shadow: none;
+        color: {{ customization.body_font_color|default:"#000000" }};
+        font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+        border-width: {{ customization.input_border_width|default:1 }}px; 
+        border-style: {{ customization.input_border_style|default:'solid' }};
+        border-color:var(--primary-color);
+        border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+    }
+
+    .search-input-group .form-control:focus {
+        box-shadow: none;
+        border-color: var(--secondary-color);
+    }
+
+    .clear-btn {
+        background: var(--primary-color);
+        border: 2px solid var(--secondary-color);
+        padding: 15px 20px;
+        border-radius: 0 50px 50px 0;
+        transition: all 0.3s ease;
+        color: {{ customization.button_text_color|default:'#ffffff' }}
+
+    }
+
+    .clear-btn:hover {
+        background: var(--accent-color);
+    }
+
+    .category-select {
+        font-weight: 500;
+        padding: 15px 25px;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        color: {{ customization.body_font_color|default:"#000000" }};
+        font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+        border-width: {{ customization.input_border_width|default:1 }}px; 
+        border-style: {{ customization.input_border_style|default:'solid' }};
+        border-color:var(--primary-color);
+        border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+        
+    }
+
+    .category-select:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    /* Base styles */
+    .product-card .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .product-card .card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 12px rgba(0,0,0,0.15);
+    }
+
+    /* Title, Price, and Button Scaling */
+    .product-card .card-body {
+        padding: 0.75rem;
+    }
+
+    .product-card h5.card-title {
+        font-weight: 600;
+        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 25 %}{{ customization.header_font_size|default:20 }}{% else %}25{% endif %}px;
+
+    }
+
+    .product-card .price {
+        font-weight: 500;
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:12 }}{% else %}16{% endif %}px;
+
+    }
+
+    .product-card .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    /* Image Placeholder Scaling */
+    .card-img-container {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+    }
+
+    /* Responsive Queries */
+    @media (max-width: 1200px) {
+        .product-card h5.card-title {
+            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 25 %}{{ customization.header_font_size|default:20 }}{% else %}25{% endif %}px;
         }
-
-        .sidebar-nav a {
-            display: flex;
-            font-weight: 700;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            text-decoration: none;
-            transition: all 0.3s;
-            text-shadow: 1px 1px 6px rgba(37, 37, 37, 0.377);
-            font-family: {{ customization.header_font_family|default:"Arial" }};
-            color: {{ customization.navigation_text_color|default:"#000000" }};
+        .product-card .price {
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:12 }}{% else %}16{% endif %}px;
         }
+    }
 
-        .sidebar-label{
-            font-family: {{ customization.header_font_family|default:"Arial" }};
-            color: {{ customization.navigation_text_color|default:"#000000" }};
+    @media (max-width: 992px) {
+        .product-card .card-body {
+            padding: 10px;
         }
-
-
-        .sidebar-nav a:hover,
-        .sidebar-nav a.active {
-            border-left: 5px solid;
-            background-color: {{ customization.navigation_hover_color|default:"#a8a8a8" }};
-            border-color: {{ customization.navigation_border_color|default:"#cccccc" }};
+        .product-card h5.card-title {
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:12 }}{% else %}16{% endif %}px;
         }
-
-        .sidebar-nav i {
-            font-size: larger;
-            width: 30px;
-            text-align: center;
-            flex-shrink: 0;
-
+        .product-card .btn {
+            font-size: 0.85rem;
+            padding: 0.45rem 0.9rem;
         }
+    }
 
-        /* Sidebar Footer */
-        .sidebar-footer {
-            padding: 15px 0;
-            border-top: 2px solid;
-            border-color: var(--primary-color);
+    @media (max-width: 768px) {
+        .product-card h5.card-title {
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 18 %}{{ customization.body_font_size|default:12 }}{% else %}18{% endif %}px;
         }
-
-        .logout-btn {
-            display: flex;
-            font-weight: 700;
-            font-family: {{ customization.header_font_family|default:"Arial" }};
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            color: {{ customization.navigation_text_color|default:"#000000" }};
-            text-decoration: none;
-            transition: all 0.3s;
-            text-shadow: 1px 1px 6px rgba(37, 37, 37, 0.377);
+        .product-card .price {
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 14 %}{{ customization.body_font_size|default:12 }}{% else %}14{% endif %}px;
         }
-
-        .logout-btn:hover {
-            border-left: 5px solid;
-            background-color: {{ customization.navigation_hover_color|default:"#a8a8a8" }};
-            border-color: {{ customization.navigation_border_color|default:"#cccccc" }};
+        .product-card .btn {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
         }
+    }
 
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            margin-top: var(--navbar-height);
-            min-height: calc(100vh - var(--navbar-height));
-            transition: margin-left 0.3s ease;
+    @media (max-width: 576px) {
+        .product-card h5.card-title {
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 14 %}{{ customization.body_font_size|default:12 }}{% else %}14{% endif %}px;
         }
-
-        .main-content.collapsed {
-            margin-left: 65px;
+        .product-card .btn {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.7rem;
         }
+    }
 
-        /* Mobile Menu Button */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--primary-color);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-        }
+    
+    /* Product Cards */
+    .product-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 15px;
+    }
 
-        .mobile-menu-btn:hover {
-            color: var(--secondary-color);
-            transition: all 0.3s;
-        }
+    .product-card:hover {
+        transform: translateY(-10px);
+    }
 
-        /* Sidebar Overlay  for mobile */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1035;
-        }
+    .product-card .card {
+        padding: 12px;
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
+        transition: all 0.3s ease;
+    }
 
-        /* Hide sidebar labels when collapsed on desktop */
-        .sidebar.collapsed .sidebar-label {
-            display: none !important;
-        }
+    .product-card:hover .card {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
 
-        .sidebar.collapsed .logout-btn span {
-            display: none !important;
+    #bestsellerGrid .card-img-container {
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+        border-radius: 20px 20px 0 0;
+    }
+    
+    #bestsellerGrid .card-img-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+        font-size: 3rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .card-img-container img {   
+        transition: transform 0.2s ease;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .card-img-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+        font-size: 3rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .card-title {
+        font-weight: 700;
+        text-transform: capitalize;
+        text-align: left;
+        margin: 0;
+        font-family: "{{ customization.header_font_family|default:'Arial' }}";
+        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' > 20 %}20{% else %}{{ customization.header_font_size|default:14 }}{% endif %}px;
+        color: {{ customization.header_font_color|default:"#000000" }};
+    }
+
+    .price-badge {
+        font-weight: 600;
+        font-family: {{ customization.body_font_family|default:"Montserrat" }};
+        color: {{ customization.body_font_color|default:"#000000" }};
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 15 %}15
+        {% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+        display: inline-block;
+    }
+
+    .btn-add-to-cart {
+        background: linear-gradient(90deg, var(--primary-color, #3498db), var(--secondary-color, #e74c3c)); /* Gradient background */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        border: none;
+        padding: 12px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border-radius: {{ customization.button_rounded_corner|default:1 }}px;
+        font-family: {{ customization.header_font_family|default:"Montserrat" }};
+        color: {{ customization.button_text_color|default:'#ffffff' }};
+    }
+
+    .btn-add-to-cart:hover {
+        linear-gradient(90deg, var(--secondary-color, #3498db), var(--primary-color, #e74c3c)); /* Gradient background */       
+        transform: translateY(-2px);
+        box-shadow: none;
+        color: {{ customization.button_text_color|default:'#ffffff' }};
+    }
+
+    .btn-add-to-cart:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--accent-color);
+        transition: left 0.5s;
+        
+    }
+
+    .btn-add-to-cart:hover:before {
+        left: 100%;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(20px);
+    }
+
+    .modal-header {
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); /* Gradient background */
+        font-family: {{ customization.header_font_family|default:"Arial" }};
+        color: white;
+        border-radius: 20px 20px 0 0;
+        padding: 20px 20px;
+        border-bottom: 2px solid var(--secondary-color);
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .modal-image-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-image-box {
+        width: 300px;
+        height: 300px;
+        position: relative;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        overflow: hidden;
+        background-color: #f2f2f2;
+    }
+
+    #modalProductImage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+        z-index: 2;
+    }
+
+    .modal-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+        border-radius: 10px;
+        z-index: 1;
+    }
+
+    .modal-placeholder span {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    .modal-footer {
+        font-family: {{ customization.body_font_family|default:"Montserrat" }};
+        padding: 10px 10px;
+        border-top: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .form-label{
+        font-family: {{ customization.body_font_family|default:"Montserrat" }};
+        margin-bottom: 1px;
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 12 %}{{ customization.body_font_size|default:10 }}{% else %}12{% endif %}px;
+
+    }
+
+        /* Product Name */
+    #modalProductName {
+        font-weight: 700;
+        margin-bottom: 2px;
+        font-family: {{ customization.header_font_family|default:"Montserrat" }};
+        color: {{ customization.header_font_color|default:"#000000" }};
+        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 20 %}{{ customization.header_font_size|default:15 }}{% else %}20{% endif %}px;
+
+    }
+
+    /* Price */
+    .modal-product-price {
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 15px;
+        font-family:  {{ customization.body_font_family|default:"Montserrat" }};
+        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 25 %}{{ customization.header_font_size|default:20 }}{% else %}25{% endif %}px;
+    }
+
+    .modal-dropdown {
+        width: 100%;
+        font-weight: 600;
+        max-width: 250px;
+        padding: 10px 14px;
+        font-size: 1rem;
+        background-color: #fdfdfd;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        appearance: none; /* removes native dropdown styling */
+        color: {{ customization.body_font_color|default:"#000000" }};
+        font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+        border-width: {{ customization.input_border_width|default:1 }}px; 
+        border-style: {{ customization.input_border_style|default:'solid' }};
+        border-color: {{ customization.primary_color|default:'#000000' }};
+        border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+    }
+
+    /* Optional: focus and hover effect */
+    .modal-dropdown:focus {
+        border-color: var(--secondary-color);
+        box-shadow: none;
+        outline: none;
+    }
+
+    .modal-dropdown:hover {
+        border-color: var(--secondary-color);
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 12px;
+        background-color: #f8f9fa;
+        width: fit-content;
+        margin: 0 auto;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        color: {{ customization.body_font_color|default:"#000000" }};
+        font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+        border-width: {{ customization.input_border_width|default:1 }}px; 
+        border-style: {{ customization.input_border_style|default:'solid' }};
+        border-color: {{ customization.primary_color|default:'#000000' }};
+        border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
+
+    }
+
+    .unit-total {
+        color: var(--secondary-color);
+        font-weight: 800;
+        font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 25 %}{{ customization.header_font_size|default:20 }}{% else %}25{% endif %}px;
+    }
+
+    /* Buttons */
+    .quantity-btn {
+        font-weight: 600;
+        background-color: #ffffff;
+        color: var(--primary-color);
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        border-width: {{ customization.input_border_width|default:1 }}px; 
+        border-style: {{ customization.input_border_style|default:'solid' }};
+        border-color: {{ customization.primary_color|default:'#000000' }};
+        border-radius: {{ customization.button_rounded_corner|default:1 }}px;
+        font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 17 %}{{ customization.body_font_size|default:12 }}{% else %}17{% endif %}px;
+    }
+
+    .quantity-btn:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        color: {{ customization.button_text_color|default:'#ffffff' }};
+        transform: scale(1.05);
+    }
+
+    .quantity-input {
+        border: none;
+        background: transparent;
+        text-align: center;
+        font-weight: 600;
+        width: 40px;
+        outline: none;
+        font-family:  {{ customization.body_font_family|default:"Montserrat" }};
+        color: {{ customization.body_font_color|default:"#000000" }};
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 17 %}{{ customization.body_font_size|default:12 }}{% else %}17{% endif %}px;
+
+    }
+
+    /* Success Message */
+    .cart-success {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: none;
+        box-shadow: 0 5px 15px rgba(21, 87, 36, 0.2);
+    }
+
+    /* No Results */
+    .no-products {
+        text-align: center;
+        padding: 80px 20px;
+        color: #6c757d;
+    }
+
+    .no-products i {
+        opacity: 0.5;
+        margin-bottom: 20px;
+    }
+
+    /* Product Count */
+    .product-count {
+        font-family: {{ customization.body_font_family|default:"Montserrat" }};
+        background: rgba(255,255,255,0.8);
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: 500;
+        color: var(--accent-color);
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        text-align: center;
+        padding: 40px;
+        display: none;
+    }
+
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+    }
+
+
+
+    /* Mobile Responsive Design */
+    @media (max-width: 1024px) {
+        .banner-section {
+            height: 50vh;
+            min-height: 350px;
         }
         
-        /* Responsive Design */
+        .banner-text h1 {
+            font-size: 2.2rem;
+        }
         
-        /* Tablets and small desktops (768px - 1199px) */
-        @media (min-width: 768px) and (max-width: 1199px) {
-            :root {
-                --sidebar-width: 220px;
-            }
-            
-            .main-content {
-                padding: 25px;
-            }
-            
-            .content-header {
-                font-size: 1.75rem;
-            }
+        .banner-text p {
+            font-size: 1rem;
         }
-
-        /* Mobile devices (max-width: 767px) */
-        @media (max-width: 767px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: var(--sidebar-width);
-            }
-
-            .sidebar.show {
-                transform: translateX(0);
-            }
-
-            .sidebar-overlay.show {
-                display: block;
-            }
-
-            .top-navbar {
-                left: 0;
-                padding: 0 15px;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 20px 15px;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .content-header {
-                font-size: 1.5rem;
-                margin-bottom: 20px;
-            }
-
-            .navbar-brand {
-                font-size: 1.1rem;
-            }
-
-            .navbar-nav {
-                gap: 10px;
-            }
-
-            .navbar-nav a {
-                padding: 6px 8px;
-                font-size: 0.9rem;
-            }
-
-            /* Ensure sidebar is full width on mobile when collapsed state is applied */
-            .sidebar.collapsed {
-                width: var(--sidebar-width);
-                transform: translateX(-100%);
-            }
-
-            .sidebar.collapsed.show {
-                transform: translateX(0);
-            }
+    }
+    
+    @media (max-width: 768px) {
+        .banner-section {
+            height: 45vh;
+            min-height: 320px;
+            margin-bottom: 30px;
         }
-
-        /* Small mobile devices (max-width: 575px) */
-        @media (max-width: 575px) {
-            .main-content {
-                padding: 15px 10px;
-            }
-
-            .content-header {
-                font-size: 1.25rem;
-            }
-
-            .navbar-brand {
-                font-size: 1rem;
-            }
-
-            .top-navbar {
-                padding: 0 10px;
-            }
-
-            .navbar-nav a span {
-                display: none;
-            }
-
-            .navbar-nav a {
-                padding: 8px;
-            }
+        
+        .banner-content {
+            padding: 1.5rem 1rem;
         }
-
-        /* Large screens (min-width: 1200px) */
-        @media (min-width: 1200px) {
-            .main-content {
-                padding: 40px;
-            }
-            
-            .content-header {
-                font-size: 2.25rem;
-            }
+        
+        .banner-text h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
         }
-
-        .delivery-fee-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            border-radius: 15px;
-            z-index: 10000;
-            width: 380px;
-            box-shadow: 0 20px 40px var(--primary-color);
+        
+        .banner-text p {
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            max-width: 90%;
         }
-
-        .delivery-modal-content {
-            background: white;
-            border-radius: 15px;
-        }
-
-        .delivery-modal-header {
-            display: flex;
-            align-items: center;
-            flex-direction: column; 
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 15px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        }
-
-        .delivery-fee-modal h4 {
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            font-size: 20px;
-            font-weight: 700;
-            font-family: "{{ customization.header_font_family|default:"Arial" }}";
-            color: {{ customization.button_text_color|default:'#ffffff' }};
-            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
-            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
-        }
-
-        .delivery-modal-section {
-            padding-bottom: 15px;
-            padding-left: 15px;
-            padding-right: 15px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .delivery-modal-section:hover {
-            background: rgba(255, 255, 255, 0.8);
-            transform: translateY(-1px);
-        }
-
-        .delivery-modal-label {
-            margin: 0 0 4px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 700;
-            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
-            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 12 %}12
-            {% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
-            color: {{ customization.body_font_color|default:"#000000" }};
-        }
-
-        .delivery-modal-value {
-            margin: 0;
-            color: #1f2937;
+        
+        .banner-cta {
+            padding: 12px 24px;
             font-size: 14px;
-            font-weight: 500;
+            margin-top: 1rem;
+        }
+        
+        .search-section {
+            padding: 20px;
+        }
+        
+        .product-card {
+            margin-bottom: 10px;
         }
 
-        .delivery-address-container {
-            display: flex;
-            align-items: flex-start;
+        .slideshow-nav {
+            display: none;
+        }
+        
+        .slideshow-indicators {
+            bottom: 15px;
+        }
+        
+        .indicator {
+            width: 8px;
+            height: 8px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .banner-section {
+            height: 40vh;
+            min-height: 280px;
+            border-radius: 8px;
+        }
+        
+        .banner-content {
+            padding: 1rem 0.8rem;
+        }
+        
+        .banner-text h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.6rem;
+        }
+        
+        .banner-text p {
+            font-size: 0.85rem;
+            margin-bottom: 0.6rem;
+            max-width: 95%;
+        }
+        
+        .banner-cta {
+            padding: 10px 20px;
+            font-size: 13px;
+            margin-top: 0.8rem;
+        }
+        
+        .slideshow-indicators {
+            bottom: 10px;
             gap: 8px;
         }
-
-        .delivery-address-container .modal-value {
-            flex: 1;
+        
+        .indicator {
+            width: 6px;
+            height: 6px;
         }
+    }
 
-        .delivery-copyAddressBtn {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            border-radius: {{ customization.input_rounded_corner|default:1 }}px;
-            padding: 6px 12px;
-            font-size: 10px;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            text-transform: uppercase;
-            transition: transform 0.2s ease;
+    /* Best Seller List View - Match Product Grid Style */
+
+
+    /* Animation Classes */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .scale-in {
+        animation: scaleIn 0.3s ease-out;
+    }
+
+    @keyframes scaleIn {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    /* List View - Flex Row Container */
+    #productGrid.list-view {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+
+    /* Each Product Card: take full width on small, 48% on large */
+    #productGrid.list-view .product-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        background: rgba(255,255,255,0.9);
+        border-radius: 15px;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+
+    /* Small devices (≥576px) */
+   
+    /* Default: mobile first (sm–md: <992px) → 1 per row */
+    #productGrid.list-view .product-card {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    /* Large devices (≥992px) → 2 per row */
+    @media (min-width: 992px) {
+        #productGrid.list-view .product-card {
+            width: calc(39% - 10px);
         }
+    }
 
-        .delivery-copyAddressBtn:hover {
-            transform: translateY(-1px) scale(1.05);
+    /* Extra large devices (≥1200px) → still 2 per row */
+    @media (min-width: 1200px) {
+        #productGrid.list-view .product-card {
+            width: calc(36% - 10px);
         }
+    }
 
-        .modalItems {
-            background: rgba(248, 249, 250, 0.8);
-            border: 1px solid rgba(233, 236, 239, 0.5);
-            border-radius: 6px;
-            padding: 12px;
-            max-height: 100px;
-            overflow-y: auto;
-            font-size: 13px;
-            line-height: 1.4;
-            font-weight: 700;
-            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
-            color: {{ customization.body_font_color|default:"#000000" }};
+    /* 2XL screens (≥1400px) → 3 per row */
+    @media (min-width: 1400px) {
+        #productGrid.list-view .product-card {
+            width: calc(32% - 20px);
         }
+    }
 
-        .delivery-total-price {
-            background: rgba(255, 255, 255, 0.6);
-            padding-left: 15px;
-            padding-right: 15px;
+    #productGrid.list-view .product-card .card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+    }
 
+    #productGrid.list-view .card-img-container,
+    #productGrid.list-view .card-img-placeholder {
+        flex: 0 0 120px;
+        height: 120px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* Product name */
+    #productGrid.list-view .card-title {
+        font-size: 20px;
+        font-weight: 800;
+        text-align: left;
+        font-family: {{ customization.body_font_family|default:"Montserrat" }};
+        color: {{ customization.body_font_color|default:"#000000" }};
+    }
+
+    #productGrid.list-view .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: left;
+        justify-content: space-between;
+    }
+
+    #productGrid.list-view .price-badge {
+        margin-bottom: 20px;
+        font-family: {{ customization.body_font_family|default:"Montserrat" }};
+        color: {{ customization.body_font_color|default:"#000000" }};
+    }
+
+    #productGrid.list-view .btn-add-to-cart {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    /* Best Seller Grid List View - Match Product Grid Style */
+    #bestsellerGrid.list-view {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* Each Best Seller Card: take full width on small, 48% on large */
+    #bestsellerGrid.list-view .product-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        background: rgba(255,255,255,0.9);
+        border-radius: 15px;
+        width: 100%;
+    }
+
+
+    #bestsellerGrid.list-view .product-card .card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        width: 100%;
+    }
+
+    #bestsellerGrid.list-view .card-img-container,
+    #bestsellerGrid.list-view .card-img-placeholder {
+        flex: 0 0 120px;
+        height: 120px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-right: 20px;
+    }
+
+    /* Best Seller name */
+    #bestsellerGrid.list-view .card-title {
+        font-size: 20px;
+        font-family: {{ customization.body_font_family|default:"Montserrat" }};
+        color: {{ customization.body_font_color|default:"#000000" }};
+        font-weight: 700;
+        text-align: left;
+    }
+
+    #bestsellerGrid.list-view .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: left;
+        justify-content: space-between;
+    }
+
+    #bestsellerGrid.list-view .price-badge {
+        font-family: {{ customization.body_font_family|default:"Montserrat" }};
+        color: {{ customization.body_font_color|default:"#000000" }};
+        margin: 10px 20px 0 0;
+    }
+
+    #bestsellerGrid.list-view .btn-add-to-cart {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    .gridIcon {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        cursor: pointer;
+        border: none;
+        padding: 10px;
+        border-radius: 6px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .gridIcon:hover {
+        background-color: var(--primary-color);
+        border: none;
+        color: {{ customization.button_text_color|default:'#ffffff' }}
+
+    }
+
+    /* Best Seller Section */
+    .bestseller-section {
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 35px 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        border-top: 10px solid var(--accent-color);
+        border-bottom: 10px solid var(--accent-color);
+    }
+
+    .bestseller-title {
+        margin-top: 15px;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+        text-align: center;
+        font-family: "{{ customization.header_font_family|default:"Arial" }}";
+        font-size: min({{ customization.header_font_size|default:24 }}px, 45px);
+        color: var(--primary-color);
+        font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}900{% else %}normal{% endif %};
+        font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+        
+    }
+
+    .bestseller-subtitle {
+        margin-bottom: 30px;
+        font-weight: 700;
+        text-align: center;
+        font-family: "{{ customization.body_font_family|default:"Arial" }}";
+        font-size: min({{ customization.body_font_size|default:24 }}px, 18px);
+        color: var(--primary-color);
+    }
+
+    .bestseller-card {
+        position: relative;
+        background: white;
+        border-radius: 6px;
+        padding: 0;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        transition: all 0.2s ease;
+        border: 1px solid #f1f3f4;
+        height: 100%;
+    }
+
+    .bestseller-card .card-body {
+        padding: 0.4rem;
+    }
+
+    .bestseller-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(41, 41, 41, 0.178);
+    }
+
+    .bestseller-rank {
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        background: var(--primary-color);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 15px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        z-index: 3;
+    }
+
+    /* Position the ranking badge relative to the product card container */
+    #bestsellerGrid .product-card {
+        position: relative;
+        padding-top: 6px;
+        padding-left: 6px;
+    }
+
+    /* Ensure 2-grid layout for best sellers on mobile/tablet, 3-grid on desktop */
+    #bestsellerGrid .col-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    @media (min-width: 768px) {
+        #bestsellerGrid .col-md-4 {
+            flex: 0 0 50%;
+            max-width: 50%;
         }
+    }
 
-        .delivery-total-price .delivery-modal-value {
-            background: var(--primary-color);
-            font-weight: 700;
-            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
-            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 12 %}12
-            {% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
-            color: {{ customization.body_font_color|default:"#000000" }};
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+    @media (min-width: 992px) {
+        #bestsellerGrid .col-md-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
         }
+    }
 
-        .delivery-input-section {
-            margin-bottom: 20px;
-            padding-left: 15px;
-            padding-right: 15px;
+    @media (min-width: 1200px) {
+        #bestsellerGrid .col-xl-3 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
         }
+    }
 
-        .delivery-fee-modal label {
-            display: block;
-            margin-bottom: 5px;
-            color: #374151;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 576px) {
+        .bestseller-section {
+            padding: 10px;
+            margin-bottom: 15px;
         }
-
-        .delivery-fee-modal input[type="number"] {
-            width: 100%;
-            padding: 12px 16px;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
-            background: rgba(255, 255, 255, 0.8);
-            font-weight: 600;
-            color: {{ customization.body_font_color|default:"#000000" }};
-            font-family: '{{ customization.body_font_family|default:"Arial" }}';
-            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
-            border-width: {{ customization.input_border_width|default:1 }}px; 
-            border-style: {{ customization.input_border_style|default:'solid' }};
-            border-color: {{ customization.primary_color|default:'#000000' }};
-            border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+        
+        .bestseller-title {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
         }
-
-        .delivery-fee-modal input[type="number"]:focus {
-            outline: none;
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        
+        .bestseller-subtitle {
+            font-size: 0.75rem;
+            margin-bottom: 8px;
         }
-
-        .delivery-button-container {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-bottom: 20px;
-            padding-right: 15px;
+        
+        .bestseller-card .card-body {
+            padding: 0.3rem;
         }
-
-        .rejectDeliveryFeeBtn{
-            background: rgba(107, 114, 128, 0.1);
-            border: none;
-            padding: 10px 20px;
-            font-size: 12px;
-            color: #6b7280;
-            cursor: pointer;
-            font-weight: 600;
-            text-transform: uppercase;
-            transition: all 0.2s ease;
-            font-family: {{ customization.header_font_family|default:"Arial" }};
-            border-radius: {{ customization.button_rounded_corner|default:1 }}px;
+        
+        .bestseller-rank {
+            width: 26px;
+            height: 26px;
+            font-size: 0.9rem;
+            top: -5px;
+            left: -5px;
         }
-
-        .rejectDeliveryFeeBtn:hover {
-            background: rgba(107, 114, 128, 0.15);
-            transform: translateY(-1px);
+        
+        #bestsellerGrid .product-card {
+            padding-top: 4px;
+            padding-left: 4px;
         }
-
-        .submitDeliveryFeeBtn {
-            padding: 10px 24px;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: 700;
-            text-transform: uppercase;
-            transition: all 0.2s ease;
-            border-radius: {{ customization.button_rounded_corner|default:1 }}px;
-            font-family: {{ customization.header_font_family|default:"Montserrat" }};
-            background: linear-gradient(90deg, {{ customization.primary_color|default:'#000000' }}, {{ customization.secondary_color|default:'#808080' }}); /* Gradient background */
-            color: {{ customization.button_text_color|default:'#ffffff' }};
+        
+        .card-title {
+            font-size: 0.85rem;
+            line-height: 1.2;
         }
-
-        .submitDeliveryFeeBtn:hover {
-            background: linear-gradient(90deg, {{ customization.secondary_color|default:'#000000' }}, {{ customization.primary_color|default:'#808080' }}); /* Gradient background */
-        }
-
-        /* Backdrop to disable background clicks */
-        .delivery-fee-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 9999; /* Just below the modal */
-        }
-
-        /* Responsive notification badge size */
-        #notification-badge {
-            font-size: 0.7em;          /* Scale with icon size */
-            padding: 0.35em 0.5em;     /* Relative padding */
-            min-width: 1.4em;          /* Keeps round shape */
-            min-height: 1.4em;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Medium devices: make badge slightly bigger */
-        @media (max-width: 992px) {
-            #notification-badge {
-                font-size: 0.8em;
-                min-width: 1.6em;
-                min-height: 1.6em;
-            }
-        }
-
-        /* Small devices: bigger for visibility */
-        @media (max-width: 576px) {
-            #notification-badge {
-                font-size: 0.9em;
-                min-width: 1.8em;
-                min-height: 1.8em;
-            }
-        }
-
-        /* Reuse main logo-circle styles, but adjust size for sidebar */
-        .sidebar-logo-circle {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background-color: #f0f0f0; /* adjust color */
-            display: flex;
-            align-items: center;   /* vertical center */
-            justify-content: center; /* horizontal center */
-        }
-
-        .sidebarlogo-text {
-            font-weight: bold;
-            font-size: 15px;
-            color: #333;
-        }
-
-        .timer-container {
-            margin-top: -4px;
-            margin-bottom: 5px;
+        
+        .price-badge {
             font-size: 0.8rem;
-            font-weight: 500;
-            display: flex;
-            justify-content: left;
-            align-items: left;
-            gap: 6px;
-        }
-    
-        .timer-label {
-            font-size: 13px;
-            font-weight: 700;
-            font-family: "{{ customization.header_font_family|default:"Arial" }}";
-            color: {{ customization.button_text_color|default:'#ffffff' }};
-            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
-            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
-        }
-    
-    
-        .timer-display {
-            fontsize: 12px;
-            font-weight: 600;
-            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
-            color: {{ customization.body_font_color|default:"#000000" }};
-            color: {{ customization.button_text_color|default:'#ffffff' }};   
-        }
-        .timer-icon {
-            width: 13px;
-            height: 13px;
-            border: 2px solid {{ customization.body_font_color|default:"#000000" }};
-            border-top: 2px solid transparent; /* creates spinner effect */
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-    
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to   { transform: rotate(360deg); }
+            margin-bottom: 0.5rem !important;
         }
         
-    </style>
-</head>
-<body>
-    <audio id="modalSound" src="{% static 'sounds/notification.mp3' %}" preload="auto"></audio>
+        .btn-add-to-cart {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+        }
+    }
 
-    <!-- Top Navbar -->
-    <nav class="top-navbar">
-        <div class="d-flex align-items-center">
-            <button class="btn btn-light d-md-none me-3 mobile-menu-btn p-0 border-0" type="button" onclick="toggleSidebar()" aria-label="Toggle sidebar">
-                {% if business and business.logo %}
-                    <img src="{{ business.logo.url }}" alt="Logo" style="height: 40px; width: auto;">
-                {% else %}
-                    <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 40px; width: auto;">
-                {% endif %}
-            </button>
-            <div class="navbar-brand">
-                {% if title %}
-                    {{ title }}
-                {% else %}
-                    Business Name
-                {% endif %}
+    @media (max-width: 768px) {
+        .bestseller-section {
+            padding: 10px;
+        }
+        
+        .bestseller-title {
+            font-size: 1.3rem;
+        }
+        
+        .bestseller-card .card-body {
+            padding: 0.35rem;
+        }
+    }
+
+    .banner-slideshow {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        opacity: 0;
+        transition: opacity 1.2s ease-in-out;
+        z-index: 0;
+    }
+
+    .slide.active {
+        opacity: 1;
+        z-index: 1;
+    }
+
+    .product-stocks {
+        font-weight: 700 !important;  
+        color: var(--primary-color) !important;  
+        display: inline !important;  
+        font-family: {{ customization.body_font_family|default:"Arial" }} !important;  
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 15 %}{{ customization.body_font_size|default:12 }}{% else %}15{% endif %}px !important;  
+    }
+
+</style>
+
+
+<!-- Banner Section with Slideshow -->
+<div class="banner-section">
+    <!-- Slideshow Container -->
+    <div class="banner-slideshow" id="bannerSlideshow">
+        <!-- Welcome Slide -->
+        <div class="slide welcome-slide active" data-slide="0">
+            <!-- Text Over Welcome Slide -->
+            <div class="banner-content">
+                <div class="banner-text">
+                    <h1>Welcome to {% if business %}{{ business.business_name }}!{% else %}Our Store{% endif %}</h1>
+                    <p>
+                        {% if business.start_day and business.end_day and business.opening_time and business.closing_time %}
+                            We are open every {{ business.start_day }} to {{ business.end_day }} from {{ business.opening_time|date:"h:i A" }} to {{ business.closing_time|date:"h:i A" }}.
+                        {% else %}
+                            Discover amazing products at unbeatable prices
+                        {% endif %}
+                    </p>
+                    <p>
+                        {% if dynamic_description %}
+                            {{ dynamic_description }}
+                        {% else %}
+                            Shop with us today and find what you love!
+                        {% endif %}
+                    </p>
+                    <button class="btn banner-cta" onclick="scrollToSearch()">
+                        <i class="fas fa-search me-2"></i>Start Shopping
+                    </button>
+                </div>
             </div>
         </div>
         
-        <div class="navbar-nav">
-            <a href="{% url 'notifications' %}" class="position-relative {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
-                <i class="fa-duotone fa-regular fa-bell" style="font-size: 20px;"></i>
-                <span id="notification-badge"
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
-                    0
-                </span>
-            </a>
-        </div>
-    </nav>
+        <!-- Custom Images (if available) -->
+        {% if customization.homepage_image_1 %}
+        <div class="slide" data-slide="6" style="background-image: url('{{ customization.homepage_image_1.url }}');"></div>
+        {% endif %}
+        {% if customization.homepage_image_2 %}
+        <div class="slide" data-slide="7" style="background-image: url('{{ customization.homepage_image_2.url }}');"></div>
+        {% endif %}
+        {% if customization.homepage_image_3 %}
+        <div class="slide" data-slide="8" style="background-image: url('{{ customization.homepage_image_3.url }}');"></div>
+        {% endif %}
+        {% if customization.homepage_image_4 %}
+        <div class="slide" data-slide="9" style="background-image: url('{{ customization.homepage_image_4.url }}');"></div>
+        {% endif %}
+        {% if customization.homepage_image_5 %}
+        <div class="slide" data-slide="10" style="background-image: url('{{ customization.homepage_image_5.url }}');"></div>
+        {% endif %}
+    </div>
 
-    <!-- Sidebar Overlay (Mobile) -->
-    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <!-- Navigation Arrows -->
+    <button class="slideshow-nav prev" id="prevSlide" onclick="changeSlide(-1)">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="slideshow-nav next" id="nextSlide" onclick="changeSlide(1)">
+        <i class="fas fa-chevron-right"></i>
+    </button>
 
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo" onclick="toggleSidebarDesktop()">
-                {% if business and business.logo %}
-                    <img src="{{ business.logo.url }}" alt="Logo" class="logo-img" />
+    <!-- Indicators -->
+    <div class="slideshow-indicators" id="slideshowIndicators">
+        <div class="indicator active" onclick="currentSlide(0)"></div>
+        {% if customization.homepage_image_1 %}<div class="indicator" onclick="currentSlide(6)"></div>{% endif %}
+        {% if customization.homepage_image_2 %}<div class="indicator" onclick="currentSlide(7)"></div>{% endif %}
+        {% if customization.homepage_image_3 %}<div class="indicator" onclick="currentSlide(8)"></div>{% endif %}
+        {% if customization.homepage_image_4 %}<div class="indicator" onclick="currentSlide(9)"></div>{% endif %}
+        {% if customization.homepage_image_5 %}<div class="indicator" onclick="currentSlide(10)"></div>{% endif %}
+    </div>
+</div>
+
+
+<!-- Best Seller Section -->
+{% if customization.show_best_sellers %}
+<div class="bestseller-section">
+    <div class="section-header text-center mb-2">
+        <h2 class="bestseller-title">
+            <i class="fas fa-trophy me-1"></i>{{ customization.best_sellers_title|default:"Best Sellers" }}
+        </h2>
+        <p class="bestseller-subtitle">{{ best_sellers_description|default:"Our most popular products loved by customers" }}</p>
+    </div>
+
+    <!-- Best Seller Products Grid (same style as product grid) -->
+    <div class="row" id="bestsellerGrid">
+        {% for product in best_seller_products %}
+        <div class="col-6 col-md-4 col-xl-3 g-2 product-card fade-in" 
+             data-name="{{ product.name|lower }}" 
+             data-category="{{ product.category }}">
+             
+            <!-- Ranking Badge -->
+            <div class="bestseller-rank">{{ forloop.counter }}</div>
+
+            <div class="card">
+                {% if product.image %}
+                <div class="card-img-container ratio ratio-1x1">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                </div>
                 {% else %}
-                    <div class="logo-circle sidebar-logo-circle">
-                        <span class="sidebarlogo-text">Logo</span>
+                <div class="card-img-container ratio ratio-1x1">
+                    <div class="card-img-placeholder d-flex align-items-center justify-content-center"
+                        style="
+                            width: 100%; 
+                            height: 100%; 
+                            border-radius: 20px 20px 0 0;
+                            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+                        ">
+                        <span style="font-size: 5rem; font-weight: 800; color: #ffffff;">
+                            {{ product.name|first|upper }}
+                        </span>
                     </div>
+                </div>
                 {% endif %}
-                <span class="logo-text">
-                    {% if business and business.business_name %}
-                        {{ business.business_name }}
-                    {% else %}
-                        Business Name
-                    {% endif %}
-                </span>
+                
+                <div class="card-body d-flex flex-column">
+                    <h6 class="mb-0">
+                        <span class="card-title mb-0">{{ product.name }}</span>
+                        {% if product.track_stocks %}
+                            <span class="product-stocks">(Stocks: {{ product.stocks }})</span>
+                        {% endif %}
+                    </h6>
+                    <div>
+                        <div class="price-badge mb-2">{{ product.price_range }}</div>
+                        <button class="btn btn-add-to-cart w-100"
+                                data-product="{{ product.name }}"
+                                data-image="{% if product.image %}{{ product.image.url }}{% endif %}">
+                            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                    <i class="bi bi-bar-chart-line"></i> 
-                    <span class="sidebar-label">Dashboard</span>
-                </a></li>
+        {% empty %}
+        <div class="col-12">
+            <div class="no-products">
+                <i class="fas fa-star fa-2x"></i>
+                <h5 class="mt-2">No bestsellers available</h5>
+                <p class="text-muted small">Please check back later.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 
-                <li><a href="{% url 'inventory' %}" class="{% if request.resolver_match.url_name == 'inventory' %}active{% endif %}">
-                    <i class="bi bi-box-seam"></i> 
-                    <span class="sidebar-label">Inventory</span>
-                </a></li>
+<!-- Search and Filter Section -->
+<div id="searchSection" class="search-section">
+    <div class="row align-items-center">
+        <div class="col-lg-8 mb-3 mb-lg-0">
+            <div class="input-group search-input-group">
+                <input type="text" class="form-control" id="searchInput" 
+                       placeholder="Search..." onkeyup="filterProducts()" autocomplete="off">
+                <button class="btn clear-btn" type="button" onclick="clearSearch()" title="Clear search">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <select id="categoryFilter" class="form-select category-select" onchange="filterProducts()">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.name }}">{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div class="product-count">
+                <i class="fas fa-box me-2"></i>
+                <span id="productCount">{{ products|length }}</span> product{{ products|length|pluralize }} available
+            </div>
+            <div class="d-flex gap-2">
+                <button class="gridIcon" onclick="toggleGridView()">
+                    <i class="fas fa-th" id="gridIcon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
-                {% if 'OnSite' in business.services_offered %}
-                    <li>
-                        <a href="{% url 'pos' %}" class="{% if request.resolver_match.url_name == 'pos' %}active{% endif %}">
-                            <i class="bi bi-cart4"></i>
-                            <span class="sidebar-label">Point-of-Sale</span>
-                        </a>
-                    </li>
-                {% endif %}
+<!-- Success Message -->
+<div class="cart-success scale-in" id="cartSuccess">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-check-circle me-3 fs-4"></i>
+        <div>
+            <strong>Success!</strong><br>
+            <span id="successMessage">Item added to cart successfully!</span>
+        </div>
+    </div>
+</div>
 
-                {% if 'Delivery' in business.services_offered %}
-                <li><a href="{% url 'delivery' %}" class="{% if request.resolver_match.url_name == 'delivery' %}active{% endif %}">
-                    <i class="bi bi-truck"></i> 
-                    <span class="sidebar-label">Delivery</span>
-                </a></li>
-                {% endif %}
+<!-- Loading Spinner -->
+<div class="loading-spinner" id="loadingSpinner">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3 fw-semibold">Adding to cart...</p>
+</div>
 
-                <li><a href="{% url 'reviews' %}" class="{% if request.resolver_match.url_name == 'reviews' %}active{% endif %}">
-                    <i class="bi bi-chat-square-dots"></i> 
-                    <span class="sidebar-label">Reviews</span>
-                </a></li>
+<!-- Outside Hours Message -->
+<div class="cart-success scale-in" id="outsideHoursNotice" style="display: none; background: #dc3545;">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-clock me-3 fs-4"></i>
+        <div>
+            <strong>WE ARE CLOSED!</strong><br>
+            <span>We’re happy to serve you from {{ business.opening_time|date:"h:i A" }} to {{ business.closing_time|date:"h:i A" }}. You’ll be able to add items to your cart once we’re open again. Thank you for your understanding!</span>
+        </div>
+    </div>
+</div>
 
-                <li><a href="{% url 'users' %}" class="{% if request.resolver_match.url_name == 'users' %}active{% endif %}">
-                    <i class="bi bi-people"></i> 
-                    <span class="sidebar-label">Users</span>
-                </a></li>
+<!-- Force Closed Message -->
+<div class="cart-success scale-in" id="forceClosedNotice" style="display: none; background: #dc3545;">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
+        <div>
+            <strong>SHOP TEMPORARILY CLOSED!</strong><br>
+            <span>We are currently closed due to urgent reasons. Please check back later. Thank you for your understanding!</span>
+        </div>
+    </div>
+</div>
 
-                <li><a href="{% url 'settings' %}" class="{% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
-                    <i class="bi bi-gear"></i> 
-                    <span class="sidebar-label">Settings</span>
-                </a></li>
-            </ul>
-        </nav>
+<!-- Products Grid -->
+<div class="row" id="productGrid">
+    {% for product in products %}
+    <div class="col-6 col-md-4 col-xl-3 g-2 product-card fade-in" data-name="{{ product.name|lower }}" data-category="{{ product.category }}">
+        <div class="card">
+            {% if product.image %}
+            <div class="card-img-container ratio ratio-1x1">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+            </div>
+            {% else %}
+            <div class="card-img-container ratio ratio-1x1">
+                <div class="card-img-placeholder d-flex align-items-center justify-content-center"
+                    style="
+                        width: 100%; 
+                        height: 100%; 
+                        border-radius: 20px 20px 0 0;
+                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+                    ">
+                    <span style="font-size: 5rem; font-weight: 800; color: #ffffff;">
+                        {{ product.name|first|upper }}
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+                <h6 class="mb-0">
+                    <span class="card-title mb-0">{{ product.name }}</span>
+                    {% if product.track_stocks %}
+                        <span class="product-stocks">(Stocks: {{ product.stocks }})</span>
+                    {% endif %}
+                </h6>
+                <div>
+                    <div class="price-badge mb-2">{{ product.price_range }}</div>
+                    <button class="btn btn-add-to-cart w-100"
+                            data-product="{{ product.name }}"
+                            data-image="{% if product.image %}{{ product.image.url }}{% endif %}">
+                        <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="no-products">
+            <i class="fas fa-store-slash fa-5x"></i>
+            <h3 class="mt-4">No products available</h3>
+            <p class="text-muted">Please check back later for new products.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
-        
-        <div class="sidebar-footer">
-            <a href="{% url 'logout' %}" class="logout-btn">
-                <i class="bi bi-box-arrow-right"></i> <span>Log Out</span>
-            </a>
+<!-- No Results Message -->
+<div class="no-products" id="noResults" style="display: none;">
+    <i class="fas fa-search-minus fa-5x"></i>
+    <h3 class="mt-4">No products found</h3>
+    <p class="text-muted">Try adjusting your search terms or browse different categories.</p>
+    <button class="btn btn-add-to-cart mt-3" onclick="clearSearch()">
+        <i class="fas fa-refresh me-2"></i>Clear Filters
+    </button>
+</div>
+
+<!-- Updated Modal HTML Structure -->
+<div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 shadow">
+
+      <!-- Modal Header -->
+      <div class="modal-header bg-primary text-white rounded-top-4">
+        <h5 class="modal-title fw-bold" id="addToCartModalLabel">
+          <i class="fas fa-cart-plus me-2"></i>Add to Cart
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+
+        <!-- Product Image Container - FIXED STRUCTURE -->
+        <div class="modal-image-wrapper">
+            <div class="modal-image-box" id="modalImageContainer">
+                <!-- Image Element -->
+                <img id="modalProductImage" 
+                     src="" 
+                     alt="Product Image"
+                     style="display: none;">
+                
+                <!-- Placeholder Element -->
+                <div id="modalPlaceholder" 
+                     class="modal-placeholder"
+                     style="display: none;">
+                    <span id="modalPlaceholderLetter"></span>
+                </div>
+            </div>
         </div>
 
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content" id="mainContent">
-        {% block content %}
-        <div class="content-header">
-            <h1>Welcome to Business Panel</h1>
-            <p>Manage your business operations from this dashboard</p>
+        <!-- Product Name + Description -->
+        <div class="mb-0 text-center">
+          <label class="form-label fw-semibold text-muted">PRODUCT</label>
+          <h5 id="modalProductName"></h5>
+          <p id="modalProductDescription" class="text-muted small mt-1"></p> <!-- ✅ New description -->
         </div>
-        {% endblock %}
-    </main>
-    <div id="modalContainer"></div>
-</body>
 
-<!-- Bootstrap JS -->
+        <!-- Variation + Quantity Row -->
+        <div class="d-flex flex-wrap align-items-end justify-content-between p-3">
+            <!-- Variation -->
+            <div class="flex-fill">
+                <label for="modalVariation" class="form-label fw-semibold mb-2 text-muted">VARIATION</label>
+                <select class="modal-dropdown" id="modalVariation" required>
+                <option value="">Choose a variation...</option>
+                </select>
+            </div>
+
+            <!-- Quantity -->
+            <div>
+                <label class="form-label fw-semibold mb-2 text-muted">QUANTITY</label>
+                <div class="quantity-control">
+                <button class="quantity-btn" type="button" onclick="adjustQuantity(-1)">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" class="quantity-input" id="modalQuantity" min="1" max="99" value="1" readonly>
+                <button class="quantity-btn" type="button" onclick="adjustQuantity(1)">
+                    <i class="fas fa-plus"></i>
+                </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price and Total -->
+        <div class="row p-3">
+          <div class="col-6">
+            <label class="form-label">UNIT PRICE</label>
+            <div class="unit-total text-success mb-0">₱<span id="modalPrice">0.00</span></div>
+          </div>
+          <div class="col-6 text-end">
+            <label class="form-label">TOTAL</label>
+            <div class="unit-total text-primary mb-0">₱<span id="modalTotal">0.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer bg-light rounded-bottom-4">
+        <button type="button" class="btn btn-primary" onclick="addToCartConfirmed()" id="confirmAddBtn">
+          <i class="fas fa-cart-plus me-2"></i>Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if messages %}
+<div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    {% for message in messages %}
+    <div class="toast align-items-center text-bg-success border-0 show fade" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Embed JSON data -->
+{{ all_products|json_script:"product-variations-data" }}
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
 <script>
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        
-        if (window.innerWidth <= 767) {
-            // Mobile behavior
-            sidebar.classList.toggle('show');
-            overlay.classList.toggle('show');
-        }
+    document.addEventListener("DOMContentLoaded", function() {
+        const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+        toastElList.map(function(toastEl) {
+            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+            toast.show();
+        });
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+    // Helper to convert a string to title case
+    function toTitleCase(str) {
+        return str.toLowerCase().split(' ').map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
     }
 
-    function toggleSidebarDesktop() {
-        if (window.innerWidth > 767) {
-            // Desktop behavior
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const topNavbar = document.querySelector('.top-navbar');
-            
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('collapsed');
-            topNavbar.classList.toggle('collapsed');
-        } else {
-            // On mobile, just toggle the sidebar
-            toggleSidebar();
-        }
-    }
+    // Apply title casing to product names in both main grid and best seller section
+    document.querySelectorAll('.product-card .card-title').forEach(el => {
+        el.textContent = toTitleCase(el.textContent);
+    });
+});
 
-    // Handle window resize
-    window.addEventListener('resize', function() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        const mainContent = document.getElementById('mainContent');
-        const topNavbar = document.querySelector('.top-navbar');
-        
-        if (window.innerWidth > 767) {
-            // Desktop mode - remove mobile classes
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        } else {
-            // Mobile mode - remove desktop collapsed state
-            sidebar.classList.remove('collapsed');
-            mainContent.classList.remove('collapsed');
-            topNavbar.classList.remove('collapsed');
-        }
+    // Global variables
+    let slideInterval;
+    let currentSlideIndex = 0;
+    let totalSlides = 0;
+
+    // Store product variation data from JSON script
+    let productData = {};
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeProductData();
+        initializeSlideshow();
+        initializeProductModals();
     });
 
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', function(e) {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-        
-        if (window.innerWidth <= 767 && 
-            sidebar.classList.contains('show') && 
-            !sidebar.contains(e.target) && 
-            !mobileMenuBtn.contains(e.target)) {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        }
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        socket.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-
-            const badge = document.getElementById('notification-badge');
-
-            if (data.type === "send_notification" || data.type === "send_pending_count") {
-                if (data.count > 0) {
-                    badge.textContent = data.count;
-                    badge.classList.remove('d-none');
-                } else {
-                    badge.classList.add('d-none');
-                }
-
-                const pendingCounter = document.getElementById('pending-counter');
-                if (pendingCounter) {
-                    pendingCounter.textContent = ''; // repaint
-                    pendingCounter.offsetHeight;
-                    pendingCounter.textContent = data.dashboard_count; // update with total pending
-                }
-
-                if (window.location.pathname.includes('BusinessNotifications')) {
-                    fetch('/business/pending-orders/')
-                        .then(response => response.text())
-                        .then(html => {
-                            document.getElementById('pending-orders').innerHTML = html;
-                        });
-                }
+    function initializeProductData() {
+        try {
+            const dataElement = document.getElementById('product-variations-data');
+            if (dataElement) {
+                productData = JSON.parse(dataElement.textContent);
             }
+        } catch (error) {
+            console.error('Error parsing product data:', error);
+            productData = {};
+        }
+    }
+
+    function initializeProductModals() {
+        // Add event listener to each "Add to Cart" button (product grid + best-sellers)
+        document.querySelectorAll('.btn-add-to-cart, .btn-bestseller').forEach(button => {
+            button.addEventListener('click', () => {
+                const productName = button.getAttribute('data-product');
+                const imageUrl = button.getAttribute('data-image') || 
+                                button.closest('.product-card')?.querySelector('img')?.src || '';
+                openProductModal(productName, imageUrl);
+            });
+        });
+
+        // Handle variation change
+        const variationSelect = document.getElementById('modalVariation');
+        if (variationSelect) {
+            variationSelect.addEventListener('change', handleVariationChange);
+        }
+
+        // Handle quantity input changes
+        const quantityInput = document.getElementById('modalQuantity');
+        if (quantityInput) {
+            quantityInput.addEventListener('input', updateModalTotal);
+        }
+    }
+
+
+    function openProductModal(productName, imageUrl) {
+        const modalNameEl = document.getElementById('modalProductName');
+        const modalDescEl = document.getElementById('modalProductDescription'); // ✅ description element
+        const modalImageEl = document.getElementById('modalProductImage');
+        const placeholderEl = document.getElementById('modalPlaceholder');
+        const placeholderLetterEl = document.getElementById('modalPlaceholderLetter');
+        const variationSelect = document.getElementById('modalVariation');
+        const confirmAddBtn = document.getElementById('confirmAddBtn');
+    
+        if (modalNameEl) modalNameEl.textContent = productName;
+    
+        // ✅ Fill description if available
+        if (modalDescEl) {
+            const variations = getProductVariations(productName);
+            if (variations.length > 0 && variations[0].description) {
+                modalDescEl.textContent = variations[0].description;
+                modalDescEl.style.display = "block";
+            } else {
+                modalDescEl.textContent = "";
+                modalDescEl.style.display = "none";
+            }
+        }
+    
+        // Handle image display with improved logic
+        if (modalImageEl && placeholderEl && placeholderLetterEl) {
+            modalImageEl.style.display = 'none';
+            modalImageEl.src = '';
+            placeholderEl.style.display = 'none';
+            placeholderLetterEl.textContent = '';
+            
+            modalImageEl.offsetHeight;
+            placeholderEl.offsetHeight;
+            
+            if (imageUrl && imageUrl.trim() !== "") {
+                modalImageEl.onload = function() {
+                    placeholderEl.style.display = 'none';
+                    modalImageEl.style.display = 'block';
+                };
+                modalImageEl.onerror = function() {
+                    modalImageEl.style.display = 'none';
+                    placeholderLetterEl.textContent = productName ? productName.charAt(0).toUpperCase() : "?";
+                    placeholderEl.style.display = 'flex';
+                };
+                modalImageEl.src = imageUrl;
+            } else {
+                setTimeout(() => {
+                    placeholderLetterEl.textContent = productName ? productName.charAt(0).toUpperCase() : "?";
+                    placeholderEl.style.display = 'flex';
+                }, 10);
+            }
+        }
+    
+        // Reset and populate variation dropdown WITH STOCK INFORMATION
+        if (variationSelect) {
+            variationSelect.innerHTML = `
+                <option value="" disabled selected hidden>Choose a variation...</option>
+            `;
+            const variations = getProductVariations(productName);
+            if (variations.length > 0) {
+                variations.forEach(variation => {
+                    const opt = document.createElement('option');
+                    opt.value = variation.variation_name;
+                    opt.setAttribute('data-price', variation.price);
+                    opt.setAttribute('data-stocks', variation.stocks);
+                    opt.setAttribute('data-track-stocks', variation.track_stocks);
+                    
+                    let optionText = `${variation.variation_name} (₱${parseFloat(variation.price).toFixed(2)})`;
+                    if (variation.track_stocks) {
+                        if (variation.stocks > 0) {
+                            optionText += ` - Qty:${variation.stocks}`;
+                        } else {
+                            optionText += ` - Out of stock`;
+                            opt.disabled = true;
+                            opt.style.color = '#dc3545';
+                        }
+                    }
+                    
+                    opt.textContent = optionText;
+                    variationSelect.appendChild(opt);
+                });
+                variationSelect.disabled = false;
+            } else {
+                variationSelect.innerHTML = '<option value="" disabled selected>No variations available</option>';
+                variationSelect.disabled = true;
+            }
+        }
+    
+        // Reset quantity & pricing
+        const quantityInput = document.getElementById('modalQuantity');
+        const priceEl = document.getElementById('modalPrice');
+        const totalEl = document.getElementById('modalTotal');
+    
+        if (quantityInput) quantityInput.value = 1;
+        if (priceEl) priceEl.textContent = '0.00';
+        if (totalEl) totalEl.textContent = '0.00';
+    
+        if (confirmAddBtn) confirmAddBtn.disabled = true;
+    
+        // Show modal
+        const modalElement = document.getElementById('addToCartModal');
+        if (modalElement && typeof bootstrap !== 'undefined') {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+    }
+
+
+    function getProductVariations(productName) {
+        // Handle both possible data structures
+        if (Array.isArray(productData)) {
+            return productData.filter(p => p.name === productName);
+        } else if (productData[productName]) {
+            return productData[productName];
+        }
+        return [];
+    }
+
+    function handleVariationChange() {
+        const variationSelect = document.getElementById('modalVariation');
+        const selected = variationSelect?.selectedOptions[0];
+        const price = parseFloat(selected?.getAttribute('data-price')) || 0;
+        const stocks = parseInt(selected?.getAttribute('data-stocks')) || 0;
+        const trackStocks = selected?.getAttribute('data-track-stocks') === 'True';
+        
+        const priceEl = document.getElementById('modalPrice');
+        const quantityInput = document.getElementById('modalQuantity');
+        const confirmAddBtn = document.getElementById('confirmAddBtn');
+        
+        if (priceEl) {
+            priceEl.textContent = price.toFixed(2);
+        }
+
+        // Set quantity limits based on stock
+        if (quantityInput && trackStocks) {
+            quantityInput.max = stocks;
+            if (parseInt(quantityInput.value) > stocks) {
+                quantityInput.value = Math.min(stocks, 1);
+            }
+        }
+
+        // Enable Add to Cart button if a variation is selected and has stock
+        if (confirmAddBtn) {
+            const hasStock = !trackStocks || stocks > 0;
+            confirmAddBtn.disabled = !selected || !hasStock;
+        }
+
+        updateModalTotal();
+    }
+
+    function updateModalTotal() {
+        const quantityInput = document.getElementById('modalQuantity');
+        const priceEl = document.getElementById('modalPrice');
+        const totalEl = document.getElementById('modalTotal');
+
+        if (!quantityInput || !priceEl || !totalEl) return;
+
+        const qty = parseInt(quantityInput.value) || 1;
+        const unitPrice = parseFloat(priceEl.textContent.replace(',', '')) || 0;
+        const total = qty * unitPrice;
+        
+        totalEl.textContent = total.toFixed(2);
+    }
+
+    function adjustQuantity(change) {
+        const input = document.getElementById('modalQuantity');
+        const variationSelect = document.getElementById('modalVariation');
+        const selected = variationSelect?.selectedOptions[0];
+        
+        if (!input) return;
+
+        const stocks = parseInt(selected?.getAttribute('data-stocks')) || 99;
+        const trackStocks = selected?.getAttribute('data-track-stocks') === 'True';
+        const maxQuantity = trackStocks ? stocks : 99;
+
+        let current = parseInt(input.value) || 1;
+        const newVal = Math.min(Math.max(current + change, 1), maxQuantity);
+        input.value = newVal;
+        updateModalTotal();
+    }
+
+    function addToCartConfirmed() {
+        const modalElement = document.getElementById('addToCartModal');
+        const spinner = document.getElementById('loadingSpinner');
+        const success = document.getElementById('cartSuccess');
+
+        const productName = document.getElementById('modalProductName')?.textContent;
+        const variation = document.getElementById('modalVariation')?.value;
+        const quantity = parseInt(document.getElementById('modalQuantity')?.value) || 1;
+        const price = parseFloat(document.getElementById('modalPrice')?.textContent) || 0;
+
+        const cartData = {
+            product_name: `${productName} - ${variation}`,
+            quantity: quantity,
+            price: price * quantity  // Saving price multiplied by quantity
         };
-    });
 
-    function updateOrderStatusByCode(orderCode, status) {
-        showLoading();
+        if (modalElement && typeof bootstrap !== 'undefined') {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) modal.hide();
+        }
 
-        fetch('/update-order-status/', {
+        spinner.style.display = 'block';
+        success.style.display = 'none';
+
+        fetch('/add-to-cart/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
+                'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify({ order_code: orderCode, status: status })
+            body: JSON.stringify(cartData)
         })
         .then(response => response.json())
         .then(data => {
-            hideLoading();
-
-            const modal = new bootstrap.Modal(document.getElementById('statusModal'));
-            const title = document.getElementById('statusModalTitle');
-            const body = document.getElementById('statusModalBody');
-
+            spinner.style.display = 'none';
             if (data.success) {
-                title.innerHTML = `<i class="fas fa-check-circle me-2 text-success"></i> Success`;
-                body.innerHTML = `Order <strong>${orderCode}</strong> ${status} successfully!`;
-
-                // Refresh table after modal closes
-                document.getElementById('statusModal').addEventListener('hidden.bs.modal', function () {
-                    fetch('/partial/pending-orders/')
-                        .then(response => response.text())
-                        .then(html => {
-                            document.getElementById('pending-orders').innerHTML = html;
-                        });
-                }, { once: true });
-            } else {
-                title.innerHTML = `<i class="fas fa-exclamation-triangle me-2 text-danger"></i> Error`;
-                body.innerHTML = `Failed to update order: ${data.error || "Unknown error"}`;
+                success.style.display = 'block';
+                setTimeout(() => success.style.display = 'none', 2500);
             }
-
-            modal.show();
         })
         .catch(error => {
-            hideLoading();
-            console.error("Error:", error);
-            alert("Something went wrong while updating the order.");
+            console.error('Error:', error);
+            spinner.style.display = 'none';
         });
     }
 
-    // CSRF helper function
+
+    // Helper to get CSRF token
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
             const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            for (let cookie of cookies) {
+                const trimmed = cookie.trim();
+                if (trimmed.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
                     break;
                 }
             }
@@ -1053,461 +1987,321 @@
         return cookieValue;
     }
 
-    // Function to play the notification sound
-    function playNotificationSound() {
-        const modalSound = document.getElementById('modalSound');
-        modalSound.play()
-            .then(() => {
-                console.log("Audio played successfully");
-            })
-            .catch((error) => {
-                console.error("Error playing audio: ", error);
+
+    function resetInterval() {
+        clearInterval(slideInterval);
+        startSlideshow();
+    }
+
+    // ==== Utility Functions ====
+    function scrollToSearch() {
+        const searchSection = document.getElementById("searchSection");
+        if (searchSection) {
+            searchSection.scrollIntoView({ behavior: 'smooth' });
+
+            // Focus the input after scrolling
+            setTimeout(() => {
+                const input = document.getElementById("searchInput");
+                if (input) input.focus();
+            }, 800);
+        }
+    }
+
+    function filterProducts() {
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        // Only select product cards inside the main product grid, excluding best sellers
+        const productCards = document.querySelectorAll('#productGrid .product-card');
+        const noResults = document.getElementById('noResults');
+        const countLabel = document.getElementById('productCount');
+
+        if (!searchInput || !categoryFilter) return;
+
+        const input = searchInput.value.toLowerCase();
+        const category = categoryFilter.value;
+        let visibleCount = 0;
+
+        productCards.forEach(card => {
+            const name = (card.getAttribute('data-name') || '').toLowerCase();
+            const cat = card.getAttribute('data-category');
+            const matchesName = name.includes(input);
+            const matchesCategory = !category || category === cat;
+
+            if (matchesName && matchesCategory) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (noResults) {
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+        if (countLabel) {
+            countLabel.textContent = visibleCount;
+        }
+    }
+
+    function clearSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        
+        if (searchInput) searchInput.value = '';
+        if (categoryFilter) categoryFilter.value = '';
+        
+        filterProducts();
+    }
+
+    function toggleGridView() {
+        const grid = document.getElementById('productGrid');
+        const icon = document.getElementById('gridIcon');
+        
+        if (!grid || !icon) return;
+        
+        const isList = grid.classList.toggle('list-view');
+        icon.className = isList ? 'fas fa-bars' : 'fas fa-th';
+    }
+
+
+
+
+    function initializeSlideshow() {
+        const slides = document.querySelectorAll('.banner-slideshow .slide');
+        const indicators = document.querySelectorAll('.slideshow-indicators .indicator');
+        totalSlides = slides.length;
+
+        window.showSlide = function(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
             });
-    }
+            indicators.forEach((indicator, i) => {
+                indicator.classList.toggle('active', i === index);
+            });
+            currentSlideIndex = index;
+        }
 
-    const badge = document.getElementById('notification-badge');
-    const socket = new WebSocket("wss://" + window.location.host + "/ws/notifications/");
+        function nextSlide() {
+            const nextIndex = (currentSlideIndex + 1) % totalSlides;
+            showSlide(nextIndex);
+        }
 
-    socket.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        if (data.type === "send_notification") {
-            // Only play the sound if the notification count is greater than 0
-            if (data.count > 0) {
-                playNotificationSound();
-                document.getElementById('notification-badge').textContent = data.count;
-                document.getElementById('notification-badge').classList.remove('d-none');
+        function startSlideshow() {
+            slideInterval = setInterval(nextSlide, 8000); // 8 seconds
+        }
+
+        function resetInterval() {
+            clearInterval(slideInterval);
+            startSlideshow();
+        }
+
+        // Global functions for navigation
+        window.currentSlide = function(index) {
+            showSlide(index);
+            resetInterval();
+        }
+
+        window.changeSlide = function(direction) {
+            let newIndex;
+            if (direction === 1) {
+                newIndex = (currentSlideIndex + 1) % totalSlides;
             } else {
-                document.getElementById('notification-badge').classList.add('d-none');
+                newIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
             }
+            showSlide(newIndex);
+            resetInterval();
         }
-    };
 
-    socket.onclose = function(event) {
-        console.error("WebSocket closed unexpectedly");
-    };
+        // Setup indicator click handlers
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                showSlide(index);
+                resetInterval();
+            });
+        });
 
-    document.addEventListener("click", function (event) {
-        if (event.target.closest("[data-bs-target='#proofModal']")) {
-            const button = event.target.closest("[data-bs-target='#proofModal']");
-            const imageUrl = button.getAttribute("data-img-url");
-            const proofImage = document.querySelector("#proofModal #proofImage");
-            proofImage.src = imageUrl || "";
+        // Pause on hover
+        const banner = document.querySelector('.banner-section');
+        if (banner) {
+            banner.addEventListener('mouseenter', () => clearInterval(slideInterval));
+            banner.addEventListener('mouseleave', startSlideshow);
         }
-    });
 
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const deliveryFeeSocketOwner = new WebSocket(`${protocol}://${window.location.host}/ws/delivery-fee/owners/`);
-
-    // Queue to hold requests (FIFO - First In, First Out)
-    const deliveryFeeQueue = [];
-    let isModalOpen = false;
-    let currentModalTimer = null;
-    let currentRequestId = null;
-
-    // Timer sync interval (check server time every 5 seconds)
-    let timerSyncInterval = null;
-
-    deliveryFeeSocketOwner.onopen = () => {
-        console.log("[Owner JS] WebSocket connected");
-        // Request initial timer sync when connection opens
-        requestTimerSync();
-    };
-    
-    deliveryFeeSocketOwner.onerror = (e) => console.error("[Owner JS] WebSocket error:", e);
-    deliveryFeeSocketOwner.onclose = (e) => {
-        console.log("[Owner JS] WebSocket closed:", e);
-        // Clear timer sync when connection closes
-        if (timerSyncInterval) {
-            clearInterval(timerSyncInterval);
-            timerSyncInterval = null;
-        }
-    };
-
-    deliveryFeeSocketOwner.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        console.log("[Owner JS] Received message:", data);
-
-        if (data.type === 'delivery_fee_request') {
-            
-            // Play the sound when a delivery fee request comes in
-            const modalSound = document.getElementById('modalSound');
-            
-            modalSound.play()
-                .then(() => {
-                    console.log("Audio played successfully");
-                })
-                .catch((error) => {
-                    console.error("Error playing audio: ", error);
-                });
-            
-            // Create request object with server timestamp
-            const requestData = {
-                ...data,
-                requestId: data.request_id || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                serverCreatedAt: data.created_at || Date.now(),
-                expiresAt: data.expires_at || (Date.now() + 120000) // 2 minutes from now if not provided
-            };
-            
-            // Add request to queue (FIFO) and try to show modal
-            deliveryFeeQueue.push(requestData);
-            showNextModal();
-            
-            // Start timer sync if not already running
-            if (!timerSyncInterval) {
-                startTimerSync();
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeSlide(1);
             }
-        } 
-        else if (data.type === 'delivery_fee_timeout') {
-            console.log("[Owner JS] Request timed out from server:", data.request_id);
-            
-            // Remove from queue if still there
-            const queueIndex = deliveryFeeQueue.findIndex(req => req.requestId === data.request_id);
-            if (queueIndex !== -1) {
-                deliveryFeeQueue.splice(queueIndex, 1);
-            }
-            
-            // If this was the currently displayed modal, close it
-            if (currentRequestId === data.request_id) {
-                closeCurrentModal();
-            }
-        }
-        else if (data.type === 'timer_sync') {
-            // Update timer display with server time
-            updateTimerFromServer(data);
-        }
-    };
+        });
 
-    function requestTimerSync() {
-        if (deliveryFeeSocketOwner.readyState === WebSocket.OPEN) {
-            deliveryFeeSocketOwner.send(JSON.stringify({
-                action: "request_timer_sync"
-            }));
-        }
-    }
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
 
-    function startTimerSync() {
-        // Clear existing interval if any
-        if (timerSyncInterval) {
-            clearInterval(timerSyncInterval);
+        if (banner) {
+            banner.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            banner.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
         }
-        
-        // Only start sync if we have active modal or queued requests
-        if (isModalOpen || deliveryFeeQueue.length > 0) {
-            // Sync every 5 seconds
-            timerSyncInterval = setInterval(() => {
-                // Only sync if we have requests to track
-                if (isModalOpen || deliveryFeeQueue.length > 0) {
-                    requestTimerSync();
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    changeSlide(1); // Swipe left, next slide
                 } else {
-                    // No more requests to track, stop syncing
-                    clearInterval(timerSyncInterval);
-                    timerSyncInterval = null;
-                    console.log("[Owner JS] No active requests, stopping timer sync");
-                }
-            }, 5000);
-        }
-    }
-
-    function updateTimerFromServer(syncData) {
-        const activeServerRequests = syncData.active_requests || [];
-        const serverRequestIds = new Set(activeServerRequests.map(req => req.request_id));
-        
-        // Update currently displayed modal timer
-        if (currentRequestId && isModalOpen) {
-            const activeRequest = activeServerRequests.find(req => req.request_id === currentRequestId);
-            if (!activeRequest) {
-                // Request no longer active on server, close modal
-                console.log("[Owner JS] Active request timed out on server:", currentRequestId);
-                closeCurrentModal();
-                return;
-            } else {
-                const timeLeft = Math.max(0, activeRequest.time_remaining);
-                const timerDisplay = document.getElementById(`timer_deliveryFeeModal_${currentRequestId}`);
-                
-                if (timerDisplay) {
-                    timerDisplay.textContent = formatTime(timeLeft);
-                    
-                    // Change color based on time remaining
-                    if (timeLeft <= 30) {
-                        timerDisplay.style.color = '#ff4444';
-                    } else if (timeLeft <= 60) {
-                        timerDisplay.style.color = '#ff8800';
-                    } else {
-                        timerDisplay.style.color = '#333';
-                    }
+                    changeSlide(-1); // Swipe right, previous slide
                 }
             }
         }
-        
-        // Update queued requests - remove any that are no longer active on server
-        for (let i = deliveryFeeQueue.length - 1; i >= 0; i--) {
-            const queuedRequest = deliveryFeeQueue[i];
-            const serverRequest = activeServerRequests.find(req => req.request_id === queuedRequest.requestId);
-            
-            if (!serverRequest || serverRequest.time_remaining <= 0) {
-                // Request timed out on server, remove from queue
-                console.log("[Owner JS] Queued request timed out on server:", queuedRequest.requestId);
-                deliveryFeeQueue.splice(i, 1);
-            } else {
-                // Update the queued request's timing info
-                queuedRequest.serverTimeRemaining = serverRequest.time_remaining;
-                queuedRequest.lastSyncTime = Date.now();
+
+        // Start
+        if (totalSlides > 0) {
+            showSlide(0);
+            if (totalSlides > 1) startSlideshow();
+        }
+    }
+</script>
+{% with opening=opening_time closing=closing_time start_day=business.start_day end_day=business.end_day force_closed=business.force_closed %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const openingTime = "{{ opening }}";   // e.g. "08:00:00"
+    const closingTime = "{{ closing }}";   // e.g. "17:00:00"
+    const startDay = "{{ start_day }}";    // e.g. "Monday"
+    const endDay = "{{ end_day }}";        // e.g. "Friday"
+    let forceClosed = {{ force_closed|yesno:"true,false" }}; // from backend
+
+    const weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+    function parseTimeToToday(t) {
+        const [h, m, s] = t.split(":").map(Number);
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, s, 0);
+    }
+
+    function isWithinOperatingDays() {
+        const now = new Date();
+        const todayIndex = now.getDay(); 
+        const startIndex = weekdays.indexOf(startDay);
+        const endIndex = weekdays.indexOf(endDay);
+
+        if (startIndex <= endIndex) {
+            return todayIndex >= startIndex && todayIndex <= endIndex;
+        } else {
+            return todayIndex >= startIndex || todayIndex <= endIndex;
+        }
+    }
+
+    function isWithinOperatingHours() {
+        const now = new Date();
+        let open = parseTimeToToday(openingTime);
+        let close = parseTimeToToday(closingTime);
+    
+        // Handle special case: closing exactly at midnight (00:00:00)
+        if (closingTime === "00:00:00") {
+            // midnight means "end of the current day"
+            close = new Date(open);
+            close.setHours(23, 59, 59, 999);
+        }
+        else if (close <= open) {
+            // Overnight support
+            close.setDate(close.getDate() + 1);
+            if (now < open) {
+                open.setDate(open.getDate() - 1);
             }
         }
-        
-        // If no more requests and no active modal, stop timer sync
-        if (deliveryFeeQueue.length === 0 && !isModalOpen && timerSyncInterval) {
-            clearInterval(timerSyncInterval);
-            timerSyncInterval = null;
-            console.log("[Owner JS] No more active requests, stopping timer sync");
+    
+        return now >= open && now <= close;
+    }
+
+    function applyClosedState() {
+        const addToCartButtons = document.querySelectorAll('.btn-add-to-cart, .btn-bestseller');
+        const outsideHoursNotice = document.getElementById('outsideHoursNotice');
+        const forceClosedNotice = document.getElementById('forceClosedNotice');
+
+        addToCartButtons.forEach(btn => {
+            btn.disabled = true;
+            btn.title = "Shop is currently closed";
+            btn.classList.add("disabled");
+        });
+
+        if (forceClosed) {
+            // Show force-closed message
+            if (forceClosedNotice) forceClosedNotice.style.display = 'block';
+            if (outsideHoursNotice) outsideHoursNotice.style.display = 'none';
+        } else {
+            // Show outside hours message
+            if (outsideHoursNotice) outsideHoursNotice.style.display = 'block';
+            if (forceClosedNotice) forceClosedNotice.style.display = 'none';
         }
     }
 
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    function applyOpenState() {
+        const addToCartButtons = document.querySelectorAll('.btn-add-to-cart, .btn-bestseller');
+        const outsideHoursNotice = document.getElementById('outsideHoursNotice');
+        const forceClosedNotice = document.getElementById('forceClosedNotice');
+
+        addToCartButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.title = "";
+            btn.classList.remove("disabled");
+        });
+
+        // Hide all notices when shop is open
+        if (outsideHoursNotice) outsideHoursNotice.style.display = 'none';
+        if (forceClosedNotice) forceClosedNotice.style.display = 'none';
     }
 
-    function closeCurrentModal() {
-        if (currentModalTimer) {
-            clearInterval(currentModalTimer);
-            currentModalTimer = null;
-        }
-        
-        const activeModal = document.querySelector('.delivery-fee-modal');
-        const backdrop = document.getElementById('modalBackdrop');
-        
-        if (activeModal) {
-            activeModal.remove();
-        }
-        if (backdrop) {
-            backdrop.remove();
-        }
-        
-        document.body.style.overflow = '';
-        isModalOpen = false;
-        currentRequestId = null;
-        
-        // Stop timer sync if no more requests
-        if (deliveryFeeQueue.length === 0) {
-            if (timerSyncInterval) {
-                clearInterval(timerSyncInterval);
-                timerSyncInterval = null;
-            }
-        }
-        
-        // Process next modal in queue
-        showNextModal();
-    }
-
-    function showNextModal() {
-        if (isModalOpen) return;  // modal already showing, wait
-        if (deliveryFeeQueue.length === 0) return; // no requests waiting
-
-        isModalOpen = true;
-
-        // Get the first request from queue (FIFO)
-        const requestData = deliveryFeeQueue.shift();
-        currentRequestId = requestData.requestId;
-        
-        // Check if this request is still valid based on last server sync
-        if (requestData.serverTimeRemaining !== undefined && requestData.serverTimeRemaining <= 0) {
-            console.log("[Owner JS] Skipping expired queued request:", requestData.requestId);
-            isModalOpen = false;
-            currentRequestId = null;
-            showNextModal(); // Try next request
+    function checkShopStatus() {
+        if (forceClosed) {
+            applyClosedState(); 
             return;
         }
-        
-        const container = document.getElementById('modalContainer');
-        const { customer_email, order_details, requestId } = requestData;
-        const { customer_name, email, address, items, total } = order_details;
 
-        const modalId = `deliveryFeeModal_${requestId}`;
-
-        // Create backdrop
-        const backdrop = document.createElement('div');
-        backdrop.id = 'modalBackdrop';
-        backdrop.style.cssText = `
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.3);
-            z-index: 9999;
-        `;
-        document.body.appendChild(backdrop);
-
-        const modalHtml = `
-        <div class="delivery-fee-modal" id="${modalId}">
-            <div class="delivery-modal-content">
-                <div class="delivery-modal-header" style="flex-direction: column; text-align: left;">
-                    <h4>Delivery Fee Request</h4>
-                    <div class="timer-container">
-                        <span class="timer-label">Time remaining:</span>
-                        <span class="timer-display" id="timer_${modalId}">
-                            Loading...
-                        </span>
-                        <span class="timer-icon"></span>
-                    </div>
-                </div>
-
-                
-                <div class="delivery-modal-section">
-                    <p class="delivery-modal-label">Customer</p>
-                    <p class="delivery-modal-value"><span class="modalCustomerName"></span></p>
-                </div>
-                
-                <div class="delivery-modal-section">
-                    <p class="delivery-modal-label">Email</p>
-                    <p class="delivery-modal-value"><span class="modalEmail"></span></p>
-                </div>
-                
-                <div class="delivery-modal-section">
-                    <p class="delivery-modal-label">Address</p>
-                    <div class="delivery-address-container">
-                        <p class="delivery-modal-value"><span class="modalAddress"></span></p>
-                        <button class="delivery-copyAddressBtn">Copy</button>
-                    </div>
-                </div>
-                
-                <div class="delivery-modal-section">
-                    <p class="delivery-modal-label">Order Items</p>
-                    <pre class="modalItems"></pre>
-                </div>
-                
-                <div class="delivery-modal-section delivery-total-price">
-                    <p class="delivery-modal-label">Total Price</p>
-                    <p class="delivery-modal-value">₱<span class="modalTotal"></span></p>
-                </div>
-
-                <div class="delivery-input-section">
-                    <label for="deliveryFeeInput_${modalId}">Enter delivery fee:</label>
-                    <input type="number" id="deliveryFeeInput_${modalId}" min="0" step="0.01">
-                </div>
-
-                <div class="delivery-button-container">
-                    <button class="rejectDeliveryFeeBtn">Reject</button>
-                    <button class="submitDeliveryFeeBtn">Submit</button>
-                </div>
-            </div>
-        </div>
-        `;
-
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = modalHtml;
-        container.appendChild(tempDiv.firstElementChild);
-
-        const modal = document.getElementById(modalId);
-        modal.querySelector('.modalCustomerName').textContent = customer_name;
-        modal.querySelector('.modalEmail').textContent = email;
-        modal.querySelector('.modalAddress').textContent = address;
-        modal.querySelector('.modalItems').textContent = items.map(item => `${item.product_name} x${item.quantity} @ ₱${item.price}`).join('\n');
-        modal.querySelector('.modalTotal').textContent = total;
-
-        // Disable page scroll while modal open
-        document.body.style.overflow = 'hidden';
-
-        // Request immediate timer sync for this modal
-        requestTimerSync();
-
-        // Initialize timer display with server data if available
-        const timerDisplay = document.getElementById(`timer_${modalId}`);
-        let localTimeLeft = requestData.serverTimeRemaining || 120; // Use server time if available
-        
-        // If we have server sync data, calculate current time based on last sync
-        if (requestData.lastSyncTime && requestData.serverTimeRemaining !== undefined) {
-            const timeSinceSync = Math.floor((Date.now() - requestData.lastSyncTime) / 1000);
-            localTimeLeft = Math.max(0, requestData.serverTimeRemaining - timeSinceSync);
+        // Only check schedule when not forced closed
+        const shopClosed = !(isWithinOperatingDays() && isWithinOperatingHours());
+        if (shopClosed) {
+            applyClosedState();
+        } else {
+            applyOpenState();
         }
-        
-        // Update initial display
-        if (timerDisplay && localTimeLeft > 0) {
-            timerDisplay.textContent = formatTime(localTimeLeft);
-            if (localTimeLeft <= 30) {
-                timerDisplay.style.color = '#ff4444';
-            } else if (localTimeLeft <= 60) {
-                timerDisplay.style.color = '#ff8800';
-            }
-        }
-        
-        currentModalTimer = setInterval(() => {
-            localTimeLeft--;
-            if (timerDisplay && localTimeLeft > 0) {
-                timerDisplay.textContent = formatTime(localTimeLeft);
-                
-                // Change color when less than 30 seconds left
-                if (localTimeLeft <= 30) {
-                    timerDisplay.style.color = '#ff4444';
-                } else if (localTimeLeft <= 60) {
-                    timerDisplay.style.color = '#ff8800';
-                }
-            }
-        }, 1000);
-
-        // Copy address button
-        modal.querySelector('.delivery-copyAddressBtn').onclick = () => {
-            const addressText = modal.querySelector('.modalAddress').textContent.trim();
-            navigator.clipboard.writeText(addressText)
-                .then(() => {
-                    alert('Address copied to clipboard!');
-                })
-                .catch(() => {
-                    alert('Failed to copy address');
-                });
-        };
-
-        // Submit button
-        modal.querySelector('.submitDeliveryFeeBtn').onclick = () => {
-            const feeInput = modal.querySelector(`#deliveryFeeInput_${modalId}`);
-            const fee = feeInput.value.trim();
-            
-            // Allow 0 as a valid input
-            if (fee === '' || isNaN(fee) || parseFloat(fee) < 0) {
-                alert('Please enter a valid delivery fee (0 or greater)');
-                return;
-            }
-
-            console.log("[Owner JS] Sending fee:", fee);
-            
-            deliveryFeeSocketOwner.send(JSON.stringify({
-                action: "send_fee",
-                customer_email: customer_email,
-                request_id: requestId,
-                delivery_fee: fee,
-            }));
-
-            closeCurrentModal();
-        };
-
-        // Reject button
-        modal.querySelector('.rejectDeliveryFeeBtn').onclick = () => {
-            deliveryFeeSocketOwner.send(JSON.stringify({
-                action: "reject_fee",
-                customer_email: customer_email,
-                request_id: requestId,
-                reason: "Delivery fee request is rejected, location is out of coverage area"
-            }));
-
-            closeCurrentModal();
-        };
     }
 
-    // Handle page visibility changes to sync timers when page becomes visible
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden && isModalOpen) {
-            // Page became visible, request immediate timer sync
-            requestTimerSync();
-        }
-    });
+    // ✅ Initial check
+    checkShopStatus();
 
-    // Handle window focus to sync timers when window gets focus
-    window.addEventListener('focus', function() {
-        if (isModalOpen) {
-            // Window got focus, request immediate timer sync
-            requestTimerSync();
+    // --- Poll backend every 3s to refresh forceClosed flag ---
+    setInterval(() => {
+        fetch("{% url 'toggle_shop_status' %}", { method: "GET" })
+        .then(res => res.json())
+        .then(data => { 
+            const newForceClosed = data.force_closed;
+            if (forceClosed !== newForceClosed) {
+                forceClosed = newForceClosed;
+            }
+            checkShopStatus(); // 👈 re-check only when flag updates
+        })
+        .catch(() => {});
+    }, 3000);
+
+    // --- Schedule recheck only when not forced closed ---
+    setInterval(() => {
+        if (!forceClosed) {
+            checkShopStatus();
         }
-    });
+    }, 1000); // every 60s instead of 1s (enough for schedule drift)
+
+});
 </script>
-    
-</body>
-</html>
+{% endwith %}
+
+{% endblock %}
