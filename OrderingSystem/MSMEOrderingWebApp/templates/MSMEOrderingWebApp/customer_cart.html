@@ -22,7 +22,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Brawler:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Rokkitt:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
@@ -1242,7 +1241,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 const userEmail = "{{ user_email|escapejs }}";
 const deliveryFeeSocketCustomer = new WebSocket(
-    `wss://${window.location.host}/ws/delivery-fee/customer/?email=${encodeURIComponent(userEmail)}`
+    `ws://${window.location.host}/ws/delivery-fee/customer/?email=${encodeURIComponent(userEmail)}`
 );
 
 deliveryFeeSocketCustomer.onopen = () => console.log("[Customer JS] WebSocket connected");
@@ -1301,9 +1300,16 @@ function updatePlaceOrderButtonState() {
 
 // === TIMER HELPER ===
 let deliveryFeeTimer = null;
-function startDeliveryFeeTimer(button, duration = 120) {
-    let remaining = duration;
 
+function startDeliveryFeeTimer(button, duration = 120) {
+    const now = Date.now();
+    const expiryTime = now + duration * 1000;
+    localStorage.setItem("deliveryFeeExpiry", expiryTime); // save expiry timestamp
+
+    runDeliveryFeeTimer(button, expiryTime);
+}
+
+function runDeliveryFeeTimer(button, expiryTime) {
     // Create timer span if not exists
     let timerSpan = document.getElementById("delivery-fee-timer");
     if (!timerSpan) {
@@ -1313,24 +1319,39 @@ function startDeliveryFeeTimer(button, duration = 120) {
         button.parentNode.appendChild(timerSpan);
     }
 
-    button.disabled = true;
-    button.textContent = "Requested";
-    timerSpan.textContent = ` (wait ${remaining}s)`;
-
-    deliveryFeeTimer = setInterval(() => {
-        remaining--;
-        timerSpan.textContent = ` (wait ${remaining}s)`;
-
-        if (remaining <= 0) {
+    function updateTimer() {
+        const remaining = Math.max(0, Math.floor((expiryTime - Date.now()) / 1000));
+        if (remaining > 0) {
+            button.disabled = true;
+            button.textContent = "Requested";
+            timerSpan.textContent = ` (wait ${remaining}s)`;
+        } else {
             clearInterval(deliveryFeeTimer);
             deliveryFeeTimer = null;
+            localStorage.removeItem("deliveryFeeExpiry"); // clear saved expiry
             button.disabled = false;
             button.textContent = "Request Delivery Fee Again";
             timerSpan.textContent = "";
             button.style.display = "inline-block";
+            const loadingSpan = document.getElementById("delivery-fee-loading");
+            if (loadingSpan) loadingSpan.style.display = "none"
         }
-    }, 1000);
+    }
+
+    updateTimer();
+    if (deliveryFeeTimer) clearInterval(deliveryFeeTimer);
+    deliveryFeeTimer = setInterval(updateTimer, 1000);
 }
+
+// === Restore timer on reload ===
+document.addEventListener("DOMContentLoaded", function () {
+    const requestBtn = document.getElementById("request-delivery-fee-btn");
+    const expiryTime = parseInt(localStorage.getItem("deliveryFeeExpiry"), 10);
+
+    if (requestBtn && expiryTime && Date.now() < expiryTime) {
+        runDeliveryFeeTimer(requestBtn, expiryTime);
+    }
+});
 
 // === DELIVERY FEE UI ===
 function showDeliveryFeeRequest() {
