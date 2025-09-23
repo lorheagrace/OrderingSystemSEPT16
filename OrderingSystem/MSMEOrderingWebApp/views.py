@@ -3206,7 +3206,7 @@ def inventory(request):
             image = request.FILES.get('product_image')
             skip_image = request.POST.get('disable_image')  
             name = request.POST.get('product_name')
-			 description = request.POST.get('product_description')
+			description = request.POST.get('product_description')
             category_id = request.POST.get('product_category')
             default_price = request.POST.get('default_price')
             default_stocks = request.POST.get('product_stocks')
