@@ -772,10 +772,6 @@
     </style>
 </head>
 <body>
-
-    <button id="enableSoundBtn" class="btn btn-success">
-    🔔 Enable Notifications
-    </button>
     <audio id="modalSound" src="{% static 'sounds/notification.mp3' %}" preload="auto"></audio>
 
     <!-- Top Navbar -->
@@ -898,549 +894,620 @@
     <div id="modalContainer"></div>
 </body>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
 <script>
-
-        const btn = document.getElementById("enableSoundBtn");
-        const modalSound = document.getElementById("modalSound");
-
-            btn.addEventListener("click", () => {
-            modalSound.play().then(() => {
-                modalSound.pause();
-                modalSound.currentTime = 0;
-                btn.style.display = "none"; // hide button after enabling
-                console.log("🔓 Sound enabled for all future notifications!");
-            });
-        });
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            
-            if (window.innerWidth <= 767) {
-                // Mobile behavior
-                sidebar.classList.toggle('show');
-                overlay.classList.toggle('show');
-            }
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        
+        if (window.innerWidth <= 767) {
+            // Mobile behavior
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
         }
+    }
 
-        function toggleSidebarDesktop() {
-            if (window.innerWidth > 767) {
-                // Desktop behavior
-                const sidebar = document.getElementById('sidebar');
-                const mainContent = document.getElementById('mainContent');
-                const topNavbar = document.querySelector('.top-navbar');
-                
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('collapsed');
-                topNavbar.classList.toggle('collapsed');
-            } else {
-                // On mobile, just toggle the sidebar
-                toggleSidebar();
-            }
-        }
-
-        // Handle window resize
-        window.addEventListener('resize', function() {
+    function toggleSidebarDesktop() {
+        if (window.innerWidth > 767) {
+            // Desktop behavior
             const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
             const mainContent = document.getElementById('mainContent');
             const topNavbar = document.querySelector('.top-navbar');
             
-            if (window.innerWidth > 767) {
-                // Desktop mode - remove mobile classes
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-            } else {
-                // Mobile mode - remove desktop collapsed state
-                sidebar.classList.remove('collapsed');
-                mainContent.classList.remove('collapsed');
-                topNavbar.classList.remove('collapsed');
-            }
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(e) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            
-            if (window.innerWidth <= 767 && 
-                sidebar.classList.contains('show') && 
-                !sidebar.contains(e.target) && 
-                !mobileMenuBtn.contains(e.target)) {
-                sidebar.classList.remove('show');
-                overlay.classList.remove('show');
-            }
-        });
-
-        document.addEventListener("DOMContentLoaded", function () {
-            socket.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-
-                const badge = document.getElementById('notification-badge');
-
-                if (data.type === "send_notification" || data.type === "send_pending_count") {
-                    if (data.count > 0) {
-                        badge.textContent = data.count;
-                        badge.classList.remove('d-none');
-                    } else {
-                        badge.classList.add('d-none');
-                    }
-
-                    const pendingCounter = document.getElementById('pending-counter');
-                    if (pendingCounter) {
-                        pendingCounter.textContent = ''; // repaint
-                        pendingCounter.offsetHeight;
-                        pendingCounter.textContent = data.dashboard_count; // update with total pending
-                    }
-
-                    if (window.location.pathname.includes('BusinessNotifications')) {
-                        fetch('/business/pending-orders/')
-                            .then(response => response.text())
-                            .then(html => {
-                                document.getElementById('pending-orders').innerHTML = html;
-                            });
-                    }
-                }
-            };
-        });
-
-        function updateOrderStatusByCode(orderCode, status) {
-            showLoading();
-
-            fetch('/update-order-status/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                body: JSON.stringify({ order_code: orderCode, status: status })
-            })
-            .then(response => response.json())
-            .then(data => {
-                hideLoading();
-
-                const modal = new bootstrap.Modal(document.getElementById('statusModal'));
-                const title = document.getElementById('statusModalTitle');
-                const body = document.getElementById('statusModalBody');
-
-                if (data.success) {
-                    title.innerHTML = `<i class="fas fa-check-circle me-2 text-success"></i> Success`;
-                    body.innerHTML = `Order <strong>${orderCode}</strong> ${status} successfully!`;
-
-                    // Refresh table after modal closes
-                    document.getElementById('statusModal').addEventListener('hidden.bs.modal', function () {
-                        fetch('/partial/pending-orders/')
-                            .then(response => response.text())
-                            .then(html => {
-                                document.getElementById('pending-orders').innerHTML = html;
-                            });
-                    }, { once: true });
-                } else {
-                    title.innerHTML = `<i class="fas fa-exclamation-triangle me-2 text-danger"></i> Error`;
-                    body.innerHTML = `Failed to update order: ${data.error || "Unknown error"}`;
-                }
-
-                modal.show();
-            })
-            .catch(error => {
-                hideLoading();
-                console.error("Error:", error);
-                alert("Something went wrong while updating the order.");
-            });
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('collapsed');
+            topNavbar.classList.toggle('collapsed');
+        } else {
+            // On mobile, just toggle the sidebar
+            toggleSidebar();
         }
+    }
 
-        // CSRF helper function
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        const mainContent = document.getElementById('mainContent');
+        const topNavbar = document.querySelector('.top-navbar');
+        
+        if (window.innerWidth > 767) {
+            // Desktop mode - remove mobile classes
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        } else {
+            // Mobile mode - remove desktop collapsed state
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('collapsed');
+            topNavbar.classList.remove('collapsed');
         }
+    });
 
-        let audioUnlocked = false;
-
-        // Unlock audio on first user interaction
-        function unlockAudio() {
-            const modalSound = document.getElementById('modalSound');
-            if (modalSound && !audioUnlocked) {
-                modalSound.muted = true; // play silently
-                modalSound.play().then(() => {
-                    modalSound.pause();
-                    modalSound.currentTime = 0;
-                    modalSound.muted = false;
-                    audioUnlocked = true;
-                    console.log("🔓 Audio unlocked");
-                }).catch(err => console.warn("Audio unlock failed:", err));
-            }
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(e) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        
+        if (window.innerWidth <= 767 && 
+            sidebar.classList.contains('show') && 
+            !sidebar.contains(e.target) && 
+            !mobileMenuBtn.contains(e.target)) {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
         }
+    });
 
-        // Listen once for user interaction
-        ["click", "keydown", "touchstart"].forEach(event =>
-            document.addEventListener(event, unlockAudio, { once: true })
-        );
-
-        // Function to play the notification sound everywhere
-        function playNotificationSound() {
-            const modalSound = document.getElementById('modalSound');
-
-            if (!modalSound) {
-                console.warn("Custom sound not found, trying fallback...");
-                fallbackNotification();
-                return;
-            }
-
-            modalSound.play()
-                .then(() => {
-                    console.log("Custom notification sound played successfully");
-                })
-                .catch((error) => {
-                    console.warn("Custom sound blocked/unavailable, using fallback:", error);
-                    fallbackNotification();
-                });
-        }
-
-        // Fallback: system/device default + vibration
-        function fallbackNotification() {
-            try {
-                // Try system beep (may trigger native notification sound)
-                const beep = new Audio();
-                beep.play().catch(err => {
-                    console.error("Fallback beep blocked:", err);
-                });
-
-                // Vibrate if supported
-                if ("vibrate" in navigator) {
-                    navigator.vibrate([200, 100, 200]); 
-                    // pattern: buzz 200ms, pause 100ms, buzz 200ms
-                    console.log("Device vibration triggered");
-                } else {
-                    console.log("Vibration not supported on this device");
-                }
-            } catch (e) {
-                console.error("No audio/vibration support:", e);
-            }
-        }
-
-
-        const badge = document.getElementById('notification-badge');
-        const socket = new WebSocket("wss://" + window.location.host + "/ws/notifications/");
-
+    document.addEventListener("DOMContentLoaded", function () {
         socket.onmessage = function(event) {
             const data = JSON.parse(event.data);
-            if (data.type === "send_notification") {
-                // Only play the sound if the notification count is greater than 0
+
+            const badge = document.getElementById('notification-badge');
+
+            if (data.type === "send_notification" || data.type === "send_pending_count") {
                 if (data.count > 0) {
-                    playNotificationSound();
-                    document.getElementById('notification-badge').textContent = data.count;
-                    document.getElementById('notification-badge').classList.remove('d-none');
+                    badge.textContent = data.count;
+                    badge.classList.remove('d-none');
                 } else {
-                    document.getElementById('notification-badge').classList.add('d-none');
+                    badge.classList.add('d-none');
+                }
+
+                const pendingCounter = document.getElementById('pending-counter');
+                if (pendingCounter) {
+                    pendingCounter.textContent = ''; // repaint
+                    pendingCounter.offsetHeight;
+                    pendingCounter.textContent = data.dashboard_count; // update with total pending
+                }
+
+                if (window.location.pathname.includes('BusinessNotifications')) {
+                    fetch('/business/pending-orders/')
+                        .then(response => response.text())
+                        .then(html => {
+                            document.getElementById('pending-orders').innerHTML = html;
+                        });
                 }
             }
         };
+    });
 
-        socket.onclose = function(event) {
-            console.error("WebSocket closed unexpectedly");
-        };
+    function updateOrderStatusByCode(orderCode, status) {
+        showLoading();
 
-        document.addEventListener("click", function (event) {
-            if (event.target.closest("[data-bs-target='#proofModal']")) {
-                const button = event.target.closest("[data-bs-target='#proofModal']");
-                const imageUrl = button.getAttribute("data-img-url");
-                const proofImage = document.querySelector("#proofModal #proofImage");
-                proofImage.src = imageUrl || "";
+        fetch('/update-order-status/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ order_code: orderCode, status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+
+            const modal = new bootstrap.Modal(document.getElementById('statusModal'));
+            const title = document.getElementById('statusModalTitle');
+            const body = document.getElementById('statusModalBody');
+
+            if (data.success) {
+                title.innerHTML = `<i class="fas fa-check-circle me-2 text-success"></i> Success`;
+                body.innerHTML = `Order <strong>${orderCode}</strong> ${status} successfully!`;
+
+                // Refresh table after modal closes
+                document.getElementById('statusModal').addEventListener('hidden.bs.modal', function () {
+                    fetch('/partial/pending-orders/')
+                        .then(response => response.text())
+                        .then(html => {
+                            document.getElementById('pending-orders').innerHTML = html;
+                        });
+                }, { once: true });
+            } else {
+                title.innerHTML = `<i class="fas fa-exclamation-triangle me-2 text-danger"></i> Error`;
+                body.innerHTML = `Failed to update order: ${data.error || "Unknown error"}`;
             }
+
+            modal.show();
+        })
+        .catch(error => {
+            hideLoading();
+            console.error("Error:", error);
+            alert("Something went wrong while updating the order.");
         });
+    }
 
-        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-        const deliveryFeeSocketOwner = new WebSocket(`${protocol}://${window.location.host}/ws/delivery-fee/owners/`);
-
-        // Queue to hold requests with individual timers (FIFO - First In, First Out)
-        const deliveryFeeQueue = [];
-        let isModalOpen = false;
-        let currentModalTimer = null;
-
-        deliveryFeeSocketOwner.onopen = () => console.log("[Owner JS] WebSocket connected");
-        deliveryFeeSocketOwner.onerror = (e) => console.error("[Owner JS] WebSocket error:", e);
-        deliveryFeeSocketOwner.onclose = (e) => console.log("[Owner JS] WebSocket closed:", e);
-
-        deliveryFeeSocketOwner.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            console.log("[Owner JS] Received message:", data);
-
-            if (data.type === 'delivery_fee_request') {
-                
-                // Play the sound when a delivery fee request comes in
-                const modalSound = document.getElementById('modalSound');
-                
-                modalSound.play()
-                    .then(() => {
-                        console.log("Audio played successfully");
-                    })
-                    .catch((error) => {
-                        console.error("Error playing audio: ", error);
-                    });
-                
-                // Create request object with immediate timer start
-                const requestData = {
-                    ...data,
-                    receivedAt: Date.now(),
-                    timeLeft: 120, // 2 minutes in seconds
-                    requestId: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-                };
-                
-                // Start individual timer for this request immediately
-                requestData.timer = setInterval(() => {
-                    requestData.timeLeft--;
-                    
-                    // If this request times out while in queue or being displayed
-                    if (requestData.timeLeft <= 0) {
-                        console.log("[Owner JS] Request timed out:", requestData.requestId);
-                        
-                        // Clear the timer
-                        clearInterval(requestData.timer);
-                        
-                        // Send timeout rejection
-                        deliveryFeeSocketOwner.send(JSON.stringify({
-                            action: "reject_fee",
-                            customer_email: requestData.customer_email,
-                            reason: "Delivery fee request timed out (no response within 2 minutes)"
-                        }));
-                        
-                        // Remove from queue if still there
-                        const queueIndex = deliveryFeeQueue.findIndex(req => req.requestId === requestData.requestId);
-                        if (queueIndex !== -1) {
-                            deliveryFeeQueue.splice(queueIndex, 1);
-                        }
-                        
-                        // If this was the currently displayed modal, close it
-                        const currentModal = document.querySelector('.delivery-fee-modal');
-                        if (currentModal && currentModal.id.includes(requestData.requestId.split('_')[1])) {
-                            closeCurrentModal();
-                        }
-                    }
-                }, 1000);
-                
-                // Add request to queue (FIFO) and try to show modal
-                deliveryFeeQueue.push(requestData);
-                showNextModal();
+    // CSRF helper function
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
-        };
-
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = seconds % 60;
-            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
+        return cookieValue;
+    }
 
-        function closeCurrentModal() {
-            if (currentModalTimer) {
-                clearInterval(currentModalTimer);
-                currentModalTimer = null;
+    // Function to play the notification sound
+    function playNotificationSound() {
+        const modalSound = document.getElementById('modalSound');
+        modalSound.play()
+            .then(() => {
+                console.log("Audio played successfully");
+            })
+            .catch((error) => {
+                console.error("Error playing audio: ", error);
+            });
+    }
+
+    const badge = document.getElementById('notification-badge');
+    const socket = new WebSocket("wss://" + window.location.host + "/ws/notifications/");
+
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if (data.type === "send_notification") {
+            // Only play the sound if the notification count is greater than 0
+            if (data.count > 0) {
+                playNotificationSound();
+                document.getElementById('notification-badge').textContent = data.count;
+                document.getElementById('notification-badge').classList.remove('d-none');
+            } else {
+                document.getElementById('notification-badge').classList.add('d-none');
             }
+        }
+    };
+
+    socket.onclose = function(event) {
+        console.error("WebSocket closed unexpectedly");
+    };
+
+    document.addEventListener("click", function (event) {
+        if (event.target.closest("[data-bs-target='#proofModal']")) {
+            const button = event.target.closest("[data-bs-target='#proofModal']");
+            const imageUrl = button.getAttribute("data-img-url");
+            const proofImage = document.querySelector("#proofModal #proofImage");
+            proofImage.src = imageUrl || "";
+        }
+    });
+
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const deliveryFeeSocketOwner = new WebSocket(`${protocol}://${window.location.host}/ws/delivery-fee/owners/`);
+
+    // Queue to hold requests (FIFO - First In, First Out)
+    const deliveryFeeQueue = [];
+    let isModalOpen = false;
+    let currentModalTimer = null;
+    let currentRequestId = null;
+
+    // Timer sync interval (check server time every 5 seconds)
+    let timerSyncInterval = null;
+
+    deliveryFeeSocketOwner.onopen = () => {
+        console.log("[Owner JS] WebSocket connected");
+        // Request initial timer sync when connection opens
+        requestTimerSync();
+    };
+    
+    deliveryFeeSocketOwner.onerror = (e) => console.error("[Owner JS] WebSocket error:", e);
+    deliveryFeeSocketOwner.onclose = (e) => {
+        console.log("[Owner JS] WebSocket closed:", e);
+        // Clear timer sync when connection closes
+        if (timerSyncInterval) {
+            clearInterval(timerSyncInterval);
+            timerSyncInterval = null;
+        }
+    };
+
+    deliveryFeeSocketOwner.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log("[Owner JS] Received message:", data);
+
+        if (data.type === 'delivery_fee_request') {
             
-            const activeModal = document.querySelector('.delivery-fee-modal');
-            const backdrop = document.getElementById('modalBackdrop');
+            // Play the sound when a delivery fee request comes in
+            const modalSound = document.getElementById('modalSound');
             
-            if (activeModal) {
-                activeModal.remove();
-            }
-            if (backdrop) {
-                backdrop.remove();
-            }
+            modalSound.play()
+                .then(() => {
+                    console.log("Audio played successfully");
+                })
+                .catch((error) => {
+                    console.error("Error playing audio: ", error);
+                });
             
-            document.body.style.overflow = '';
-            isModalOpen = false;
+            // Create request object with server timestamp
+            const requestData = {
+                ...data,
+                requestId: data.request_id || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                serverCreatedAt: data.created_at || Date.now(),
+                expiresAt: data.expires_at || (Date.now() + 120000) // 2 minutes from now if not provided
+            };
             
-            // Process next modal in queue
+            // Add request to queue (FIFO) and try to show modal
+            deliveryFeeQueue.push(requestData);
             showNextModal();
-        }
-
-        function showNextModal() {
-            if (isModalOpen) return;  // modal already showing, wait
-            if (deliveryFeeQueue.length === 0) return; // no requests waiting
-
-            isModalOpen = true;
-
-            // Get the first request from queue (FIFO)
-            const requestData = deliveryFeeQueue.shift();
             
-            // Check if request is still valid (not timed out)
-            if (requestData.timeLeft <= 0) {
-                isModalOpen = false;
-                showNextModal(); // Try next request
-                return;
+            // Start timer sync if not already running
+            if (!timerSyncInterval) {
+                startTimerSync();
+            }
+        } 
+        else if (data.type === 'delivery_fee_timeout') {
+            console.log("[Owner JS] Request timed out from server:", data.request_id);
+            
+            // Remove from queue if still there
+            const queueIndex = deliveryFeeQueue.findIndex(req => req.requestId === data.request_id);
+            if (queueIndex !== -1) {
+                deliveryFeeQueue.splice(queueIndex, 1);
             }
             
-            const container = document.getElementById('modalContainer');
-            const { customer_email, order_details, requestId } = requestData;
-            const { customer_name, email, address, items, total } = order_details;
+            // If this was the currently displayed modal, close it
+            if (currentRequestId === data.request_id) {
+                closeCurrentModal();
+            }
+        }
+        else if (data.type === 'timer_sync') {
+            // Update timer display with server time
+            updateTimerFromServer(data);
+        }
+    };
 
-            const modalId = `deliveryFeeModal_${requestId}`;
+    function requestTimerSync() {
+        if (deliveryFeeSocketOwner.readyState === WebSocket.OPEN) {
+            deliveryFeeSocketOwner.send(JSON.stringify({
+                action: "request_timer_sync"
+            }));
+        }
+    }
 
-            // Create backdrop
-            const backdrop = document.createElement('div');
-            backdrop.id = 'modalBackdrop';
-            backdrop.style.cssText = `
-                position: fixed;
-                top: 0; left: 0; width: 100vw; height: 100vh;
-                background: rgba(0,0,0,0.3);
-                z-index: 9999;
-            `;
-            document.body.appendChild(backdrop);
+    function startTimerSync() {
+        // Clear existing interval if any
+        if (timerSyncInterval) {
+            clearInterval(timerSyncInterval);
+        }
+        
+        // Only start sync if we have active modal or queued requests
+        if (isModalOpen || deliveryFeeQueue.length > 0) {
+            // Sync every 5 seconds
+            timerSyncInterval = setInterval(() => {
+                // Only sync if we have requests to track
+                if (isModalOpen || deliveryFeeQueue.length > 0) {
+                    requestTimerSync();
+                } else {
+                    // No more requests to track, stop syncing
+                    clearInterval(timerSyncInterval);
+                    timerSyncInterval = null;
+                    console.log("[Owner JS] No active requests, stopping timer sync");
+                }
+            }, 5000);
+        }
+    }
 
-            const modalHtml = `
-            <div class="delivery-fee-modal" id="${modalId}">
-                <div class="delivery-modal-content">
-                    <div class="delivery-modal-header" style="flex-direction: column; text-align: left;">
-                        <h4>Delivery Fee Request</h4>
-                        <div class="timer-container">
-                            <span class="timer-label">Time remaining:</span>
-                            <span class="timer-display" id="timer_${modalId}">
-                                ${formatTime(requestData.timeLeft)}
-                            </span>
-                            <span class="timer-icon"></span>
-                        </div>
-                    </div>
-
+    function updateTimerFromServer(syncData) {
+        const activeServerRequests = syncData.active_requests || [];
+        const serverRequestIds = new Set(activeServerRequests.map(req => req.request_id));
+        
+        // Update currently displayed modal timer
+        if (currentRequestId && isModalOpen) {
+            const activeRequest = activeServerRequests.find(req => req.request_id === currentRequestId);
+            if (!activeRequest) {
+                // Request no longer active on server, close modal
+                console.log("[Owner JS] Active request timed out on server:", currentRequestId);
+                closeCurrentModal();
+                return;
+            } else {
+                const timeLeft = Math.max(0, activeRequest.time_remaining);
+                const timerDisplay = document.getElementById(`timer_deliveryFeeModal_${currentRequestId}`);
+                
+                if (timerDisplay) {
+                    timerDisplay.textContent = formatTime(timeLeft);
                     
-                    <div class="delivery-modal-section">
-                        <p class="delivery-modal-label">Customer</p>
-                        <p class="delivery-modal-value"><span class="modalCustomerName"></span></p>
-                    </div>
-                    
-                    <div class="delivery-modal-section">
-                        <p class="delivery-modal-label">Email</p>
-                        <p class="delivery-modal-value"><span class="modalEmail"></span></p>
-                    </div>
-                    
-                    <div class="delivery-modal-section">
-                        <p class="delivery-modal-label">Address</p>
-                        <div class="delivery-address-container">
-                            <p class="delivery-modal-value"><span class="modalAddress"></span></p>
-                            <button class="delivery-copyAddressBtn">Copy</button>
-                        </div>
-                    </div>
-                    
-                    <div class="delivery-modal-section">
-                        <p class="delivery-modal-label">Order Items</p>
-                        <pre class="modalItems"></pre>
-                    </div>
-                    
-                    <div class="delivery-modal-section delivery-total-price">
-                        <p class="delivery-modal-label">Total Price</p>
-                        <p class="delivery-modal-value">₱<span class="modalTotal"></span></p>
-                    </div>
+                    // Change color based on time remaining
+                    if (timeLeft <= 30) {
+                        timerDisplay.style.color = '#ff4444';
+                    } else if (timeLeft <= 60) {
+                        timerDisplay.style.color = '#ff8800';
+                    } else {
+                        timerDisplay.style.color = '#333';
+                    }
+                }
+            }
+        }
+        
+        // Update queued requests - remove any that are no longer active on server
+        for (let i = deliveryFeeQueue.length - 1; i >= 0; i--) {
+            const queuedRequest = deliveryFeeQueue[i];
+            const serverRequest = activeServerRequests.find(req => req.request_id === queuedRequest.requestId);
+            
+            if (!serverRequest || serverRequest.time_remaining <= 0) {
+                // Request timed out on server, remove from queue
+                console.log("[Owner JS] Queued request timed out on server:", queuedRequest.requestId);
+                deliveryFeeQueue.splice(i, 1);
+            } else {
+                // Update the queued request's timing info
+                queuedRequest.serverTimeRemaining = serverRequest.time_remaining;
+                queuedRequest.lastSyncTime = Date.now();
+            }
+        }
+        
+        // If no more requests and no active modal, stop timer sync
+        if (deliveryFeeQueue.length === 0 && !isModalOpen && timerSyncInterval) {
+            clearInterval(timerSyncInterval);
+            timerSyncInterval = null;
+            console.log("[Owner JS] No more active requests, stopping timer sync");
+        }
+    }
 
-                    <div class="delivery-input-section">
-                        <label for="deliveryFeeInput_${modalId}">Enter delivery fee:</label>
-                        <input type="number" id="deliveryFeeInput_${modalId}" min="0" step="0.01">
-                    </div>
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
 
-                    <div class="delivery-button-container">
-                        <button class="rejectDeliveryFeeBtn">Reject</button>
-                        <button class="submitDeliveryFeeBtn">Submit</button>
+    function closeCurrentModal() {
+        if (currentModalTimer) {
+            clearInterval(currentModalTimer);
+            currentModalTimer = null;
+        }
+        
+        const activeModal = document.querySelector('.delivery-fee-modal');
+        const backdrop = document.getElementById('modalBackdrop');
+        
+        if (activeModal) {
+            activeModal.remove();
+        }
+        if (backdrop) {
+            backdrop.remove();
+        }
+        
+        document.body.style.overflow = '';
+        isModalOpen = false;
+        currentRequestId = null;
+        
+        // Stop timer sync if no more requests
+        if (deliveryFeeQueue.length === 0) {
+            if (timerSyncInterval) {
+                clearInterval(timerSyncInterval);
+                timerSyncInterval = null;
+            }
+        }
+        
+        // Process next modal in queue
+        showNextModal();
+    }
+
+    function showNextModal() {
+        if (isModalOpen) return;  // modal already showing, wait
+        if (deliveryFeeQueue.length === 0) return; // no requests waiting
+
+        isModalOpen = true;
+
+        // Get the first request from queue (FIFO)
+        const requestData = deliveryFeeQueue.shift();
+        currentRequestId = requestData.requestId;
+        
+        // Check if this request is still valid based on last server sync
+        if (requestData.serverTimeRemaining !== undefined && requestData.serverTimeRemaining <= 0) {
+            console.log("[Owner JS] Skipping expired queued request:", requestData.requestId);
+            isModalOpen = false;
+            currentRequestId = null;
+            showNextModal(); // Try next request
+            return;
+        }
+        
+        const container = document.getElementById('modalContainer');
+        const { customer_email, order_details, requestId } = requestData;
+        const { customer_name, email, address, items, total } = order_details;
+
+        const modalId = `deliveryFeeModal_${requestId}`;
+
+        // Create backdrop
+        const backdrop = document.createElement('div');
+        backdrop.id = 'modalBackdrop';
+        backdrop.style.cssText = `
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.3);
+            z-index: 9999;
+        `;
+        document.body.appendChild(backdrop);
+
+        const modalHtml = `
+        <div class="delivery-fee-modal" id="${modalId}">
+            <div class="delivery-modal-content">
+                <div class="delivery-modal-header" style="flex-direction: column; text-align: left;">
+                    <h4>Delivery Fee Request</h4>
+                    <div class="timer-container">
+                        <span class="timer-label">Time remaining:</span>
+                        <span class="timer-display" id="timer_${modalId}">
+                            Loading...
+                        </span>
+                        <span class="timer-icon"></span>
                     </div>
                 </div>
+
+                
+                <div class="delivery-modal-section">
+                    <p class="delivery-modal-label">Customer</p>
+                    <p class="delivery-modal-value"><span class="modalCustomerName"></span></p>
+                </div>
+                
+                <div class="delivery-modal-section">
+                    <p class="delivery-modal-label">Email</p>
+                    <p class="delivery-modal-value"><span class="modalEmail"></span></p>
+                </div>
+                
+                <div class="delivery-modal-section">
+                    <p class="delivery-modal-label">Address</p>
+                    <div class="delivery-address-container">
+                        <p class="delivery-modal-value"><span class="modalAddress"></span></p>
+                        <button class="delivery-copyAddressBtn">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="delivery-modal-section">
+                    <p class="delivery-modal-label">Order Items</p>
+                    <pre class="modalItems"></pre>
+                </div>
+                
+                <div class="delivery-modal-section delivery-total-price">
+                    <p class="delivery-modal-label">Total Price</p>
+                    <p class="delivery-modal-value">₱<span class="modalTotal"></span></p>
+                </div>
+
+                <div class="delivery-input-section">
+                    <label for="deliveryFeeInput_${modalId}">Enter delivery fee:</label>
+                    <input type="number" id="deliveryFeeInput_${modalId}" min="0" step="0.01">
+                </div>
+
+                <div class="delivery-button-container">
+                    <button class="rejectDeliveryFeeBtn">Reject</button>
+                    <button class="submitDeliveryFeeBtn">Submit</button>
+                </div>
             </div>
-            `;
+        </div>
+        `;
 
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = modalHtml;
-            container.appendChild(tempDiv.firstElementChild);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = modalHtml;
+        container.appendChild(tempDiv.firstElementChild);
 
-            const modal = document.getElementById(modalId);
-            modal.querySelector('.modalCustomerName').textContent = customer_name;
-            modal.querySelector('.modalEmail').textContent = email;
-            modal.querySelector('.modalAddress').textContent = address;
-            modal.querySelector('.modalItems').textContent = items.map(item => `${item.product_name} x${item.quantity} @ ₱${item.price}`).join('\n');
-            modal.querySelector('.modalTotal').textContent = total;
+        const modal = document.getElementById(modalId);
+        modal.querySelector('.modalCustomerName').textContent = customer_name;
+        modal.querySelector('.modalEmail').textContent = email;
+        modal.querySelector('.modalAddress').textContent = address;
+        modal.querySelector('.modalItems').textContent = items.map(item => `${item.product_name} x${item.quantity} @ ₱${item.price}`).join('\n');
+        modal.querySelector('.modalTotal').textContent = total;
 
-            // Disable page scroll while modal open
-            document.body.style.overflow = 'hidden';
+        // Disable page scroll while modal open
+        document.body.style.overflow = 'hidden';
 
-            // Update timer display using the existing timer
-            const timerDisplay = document.getElementById(`timer_${modalId}`);
-            
-            currentModalTimer = setInterval(() => {
-                timerDisplay.textContent = formatTime(requestData.timeLeft);
+        // Request immediate timer sync for this modal
+        requestTimerSync();
+
+        // Initialize timer display with server data if available
+        const timerDisplay = document.getElementById(`timer_${modalId}`);
+        let localTimeLeft = requestData.serverTimeRemaining || 120; // Use server time if available
+        
+        // If we have server sync data, calculate current time based on last sync
+        if (requestData.lastSyncTime && requestData.serverTimeRemaining !== undefined) {
+            const timeSinceSync = Math.floor((Date.now() - requestData.lastSyncTime) / 1000);
+            localTimeLeft = Math.max(0, requestData.serverTimeRemaining - timeSinceSync);
+        }
+        
+        // Update initial display
+        if (timerDisplay && localTimeLeft > 0) {
+            timerDisplay.textContent = formatTime(localTimeLeft);
+            if (localTimeLeft <= 30) {
+                timerDisplay.style.color = '#ff4444';
+            } else if (localTimeLeft <= 60) {
+                timerDisplay.style.color = '#ff8800';
+            }
+        }
+        
+        currentModalTimer = setInterval(() => {
+            localTimeLeft--;
+            if (timerDisplay && localTimeLeft > 0) {
+                timerDisplay.textContent = formatTime(localTimeLeft);
                 
                 // Change color when less than 30 seconds left
-                if (requestData.timeLeft <= 30) {
+                if (localTimeLeft <= 30) {
                     timerDisplay.style.color = '#ff4444';
-                } else if (requestData.timeLeft <= 60) {
+                } else if (localTimeLeft <= 60) {
                     timerDisplay.style.color = '#ff8800';
                 }
-                
-                // The main timeout logic is handled by the individual request timer
-                // This is just for display updates
-            }, 1000);
+            }
+        }, 1000);
 
-            // Copy address button
-            modal.querySelector('.delivery-copyAddressBtn').onclick = () => {
-                const addressText = modal.querySelector('.modalAddress').textContent.trim();
-                navigator.clipboard.writeText(addressText)
-                    .then(() => {
-                        alert('Address copied to clipboard!');
-                    })
-                    .catch(() => {
-                        alert('Failed to copy address');
-                    });
-            };
+        // Copy address button
+        modal.querySelector('.delivery-copyAddressBtn').onclick = () => {
+            const addressText = modal.querySelector('.modalAddress').textContent.trim();
+            navigator.clipboard.writeText(addressText)
+                .then(() => {
+                    alert('Address copied to clipboard!');
+                })
+                .catch(() => {
+                    alert('Failed to copy address');
+                });
+        };
 
-            // Submit button
-            modal.querySelector('.submitDeliveryFeeBtn').onclick = () => {
-                const feeInput = modal.querySelector(`#deliveryFeeInput_${modalId}`);
-                const fee = feeInput.value.trim();
-                
-                // Allow 0 as a valid input
-                if (fee === '' || isNaN(fee) || parseFloat(fee) < 0) {
-                    alert('Please enter a valid delivery fee (0 or greater)');
-                    return;
-                }
+        // Submit button
+        modal.querySelector('.submitDeliveryFeeBtn').onclick = () => {
+            const feeInput = modal.querySelector(`#deliveryFeeInput_${modalId}`);
+            const fee = feeInput.value.trim();
+            
+            // Allow 0 as a valid input
+            if (fee === '' || isNaN(fee) || parseFloat(fee) < 0) {
+                alert('Please enter a valid delivery fee (0 or greater)');
+                return;
+            }
 
-                console.log("[Owner JS] Sending fee:", fee);
-                
-                // Clear the request timer since we're responding
-                clearInterval(requestData.timer);
-                
-                deliveryFeeSocketOwner.send(JSON.stringify({
-                    action: "send_fee",
-                    customer_email: customer_email,
-                    delivery_fee: fee,
-                }));
+            console.log("[Owner JS] Sending fee:", fee);
+            
+            deliveryFeeSocketOwner.send(JSON.stringify({
+                action: "send_fee",
+                customer_email: customer_email,
+                request_id: requestId,
+                delivery_fee: fee,
+            }));
 
-                closeCurrentModal();
-            };
+            closeCurrentModal();
+        };
 
-            // Reject button
-            modal.querySelector('.rejectDeliveryFeeBtn').onclick = () => {
-                // Clear the request timer since we're responding
-                clearInterval(requestData.timer);
-                
-                deliveryFeeSocketOwner.send(JSON.stringify({
-                    action: "reject_fee",
-                    customer_email: customer_email,
-                    reason: "Delivery fee request is rejected, location is out of coverage area"
-                }));
+        // Reject button
+        modal.querySelector('.rejectDeliveryFeeBtn').onclick = () => {
+            deliveryFeeSocketOwner.send(JSON.stringify({
+                action: "reject_fee",
+                customer_email: customer_email,
+                request_id: requestId,
+                reason: "Delivery fee request is rejected, location is out of coverage area"
+            }));
 
-                closeCurrentModal();
-            };
+            closeCurrentModal();
+        };
+    }
+
+    // Handle page visibility changes to sync timers when page becomes visible
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && isModalOpen) {
+            // Page became visible, request immediate timer sync
+            requestTimerSync();
         }
-    </script>
+    });
+
+    // Handle window focus to sync timers when window gets focus
+    window.addEventListener('focus', function() {
+        if (isModalOpen) {
+            // Window got focus, request immediate timer sync
+            requestTimerSync();
+        }
+    });
+</script>
     
 </body>
 </html>
