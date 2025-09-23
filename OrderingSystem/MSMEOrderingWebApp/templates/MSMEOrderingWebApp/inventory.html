@@ -1226,14 +1226,14 @@
                                                             <a onclick="openEditModal(
                                                                     '{{ product.id }}',
                                                                     '{{ product.price }}',
-                                                                    '{{ product.variation_name|escapejs }}',
+                                                                    '{{ product.variation_name }}',
                                                                     '{{ product.name|escapejs }}',
                                                                     'product',
                                                                     '{{ product.stocks }}',
                                                                     '{{ product.track_stocks }}',
-                                                                    '{{ product.description|default_if_none:""|escapejs }}'  <!-- ✅ pass description -->
-                                                                )"
-                                                                class="btn btn-outline-primary btn-sm">
+                                                                    `{{ product.description|default_if_none:''|escapejs }}`
+                                                                )" 
+                                                               class="btn btn-outline-primary btn-sm">
                                                                 <i class="fas fa-edit"></i>
                                                             </a>
                                                             <a href="#"
@@ -1368,42 +1368,56 @@
             <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <form method="post" action="{% url 'edit_product_price' %}">
-                    {% csrf_token %}
-                    <div class="modal-content">
-                        <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel"><i class="fas fa-edit me-2"></i> Edit Product </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        {% csrf_token %}
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editModalLabel">
+                                    <i class="fas fa-edit me-2"></i> Edit Product
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+            
+                            <div class="modal-body">
+                                <!-- Hidden Inputs -->
+                                <input type="hidden" name="product_id" id="editProductId">
+                                <input type="hidden" name="edit_type" id="editType">
+            
+                                <!-- Product Name -->
+                                <div class="mb-3">
+                                    <label for="editProductName" class="form-label">Product Name</label>
+                                    <input type="text" class="form-control" id="editProductName" disabled>
+                                </div>
+            
+                                <!-- Variation -->
+                                <div class="mb-3">
+                                    <label for="editVariationName" class="form-label">Variation</label>
+                                    <input type="text" class="form-control" id="editVariationName" disabled>
+                                </div>
+            
+                                <!-- Price -->
+                                <div class="mb-3">
+                                    <label for="editProductPrice" class="form-label">Price (₱)</label>
+                                    <input type="number" class="form-control" name="new_price" id="editProductPrice" required>
+                                </div>
+            
+                                <!-- Stocks -->
+                                <div class="mb-3" id="editProductStocksGroup">
+                                    <label for="editProductStocks" class="form-label">Stocks</label>
+                                    <input type="number" class="form-control" name="new_stocks" id="editProductStocks" min="0" required>
+                                </div>
+            
+                                <!-- ✅ Description -->
+                                <div class="mb-3">
+                                    <label for="editProductDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" name="new_description" id="editProductDescription" rows="3"></textarea>
+                                </div>
+                            </div>
+            
+                            <!-- Modal Footer -->
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            <input type="hidden" name="product_id" id="editProductId">
-                            <input type="hidden" name="edit_type" id="editType">
-
-                            <div class="mb-3">
-                                <label for="editProductName" class="form-label">Product Name</label>
-                                <input type="text" class="form-control" id="editProductName" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editVariationName" class="form-label">Variation</label>
-                                <input type="text" class="form-control" id="editVariationName" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editProductPrice" class="form-label">Price (₱)</label>
-                                <input type="number" class="form-control" name="new_price" id="editProductPrice" required>
-                            </div>
-
-                            <div class="mb-3" id="editProductStocksGroup">
-                                <label for="editProductStocks" class="form-label">Stocks</label>
-                                <input type="number" class="form-control" name="new_stocks" id="editProductStocks" min="0" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editProductDescription" class="form-label">Description</label>
-                                <textarea class="form-control" name="new_description" id="editProductDescription" rows="3"></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                        </div>
-                    </div>
                     </form>
                 </div>
             </div>
@@ -1833,7 +1847,9 @@
         document.getElementById("editVariationName").value = variation;
         document.getElementById("editProductPrice").value = price;
         document.getElementById("editProductStocks").value = stocks;
-        document.getElementById("editProductDescription").value = description || "";  // ✅ new
+    
+        // ✅ Populate description field
+        document.getElementById("editProductDescription").value = description || "";
     
         const stockGroup = document.getElementById("editProductStocksGroup");
         const stockInput = document.getElementById("editProductStocks");
@@ -1852,7 +1868,7 @@
         const modal = new bootstrap.Modal(document.getElementById("editModal"));
         modal.show();
     }
-
+    
     // Close Edit Modal
     function closeEditModal() {
         const modal = bootstrap.Modal.getInstance(document.getElementById("editModal"));
@@ -1860,7 +1876,7 @@
             modal.hide();
         }
     }
-
+    
     // Form validation
     document.addEventListener('DOMContentLoaded', function () {
         const forms = document.querySelectorAll('form');
@@ -1868,7 +1884,7 @@
             form.addEventListener('submit', function (e) {
                 const requiredFields = form.querySelectorAll('[required]');
                 let isValid = true;
-
+    
                 requiredFields.forEach(field => {
                     if (!field.value.trim()) {
                         field.classList.add('is-invalid');
@@ -1877,7 +1893,7 @@
                         field.classList.remove('is-invalid');
                     }
                 });
-
+    
                 if (!isValid) {
                     e.preventDefault();
                     alert('Please fill in all required fields.');
