@@ -1071,6 +1071,15 @@
                                         step="0.01" min="0" placeholder="0.00" 
                                         value="{{ form_data.default_price|default:'' }}">
                                 </div>
+
+                                <div class="col-12">
+                                    <label for="product_description" class="form-label">
+                                        <i class="fas fa-align-left"></i> Product Description
+                                    </label>
+                                    <textarea id="product_description" name="product_description" class="form-control" 
+                                              placeholder="Enter product description" rows="3">{{ form_data.product_description|default:'' }}</textarea>
+                                </div>
+
                             </div>
 
                             <!-- Add Variation Section -->
