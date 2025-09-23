@@ -3206,6 +3206,7 @@ def inventory(request):
             image = request.FILES.get('product_image')
             skip_image = request.POST.get('disable_image')  
             name = request.POST.get('product_name')
+			 description = request.POST.get('product_description')
             category_id = request.POST.get('product_category')
             default_price = request.POST.get('default_price')
             default_stocks = request.POST.get('product_stocks')
@@ -3243,6 +3244,7 @@ def inventory(request):
                         category=category,
                         image=image if not skip_image else None,
                         name=name,
+						description=description,
                         variation_name=vname,
                         price=vprice,
                         stocks=vstocks,
@@ -3261,6 +3263,7 @@ def inventory(request):
                     category=category,
                     image=image if not skip_image else None,
                     name=name,
+					description=description,
                     variation_name='Default',
                     price=default_price,
                     stocks=default_stocks if enable_stocks else 0,
