@@ -1300,8 +1300,19 @@ function updatePlaceOrderButtonState() {
 
 // === TIMER HELPER ===
 let deliveryFeeTimer = null;
+
 function startDeliveryFeeTimer(button, duration = 120) {
-    let remaining = duration;
+    const startTime = Date.now();
+    const expiryTime = startTime + duration * 1000;
+
+    // Save expiry time in localStorage
+    localStorage.setItem("delivery_fee_timer_expiry", expiryTime);
+
+    runDeliveryFeeTimer(button, expiryTime);
+}
+
+function runDeliveryFeeTimer(button, expiryTime) {
+    clearInterval(deliveryFeeTimer);
 
     // Create timer span if not exists
     let timerSpan = document.getElementById("delivery-fee-timer");
@@ -1314,22 +1325,42 @@ function startDeliveryFeeTimer(button, duration = 120) {
 
     button.disabled = true;
     button.textContent = "Requested";
-    timerSpan.textContent = ` (wait ${remaining}s)`;
 
-    deliveryFeeTimer = setInterval(() => {
-        remaining--;
-        timerSpan.textContent = ` (wait ${remaining}s)`;
+    function updateTimer() {
+        const now = Date.now();
+        let remaining = Math.max(0, Math.floor((expiryTime - now) / 1000));
 
-        if (remaining <= 0) {
+        if (remaining > 0) {
+            timerSpan.textContent = ` (wait ${remaining}s)`;
+        } else {
             clearInterval(deliveryFeeTimer);
             deliveryFeeTimer = null;
+            localStorage.removeItem("delivery_fee_timer_expiry");
+
             button.disabled = false;
             button.textContent = "Request Delivery Fee Again";
             timerSpan.textContent = "";
             button.style.display = "inline-block";
+            const loadingElem = document.getElementById("delivery-fee-loading");
+            if (loadingElem) loadingElem.style.display = "none";
         }
-    }, 1000);
+    }
+
+    updateTimer();
+    deliveryFeeTimer = setInterval(updateTimer, 1000);
 }
+
+// === RESTORE TIMER ON PAGE LOAD ===
+document.addEventListener("DOMContentLoaded", function () {
+    const requestBtn = document.getElementById("request-delivery-fee-btn");
+    if (!requestBtn) return;
+
+    const expiryTime = parseInt(localStorage.getItem("delivery_fee_timer_expiry"), 10);
+    if (expiryTime && Date.now() < expiryTime) {
+        // Resume timer
+        runDeliveryFeeTimer(requestBtn, expiryTime);
+    }
+});
 
 // === DELIVERY FEE UI ===
 function showDeliveryFeeRequest() {
