@@ -1593,10 +1593,11 @@
             </div>
         </div>
 
-        <!-- Product Name -->
+        <!-- Product Name + Description -->
         <div class="mb-0 text-center">
           <label class="form-label fw-semibold text-muted">PRODUCT</label>
           <h5 id="modalProductName"></h5>
+          <p id="modalProductDescription" class="text-muted small mt-1"></p> <!-- ✅ New description -->
         </div>
 
         <!-- Variation + Quantity Row -->
@@ -1745,23 +1746,34 @@
 
     function openProductModal(productName, imageUrl) {
         const modalNameEl = document.getElementById('modalProductName');
+        const modalDescEl = document.getElementById('modalProductDescription'); // ✅ description element
         const modalImageEl = document.getElementById('modalProductImage');
         const placeholderEl = document.getElementById('modalPlaceholder');
         const placeholderLetterEl = document.getElementById('modalPlaceholderLetter');
         const variationSelect = document.getElementById('modalVariation');
         const confirmAddBtn = document.getElementById('confirmAddBtn');
-
+    
         if (modalNameEl) modalNameEl.textContent = productName;
-
+    
+        // ✅ Fill description if available
+        if (modalDescEl) {
+            const variations = getProductVariations(productName);
+            if (variations.length > 0 && variations[0].description) {
+                modalDescEl.textContent = variations[0].description;
+                modalDescEl.style.display = "block";
+            } else {
+                modalDescEl.textContent = "";
+                modalDescEl.style.display = "none";
+            }
+        }
+    
         // Handle image display with improved logic
         if (modalImageEl && placeholderEl && placeholderLetterEl) {
-            // Reset both elements AND their content completely first
             modalImageEl.style.display = 'none';
             modalImageEl.src = '';
             placeholderEl.style.display = 'none';
             placeholderLetterEl.textContent = '';
             
-            // Force a reflow to ensure elements are hidden and content cleared
             modalImageEl.offsetHeight;
             placeholderEl.offsetHeight;
             
@@ -1783,7 +1795,7 @@
                 }, 10);
             }
         }
-
+    
         // Reset and populate variation dropdown WITH STOCK INFORMATION
         if (variationSelect) {
             variationSelect.innerHTML = `
@@ -1798,17 +1810,14 @@
                     opt.setAttribute('data-stocks', variation.stocks);
                     opt.setAttribute('data-track-stocks', variation.track_stocks);
                     
-                    // Build the option text with stock information
                     let optionText = `${variation.variation_name} (₱${parseFloat(variation.price).toFixed(2)})`;
-                    
-                    // Add stock information if stock tracking is enabled
                     if (variation.track_stocks) {
                         if (variation.stocks > 0) {
                             optionText += ` - Qty:${variation.stocks}`;
                         } else {
                             optionText += ` - Out of stock`;
-                            opt.disabled = true; // Disable out-of-stock variations
-                            opt.style.color = '#dc3545'; // Red color for out of stock
+                            opt.disabled = true;
+                            opt.style.color = '#dc3545';
                         }
                     }
                     
@@ -1821,18 +1830,18 @@
                 variationSelect.disabled = true;
             }
         }
-
+    
         // Reset quantity & pricing
         const quantityInput = document.getElementById('modalQuantity');
         const priceEl = document.getElementById('modalPrice');
         const totalEl = document.getElementById('modalTotal');
-
+    
         if (quantityInput) quantityInput.value = 1;
         if (priceEl) priceEl.textContent = '0.00';
         if (totalEl) totalEl.textContent = '0.00';
-
+    
         if (confirmAddBtn) confirmAddBtn.disabled = true;
-
+    
         // Show modal
         const modalElement = document.getElementById('addToCartModal');
         if (modalElement && typeof bootstrap !== 'undefined') {
@@ -1840,6 +1849,7 @@
             modal.show();
         }
     }
+
 
     function getProductVariations(productName) {
         // Handle both possible data structures
