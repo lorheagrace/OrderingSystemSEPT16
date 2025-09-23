@@ -4414,7 +4414,7 @@ def customer_home(request):
     return render(request, 'MSMEOrderingWebApp/customer_home.html', {
         'products': unique_products,
         'categories': categories,
-        'all_products': list(products.values('name', 'variation_name', 'price', 'stocks', 'track_stocks')),
+        'all_products': list(products.values('name', 'variation_name', 'price', 'stocks', 'track_stocks', 'description')),
         'customization': customization,
         'best_seller_products': best_seller_products,
         'business': business,
