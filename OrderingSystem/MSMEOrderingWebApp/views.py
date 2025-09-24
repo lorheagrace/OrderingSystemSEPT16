@@ -3582,22 +3582,24 @@ def pos_place_order(request):
             specific_order_type = data.get('order_type', None)
 
             checkout_entries = []
-
-            # ✅ Track grouped quantities by base product name
-            grouped_sales = {}
+            grouped_sales = {}  # ✅ Track grouped quantities by base product name
 
             for item in cart_items:
-                try:
-                    name, variation = item.product_name.split(" - ")
-                    variation = variation.split(" (₱")[0]
-                except ValueError:
-                    return JsonResponse({'success': False, 'error': 'Invalid product name format'})
+                # ✅ Split product name properly
+                parts = item.product_name.split(" - ", 1)  # only split on the first " - "
+                if len(parts) < 2:
+                    # no variation, just use full name
+                    name = parts[0].strip()
+                    variation = ""
+                else:
+                    name = parts[0].strip()
+                    variation = parts[1].split(" (₱")[0].strip()
 
                 # Deduct stock at variation level
                 try:
                     product = Products.objects.get(
-                        name__iexact=name.strip(),
-                        variation_name__iexact=variation.strip()
+                        name__iexact=name,
+                        variation_name__iexact=variation
                     )
                     if product.track_stocks:
                         if product.stocks < item.quantity:
@@ -3611,15 +3613,15 @@ def pos_place_order(request):
                     print(f"❌ Product not found for: {name} - {variation}")
                 except Products.MultipleObjectsReturned:
                     product = Products.objects.filter(
-                        name__iexact=name.strip(),
-                        variation_name__iexact=variation.strip()
+                        name__iexact=name,
+                        variation_name__iexact=variation
                     ).first()
                     if product and product.track_stocks:
                         product.stocks = max(0, product.stocks - item.quantity)
                         product.save(update_fields=["stocks"])
 
                 # ✅ Accumulate sales at base product name level
-                grouped_sales[name.strip().lower()] = grouped_sales.get(name.strip().lower(), 0) + item.quantity
+                grouped_sales[name.lower()] = grouped_sales.get(name.lower(), 0) + item.quantity
 
                 checkout = Checkout.objects.create(
                     first_name=item.first_name,
@@ -3697,6 +3699,7 @@ def pos_place_order(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
+
 
 
 from collections import defaultdict
