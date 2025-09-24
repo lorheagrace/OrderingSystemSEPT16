@@ -1680,7 +1680,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const deliveryFeeInput = document.getElementById('delivery_fee_input');
 
         // Only restore delivery fee if input exists
-        (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee) {
+        if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee) {
         deliveryFee = parseFloat(savedDeliveryFee);
         deliveryFeeInput.value = deliveryFee;
     
