@@ -1217,9 +1217,18 @@ function startGlobalQueueTimer() {
             // Update the request's time remaining
             request.currentTimeRemaining = newTimeRemaining;
             
-            // If time expired, remove from queue
+            // If time expired, remove from queue and notify customer
             if (newTimeRemaining <= 0) {
                 console.log("[Owner JS] Queued request expired locally:", request.requestId);
+                
+                // Send timeout notification to customer
+                deliveryFeeSocketOwner.send(JSON.stringify({
+                    action: "timeout_fee",
+                    customer_email: request.customer_email,
+                    request_id: request.requestId,
+                    reason: "Request timed out - no response from business owner"
+                }));
+                
                 deliveryFeeQueue.splice(i, 1);
             }
         }
@@ -1511,8 +1520,16 @@ function showNextModal() {
                 timerDisplay.style.color = '#ff8800';
             }
         } else if (localTimeLeft <= 0) {
-            // Time expired, close modal
+            // Time expired, send timeout notification to customer and close modal
             console.log("[Owner JS] Modal timer expired locally:", requestId);
+            
+            deliveryFeeSocketOwner.send(JSON.stringify({
+                action: "timeout_fee",
+                customer_email: customer_email,
+                request_id: requestId,
+                reason: "Request timed out - no response from business owner"
+            }));
+            
             closeCurrentModal();
         }
     }, 1000);
