@@ -1234,20 +1234,16 @@
 <script>
 // === CLEAR LOCAL STORAGE ONLY ON HOMEPAGE ===
 document.addEventListener("DOMContentLoaded", function() {
-    const currentPath = window.location.pathname.toLowerCase().replace(/\/+$/, ""); 
-    // strip trailing slashes
-
+    const currentPath = window.location.pathname.toLowerCase();
     const isHomePage =
-        currentPath === "" ||                 // root "/"
-        currentPath === "/home" ||
-        currentPath === "/customer/home" ||
-        currentPath === "/customerhomepage";
+        currentPath === "/" ||
+        currentPath.includes("home") ||   // matches /home, /customer/home, /CustomerHomepage, etc.
+        currentPath.includes("customerhomepage");
 
     if (isHomePage) {
         localStorage.removeItem("order_type");
         localStorage.removeItem("delivery_fee");
         localStorage.removeItem("delivery_fee_received");
-        localStorage.removeItem("delivery_fee_timer_expiry"); // clear timer too
         console.log("[CustomerHomepage] Cleared localStorage for order_type and delivery_fee");
     }
 });
@@ -1673,7 +1669,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Restore saved order type & delivery fee
     const savedOrderType = localStorage.getItem('order_type');
     const savedDeliveryFee = localStorage.getItem('delivery_fee');
-    const hasFeeResponse = localStorage.getItem('delivery_fee_received') === "true";
 
     const subtotalElement = document.getElementById('subtotal');
     const totalElement = document.getElementById('total');
@@ -1683,18 +1678,11 @@ document.addEventListener('DOMContentLoaded', function() {
         let deliveryFee = 0;
 
         const deliveryFeeInput = document.getElementById('delivery_fee_input');
-        const feeRow = document.getElementById('delivery-fee-row');
-        const feeDisplay = document.getElementById('delivery-fee-display');
 
-        // Restore delivery fee only if response was received
-        if (savedOrderType === 'delivery' && deliveryFeeInput && hasFeeResponse && savedDeliveryFee) {
+        // Only restore delivery fee if input exists
+        if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee) {
             deliveryFee = parseFloat(savedDeliveryFee);
             deliveryFeeInput.value = deliveryFee;
-
-            // ✅ Make sure delivery fee row is visible
-            if (feeRow) feeRow.style.display = 'flex';
-            if (feeDisplay) feeDisplay.textContent = deliveryFee.toFixed(2);
-
             initDeliveryFeeInputListener(); // Add listener if needed
         }
 
