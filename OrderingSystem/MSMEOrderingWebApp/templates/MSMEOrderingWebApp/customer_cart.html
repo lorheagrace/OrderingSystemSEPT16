@@ -1232,15 +1232,14 @@
 
 
 <script>
+ // Clear localStorage when on homepage - check multiple possible homepage paths
+const currentPath = window.location.pathname.toLowerCase();
+const isHomePage =
+    currentPath === '/' ||
+    currentPath.includes('home') ||   // ✅ matches /home, /customer/home, /CustomerHomepage, etc.
+    currentPath.includes('customerhomepage');
 // === CLEAR LOCAL STORAGE ON HOMEPAGE ===
 document.addEventListener("DOMContentLoaded", function() {
-    // Clear localStorage when on homepage - check multiple possible homepage paths
-    const currentPath = window.location.pathname.toLowerCase();
-    const isHomePage =
-        currentPath === '/' ||
-        currentPath.includes('home') ||   // ✅ matches /home, /customer/home, /CustomerHomepage, etc.
-        currentPath.includes('customerhomepage');
-    
     if (isHomePage) {
         // Clear all delivery-related localStorage
         localStorage.removeItem('order_type');
