@@ -1221,12 +1221,12 @@ function startGlobalQueueTimer() {
             if (newTimeRemaining <= 0) {
                 console.log("[Owner JS] Queued request expired locally:", request.requestId);
                 
-                // Send timeout notification to customer
+                // Send timeout notification to customer using reject_fee action
                 deliveryFeeSocketOwner.send(JSON.stringify({
-                    action: "timeout_fee",
+                    action: "reject_fee",
                     customer_email: request.customer_email,
                     request_id: request.requestId,
-                    reason: "Request timed out - no response from business owner"
+                    reason: "Request timed out please try again"
                 }));
                 
                 deliveryFeeQueue.splice(i, 1);
@@ -1520,14 +1520,14 @@ function showNextModal() {
                 timerDisplay.style.color = '#ff8800';
             }
         } else if (localTimeLeft <= 0) {
-            // Time expired, send timeout notification to customer and close modal
+            // Time expired, send timeout notification to customer using reject_fee and close modal
             console.log("[Owner JS] Modal timer expired locally:", requestId);
             
             deliveryFeeSocketOwner.send(JSON.stringify({
-                action: "timeout_fee",
+                action: "reject_fee",
                 customer_email: customer_email,
                 request_id: requestId,
-                reason: "Request timed out - no response from business owner"
+                reason: "Request timed out please try again"
             }));
             
             closeCurrentModal();
