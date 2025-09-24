@@ -1234,16 +1234,15 @@
 <script>
 // === CLEAR LOCAL STORAGE ON HOMEPAGE ===
 document.addEventListener("DOMContentLoaded", function() {
-    // Clear localStorage when on homepage - check multiple possible homepage paths
-    const currentPath = window.location.pathname;
-    const isHomePage = currentPath === '/' || 
-                      currentPath === '/home/' || 
-                      currentPath === '/home' ||
-                      currentPath.endsWith('/home/') ||
-                      currentPath.endsWith('/home') ||
-                      currentPath === '/customer/home/' ||
-                      currentPath === '/customer/home';
-    
+    // Normalize path to lowercase
+    const currentPath = window.location.pathname.toLowerCase();
+
+    // Check if it's any homepage (root, /home, /customer/home, /customerhomepage, etc.)
+    const isHomePage =
+        currentPath === '/' ||
+        currentPath.includes('home') ||   // matches /home, /customer/home, /customerhomepage
+        currentPath.includes('customerhomepage');
+
     if (isHomePage) {
         // Clear all delivery-related localStorage
         localStorage.removeItem('order_type');
@@ -1251,7 +1250,6 @@ document.addEventListener("DOMContentLoaded", function() {
         localStorage.removeItem('delivery_fee_timestamp');
         localStorage.removeItem('delivery_fee_requested');
         localStorage.removeItem('delivery_fee_timer_expiry');
-        localStorage.removeItem('delivery_fee_requested');
         console.log("[CustomerHomepage] Cleared all delivery-related localStorage on homepage");
     }
 });
@@ -1692,55 +1690,69 @@ document.addEventListener('DOMContentLoaded', function() {
     initDeleteButtons();
     initCartQuantityListeners();
 
-    // Restore saved order type & delivery fee
-    const savedOrderType = localStorage.getItem('order_type');
-    const savedDeliveryFee = localStorage.getItem('delivery_fee');
-    const savedDeliveryFeeTimestamp = localStorage.getItem('delivery_fee_timestamp');
+    // ✅ Detect if homepage
+    const currentPath = window.location.pathname.toLowerCase();
+    const isHomePage =
+        currentPath === '/' ||
+        currentPath.includes('home') ||     // covers /home, /customer/home
+        currentPath.includes('customerhomepage'); // covers /CustomerHomepage/
 
-    const subtotalElement = document.getElementById('subtotal');
-    const totalElement = document.getElementById('total');
+    if (!isHomePage) {
+        // Restore saved order type & delivery fee
+        const savedOrderType = localStorage.getItem('order_type');
+        const savedDeliveryFee = localStorage.getItem('delivery_fee');
+        const savedDeliveryFeeTimestamp = localStorage.getItem('delivery_fee_timestamp');
 
-    if (subtotalElement && totalElement) {
-        let subtotal = parseFloat(subtotalElement.textContent) || 0;
-        let deliveryFee = 0;
+        const subtotalElement = document.getElementById('subtotal');
+        const totalElement = document.getElementById('total');
 
-        const deliveryFeeInput = document.getElementById('delivery_fee_input');
+        if (subtotalElement && totalElement) {
+            let subtotal = parseFloat(subtotalElement.textContent) || 0;
+            let deliveryFee = 0;
 
-        // Restore delivery fee if it exists and is for delivery order type
-        if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee !== null && savedDeliveryFeeTimestamp) {
-            deliveryFee = parseFloat(savedDeliveryFee);
-            deliveryFeeInput.value = deliveryFee;
-            
-            // Show the delivery fee row if fee exists
-            const feeRow = document.getElementById('delivery-fee-row');
-            const feeDisplay = document.getElementById('delivery-fee-display');
-            if (feeRow && feeDisplay) {
-                feeRow.style.display = 'flex';
-                feeDisplay.textContent = deliveryFee.toFixed(2);
+            const deliveryFeeInput = document.getElementById('delivery_fee_input');
+
+            // Restore delivery fee if it exists and is for delivery order type
+            if (
+                savedOrderType === 'delivery' &&
+                deliveryFeeInput &&
+                savedDeliveryFee !== null &&
+                savedDeliveryFeeTimestamp
+            ) {
+                deliveryFee = parseFloat(savedDeliveryFee);
+                deliveryFeeInput.value = deliveryFee;
+
+                // Show the delivery fee row if fee exists
+                const feeRow = document.getElementById('delivery-fee-row');
+                const feeDisplay = document.getElementById('delivery-fee-display');
+                if (feeRow && feeDisplay) {
+                    feeRow.style.display = 'flex';
+                    feeDisplay.textContent = deliveryFee.toFixed(2);
+                }
+
+                initDeliveryFeeInputListener(); // Add listener if needed
+                console.log("[Customer JS] Restored delivery fee:", deliveryFee);
             }
-            
-            initDeliveryFeeInputListener(); // Add listener if needed
-            console.log("[Customer JS] Restored delivery fee:", deliveryFee);
-        }
 
-        totalElement.textContent = (subtotal + deliveryFee).toFixed(2);
+            totalElement.textContent = (subtotal + deliveryFee).toFixed(2);
 
-        // Restore radio button
-        if (savedOrderType) {
-            const radio = document.querySelector(`input[name="order_type"][value="${savedOrderType}"]`);
-            if (radio) {
-                radio.checked = true;
-                
-                // If delivery is selected and we have a saved fee, show the delivery fee UI
-                if (savedOrderType === 'delivery') {
-                    showDeliveryFeeRequest();
-                    // If we have a saved fee, make sure the UI reflects it
-                    if (savedDeliveryFee !== null) {
-                        const feeRow = document.getElementById('delivery-fee-row');
-                        const feeDisplay = document.getElementById('delivery-fee-display');
-                        if (feeRow && feeDisplay) {
-                            feeRow.style.display = 'flex';
-                            feeDisplay.textContent = parseFloat(savedDeliveryFee).toFixed(2);
+            // Restore radio button
+            if (savedOrderType) {
+                const radio = document.querySelector(`input[name="order_type"][value="${savedOrderType}"]`);
+                if (radio) {
+                    radio.checked = true;
+
+                    // If delivery is selected and we have a saved fee, show the delivery fee UI
+                    if (savedOrderType === 'delivery') {
+                        showDeliveryFeeRequest();
+
+                        if (savedDeliveryFee !== null) {
+                            const feeRow = document.getElementById('delivery-fee-row');
+                            const feeDisplay = document.getElementById('delivery-fee-display');
+                            if (feeRow && feeDisplay) {
+                                feeRow.style.display = 'flex';
+                                feeDisplay.textContent = parseFloat(savedDeliveryFee).toFixed(2);
+                            }
                         }
                     }
                 }
