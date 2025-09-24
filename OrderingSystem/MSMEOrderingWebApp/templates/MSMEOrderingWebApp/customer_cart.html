@@ -1701,6 +1701,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 feeRow.style.display = 'flex';
                 feeDisplay.textContent = deliveryFee.toFixed(2);
             }
+
+            // 🔥 Keep button in "Requested" state
+            const requestBtn = document.getElementById("request-delivery-fee-btn");
+            if (requestBtn) {
+                requestBtn.disabled = true;
+                requestBtn.textContent = "Requested";
+                let timerSpan = document.getElementById("delivery-fee-timer");
+                if (!timerSpan) {
+                    timerSpan = document.createElement("span");
+                    timerSpan.id = "delivery-fee-timer";
+                    timerSpan.style.marginLeft = "10px";
+                    requestBtn.parentNode.appendChild(timerSpan);
+                }
+                timerSpan.textContent = ""; // No countdown, but show disabled state
+            }
             
             initDeliveryFeeInputListener(); // Add listener if needed
         }
