@@ -1232,11 +1232,23 @@
 
 
 <script>
-// === CLEAR LOCAL STORAGE ON HOMEPAGE ===
+// === CLEAR LOCAL STORAGE ON HOMEPAGE (preserve delivery fee) ===
 document.addEventListener("DOMContentLoaded", function() {
-    localStorage.removeItem('order_type');
-    localStorage.removeItem('delivery_fee');
-    console.log("[CustomerHomepage] Cleared localStorage for order_type and delivery_fee");
+    // Preserve delivery fee and order type if they exist
+    const savedDeliveryFee = localStorage.getItem('delivery_fee');
+    const savedOrderType = localStorage.getItem('order_type');
+    
+    // Clear all localStorage
+    localStorage.clear();
+    
+    // Restore delivery fee and order type if they were set
+    if (savedDeliveryFee && savedOrderType === 'delivery') {
+        localStorage.setItem('delivery_fee', savedDeliveryFee);
+        localStorage.setItem('order_type', savedOrderType);
+        console.log("[CustomerHomepage] Preserved delivery fee:", savedDeliveryFee);
+    }
+    
+    console.log("[CustomerHomepage] Cleared localStorage except for delivery fee");
 });
 
 const userEmail = "{{ user_email|escapejs }}";
@@ -1428,7 +1440,7 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
     const data = JSON.parse(event.data);
 
     if (data.type === 'delivery_fee_response') {
-        // (unchanged)
+        // Store fee persistently
         const fee = parseFloat(data.delivery_fee);
 
         document.getElementById('delivery-fee-loading').style.display = 'none';
@@ -1440,7 +1452,9 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
 
         document.getElementById('delivery_fee_input').value = fee;
 
+        // Save to localStorage with timestamp for persistence
         localStorage.setItem('delivery_fee', fee);
+        localStorage.setItem('delivery_fee_timestamp', Date.now());
         localStorage.setItem('order_type', 'delivery');
 
         updatePlaceOrderButtonState();
@@ -1452,40 +1466,47 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
         }
         const timerSpan = document.getElementById("delivery-fee-timer");
         if (timerSpan) timerSpan.textContent = "";
-        } else if (data.type === 'delivery_fee_rejected') {
-            // (unchanged + reset timer)
-            document.getElementById('delivery-fee-loading').style.display = 'none';
-            showDeliveryFeeModal(data.reason || "Delivery fee request is rejected.");
         
-            document.getElementById('delivery_fee_input').value = 0;
-            localStorage.removeItem('delivery_fee');
+        // Clear timer expiry from localStorage
+        localStorage.removeItem("delivery_fee_timer_expiry");
         
-            const feeRow = document.getElementById('delivery-fee-row');
-            if (feeRow) feeRow.style.display = 'none';
-        
-            const subtotal = parseFloat(document.getElementById('subtotal').textContent);
-            document.getElementById('total').textContent = subtotal.toFixed(2);
-        
-            updatePlaceOrderButtonState();
-        
-            // Reset button
-            const requestBtn = document.getElementById("request-delivery-fee-btn");
-            if (requestBtn) {
-                requestBtn.disabled = false;
-                requestBtn.style.display = "inline-block";
-                requestBtn.textContent = "Request Delivery Fee Again";
-            }
-            
-            // Clear the timer
-            if (deliveryFeeTimer) {
-                clearInterval(deliveryFeeTimer);
-                deliveryFeeTimer = null;
-            }
-            
-            // ADD THESE LINES HERE:
-            const timerSpan = document.getElementById("delivery-fee-timer");
-            if (timerSpan) timerSpan.textContent = "";
+    } else if (data.type === 'delivery_fee_rejected') {
+        // Clear fee and reset UI
+        document.getElementById('delivery-fee-loading').style.display = 'none';
+        showDeliveryFeeModal(data.reason || "Delivery fee request is rejected.");
+    
+        document.getElementById('delivery_fee_input').value = 0;
+        localStorage.removeItem('delivery_fee');
+        localStorage.removeItem('delivery_fee_timestamp');
+    
+        const feeRow = document.getElementById('delivery-fee-row');
+        if (feeRow) feeRow.style.display = 'none';
+    
+        const subtotal = parseFloat(document.getElementById('subtotal').textContent);
+        document.getElementById('total').textContent = subtotal.toFixed(2);
+    
+        updatePlaceOrderButtonState();
+    
+        // Reset button
+        const requestBtn = document.getElementById("request-delivery-fee-btn");
+        if (requestBtn) {
+            requestBtn.disabled = false;
+            requestBtn.style.display = "inline-block";
+            requestBtn.textContent = "Request Delivery Fee Again";
         }
+        
+        // Clear the timer
+        if (deliveryFeeTimer) {
+            clearInterval(deliveryFeeTimer);
+            deliveryFeeTimer = null;
+        }
+        
+        const timerSpan = document.getElementById("delivery-fee-timer");
+        if (timerSpan) timerSpan.textContent = "";
+        
+        // Clear timer expiry from localStorage
+        localStorage.removeItem("delivery_fee_timer_expiry");
+    }
 };
 
 function showDeliveryFeeModal(message) {
@@ -1525,6 +1546,7 @@ function handleOrderTypeChange() {
 
         localStorage.setItem('order_type', 'pickup');
         localStorage.removeItem('delivery_fee');
+        localStorage.removeItem('delivery_fee_timestamp');
 
         updatePlaceOrderButtonState();
     });
@@ -1560,7 +1582,12 @@ function updateCartItem(cartId, newQty) {
         if (data.success) {
             priceElement.textContent = data.updated_price;
             document.getElementById("subtotal").textContent = data.new_subtotal;
-            document.getElementById("total").textContent = data.new_subtotal;
+            
+            // Recalculate total with delivery fee if applicable
+            const deliveryFeeInput = document.getElementById('delivery_fee_input');
+            const deliveryFee = deliveryFeeInput ? parseFloat(deliveryFeeInput.value) || 0 : 0;
+            const newSubtotal = parseFloat(data.new_subtotal);
+            document.getElementById("total").textContent = (newSubtotal + deliveryFee).toFixed(2);
         } else {
             alert("Unable to update cart. Please try again.");
             console.error("Cart update failed:", data.error);
@@ -1653,6 +1680,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Restore saved order type & delivery fee
     const savedOrderType = localStorage.getItem('order_type');
     const savedDeliveryFee = localStorage.getItem('delivery_fee');
+    const savedDeliveryFeeTimestamp = localStorage.getItem('delivery_fee_timestamp');
 
     const subtotalElement = document.getElementById('subtotal');
     const totalElement = document.getElementById('total');
@@ -1663,11 +1691,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const deliveryFeeInput = document.getElementById('delivery_fee_input');
 
-        // Only restore delivery fee if input exists
-        if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee) {
+        // Restore delivery fee if it exists and is for delivery order type
+        if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee && savedDeliveryFeeTimestamp) {
             deliveryFee = parseFloat(savedDeliveryFee);
             deliveryFeeInput.value = deliveryFee;
+            
+            // Show the delivery fee row if fee exists
+            const feeRow = document.getElementById('delivery-fee-row');
+            const feeDisplay = document.getElementById('delivery-fee-display');
+            if (feeRow && feeDisplay) {
+                feeRow.style.display = 'flex';
+                feeDisplay.textContent = deliveryFee.toFixed(2);
+            }
+            
             initDeliveryFeeInputListener(); // Add listener if needed
+            console.log("[Customer JS] Restored delivery fee:", deliveryFee);
         }
 
         totalElement.textContent = (subtotal + deliveryFee).toFixed(2);
@@ -1675,7 +1713,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Restore radio button
         if (savedOrderType) {
             const radio = document.querySelector(`input[name="order_type"][value="${savedOrderType}"]`);
-            if (radio) radio.checked = true;
+            if (radio) {
+                radio.checked = true;
+                
+                // If delivery is selected and we have a saved fee, show the delivery fee UI
+                if (savedOrderType === 'delivery' && savedDeliveryFee) {
+                    showDeliveryFeeRequest();
+                }
+            }
         }
     }
 
