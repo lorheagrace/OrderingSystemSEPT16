@@ -1244,6 +1244,15 @@
             }
         }
 
+        // Clear localStorage when checkout is clicked
+        function clearCheckoutData() {
+            localStorage.removeItem("order_type");
+            localStorage.removeItem("delivery_fee");
+            localStorage.removeItem("delivery_fee_received");
+            localStorage.removeItem("delivery_fee_timer_expiry");
+            console.log("[Checkout] Cleared localStorage for order data");
+        }
+
         // Run on load
         toggleCheckoutButton();
 
@@ -1254,6 +1263,11 @@
 
         // Listen for proof upload
         proofInput.addEventListener('change', toggleCheckoutButton);
+
+        // Clear localStorage when checkout button is clicked
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', clearCheckoutData);
+        }
     });
 </script>
 {% endblock %}
