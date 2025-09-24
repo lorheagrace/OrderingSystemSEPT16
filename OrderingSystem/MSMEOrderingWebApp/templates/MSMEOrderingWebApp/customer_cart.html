@@ -1237,14 +1237,17 @@ document.addEventListener("DOMContentLoaded", function() {
     const currentPath = window.location.pathname.toLowerCase();
     const isHomePage =
         currentPath === "/" ||
-        currentPath.includes("home") ||   // matches /home, /customer/home, /CustomerHomepage, etc.
-        currentPath.includes("customerhomepage");
+        currentPath.includes("home") ||   // matches /home, /customer/home, etc.
+        currentPath.includes("customerhomepage") ||  // matches /CustomerHomepage/
+        currentPath.endsWith("customerhomepage/");   // specifically matches /CustomerHomepage/
 
     if (isHomePage) {
         localStorage.removeItem("order_type");
         localStorage.removeItem("delivery_fee");
         localStorage.removeItem("delivery_fee_received");
+        localStorage.removeItem("delivery_fee_timer_expiry");  // Also clear timer
         console.log("[CustomerHomepage] Cleared localStorage for order_type and delivery_fee");
+        console.log("[CustomerHomepage] Current path:", window.location.pathname); // Debug log
     }
 });
 
