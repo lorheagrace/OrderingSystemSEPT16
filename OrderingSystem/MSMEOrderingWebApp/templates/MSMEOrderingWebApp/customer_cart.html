@@ -1236,6 +1236,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     localStorage.removeItem('order_type');
     localStorage.removeItem('delivery_fee');
+    localStorage.removeItem('delivery_fee_received');
     console.log("[CustomerHomepage] Cleared localStorage for order_type and delivery_fee");
 });
 
@@ -1280,11 +1281,16 @@ function updatePlaceOrderButtonState() {
     }
 
     if (selectedOrderType.value === 'delivery') {
-        placeOrderBtn.disabled = deliveryFee <= 0;
-        if (placeOrderBtn.disabled) {
+        const hasFeeResponse = localStorage.getItem("delivery_fee_received") === "true";
+    
+        if (!hasFeeResponse) {
+            // No response yet, keep disabled
+            placeOrderBtn.disabled = true;
             placeOrderBtn.title = "Please request and receive delivery fee before placing order.";
             placeOrderBtn.classList.add('disabled-btn');
         } else {
+            // Response received, allow even if fee is 0
+            placeOrderBtn.disabled = false;
             placeOrderBtn.title = "";
             placeOrderBtn.classList.remove('disabled-btn');
         }
@@ -1442,6 +1448,7 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
 
         localStorage.setItem('delivery_fee', fee);
         localStorage.setItem('order_type', 'delivery');
+        localStorage.setItem('delivery_fee_received', "true");
 
         updatePlaceOrderButtonState();
 
@@ -1458,6 +1465,7 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
             showDeliveryFeeModal(data.reason || "Delivery fee request is rejected.");
         
             document.getElementById('delivery_fee_input').value = 0;
+            localStorage.removeItem('delivery_fee_received');
             localStorage.removeItem('delivery_fee');
         
             const feeRow = document.getElementById('delivery-fee-row');
