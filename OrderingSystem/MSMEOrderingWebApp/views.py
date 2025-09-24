@@ -4688,11 +4688,14 @@ def customer_checkout(request):
     for item in cart_items:
         product_image = None
         try:
-            name, variation = item.product_name.split(" - ")
-            variation = variation.split(" (₱")[0]
+            # ✅ Safe split (supports 2 or 3+ parts)
+            parts = item.product_name.split(" - ", 1)
+            name = parts[0].strip()
+            variation = parts[1].split(" (₱")[0].strip() if len(parts) > 1 else ""
+
             product = Products.objects.get(
-                name__iexact=name.strip(),
-                variation_name__iexact=variation.strip()
+                name__iexact=name,
+                variation_name__iexact=variation
             )
             product_image = product.image
         except Exception as e:
@@ -4729,11 +4732,13 @@ def customer_checkout(request):
         # Stock validation
         for item in cart_items:
             try:
-                name, variation = item.product_name.split(" - ")
-                variation = variation.split(" (₱")[0]
+                parts = item.product_name.split(" - ", 1)
+                name = parts[0].strip()
+                variation = parts[1].split(" (₱")[0].strip() if len(parts) > 1 else ""
+
                 product = Products.objects.get(
-                    name__iexact=name.strip(),
-                    variation_name__iexact=variation.strip()
+                    name__iexact=name,
+                    variation_name__iexact=variation
                 )
 
                 if product.track_stocks and product.stocks < item.quantity:
@@ -4747,11 +4752,13 @@ def customer_checkout(request):
         for item in cart_items:
             product_image = None
             try:
-                name, variation = item.product_name.split(" - ")
-                variation = variation.split(" (₱")[0]
+                parts = item.product_name.split(" - ", 1)
+                name = parts[0].strip()
+                variation = parts[1].split(" (₱")[0].strip() if len(parts) > 1 else ""
+
                 product = Products.objects.get(
-                    name__iexact=name.strip(),
-                    variation_name__iexact=variation.strip()
+                    name__iexact=name,
+                    variation_name__iexact=variation
                 )
                 product_image = product.image
             except:
