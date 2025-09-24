@@ -1232,23 +1232,16 @@
 
 
 <script>
-// === CLEAR LOCAL STORAGE ON HOMEPAGE (preserve delivery fee) ===
+// === CLEAR LOCAL STORAGE ON HOMEPAGE (only if coming from another page) ===
 document.addEventListener("DOMContentLoaded", function() {
-    // Preserve delivery fee and order type if they exist
-    const savedDeliveryFee = localStorage.getItem('delivery_fee');
-    const savedOrderType = localStorage.getItem('order_type');
-    
-    // Clear all localStorage
-    localStorage.clear();
-    
-    // Restore delivery fee and order type if they were set
-    if (savedDeliveryFee && savedOrderType === 'delivery') {
-        localStorage.setItem('delivery_fee', savedDeliveryFee);
-        localStorage.setItem('order_type', savedOrderType);
-        console.log("[CustomerHomepage] Preserved delivery fee:", savedDeliveryFee);
+    // Only clear if this is actually the homepage and user is navigating here
+    if (window.location.pathname === '/' || window.location.pathname === '/home/' || window.location.pathname.includes('home')) {
+        localStorage.removeItem('order_type');
+        localStorage.removeItem('delivery_fee');
+        localStorage.removeItem('delivery_fee_timestamp');
+        localStorage.removeItem('delivery_fee_timer_expiry');
+        console.log("[CustomerHomepage] Cleared all localStorage on homepage");
     }
-    
-    console.log("[CustomerHomepage] Cleared localStorage except for delivery fee");
 });
 
 const userEmail = "{{ user_email|escapejs }}";
@@ -1292,12 +1285,11 @@ function updatePlaceOrderButtonState() {
     }
 
     if (selectedOrderType.value === 'delivery') {
-        // Check if delivery fee has been received (exists in localStorage or input has value)
-        const hasReceivedFee = localStorage.getItem('delivery_fee') !== null || deliveryFee >= 0;
-        const deliveryFeeInput = document.getElementById('delivery_fee_input');
-        const inputHasValue = deliveryFeeInput && deliveryFeeInput.value !== '';
+        // Check if delivery fee has been actually received (has timestamp indicating it was received from server)
+        const feeTimestamp = localStorage.getItem('delivery_fee_timestamp');
+        const hasReceivedFee = feeTimestamp !== null; // Only enable if fee was actually received from server
         
-        placeOrderBtn.disabled = !hasReceivedFee && !inputHasValue;
+        placeOrderBtn.disabled = !hasReceivedFee;
         if (placeOrderBtn.disabled) {
             placeOrderBtn.title = "Please request and receive delivery fee before placing order.";
             placeOrderBtn.classList.add('disabled-btn');
