@@ -1691,14 +1691,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initCartQuantityListeners();
 
     const currentPath = window.location.pathname;
-    const isHomePage = currentPath === '/' || 
-                       currentPath === '/home/' || 
-                       currentPath === '/home' ||
-                       currentPath.endsWith('/home/') ||
-                       currentPath.endsWith('/home') ||
-                       currentPath === '/customer/home/' ||
-                       currentPath === '/customer/home';
-
     // ✅ Only restore if NOT on homepage
     if (!isHomePage) {
         const savedOrderType = localStorage.getItem('order_type');
