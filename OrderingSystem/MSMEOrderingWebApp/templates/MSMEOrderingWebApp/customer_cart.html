@@ -1680,11 +1680,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const deliveryFeeInput = document.getElementById('delivery_fee_input');
 
         // Only restore delivery fee if input exists
-        if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee) {
-            deliveryFee = parseFloat(savedDeliveryFee);
-            deliveryFeeInput.value = deliveryFee;
-            initDeliveryFeeInputListener(); // Add listener if needed
-        }
+        (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee) {
+        deliveryFee = parseFloat(savedDeliveryFee);
+        deliveryFeeInput.value = deliveryFee;
+    
+        // ✅ Restore the fee row UI
+        const feeRow = document.getElementById('delivery-fee-row');
+        if (feeRow) feeRow.style.display = 'flex';
+    
+        const feeDisplay = document.getElementById('delivery-fee-display');
+        if (feeDisplay) feeDisplay.textContent = deliveryFee.toFixed(2);
+    
+        initDeliveryFeeInputListener(); // still needed
 
         totalElement.textContent = (subtotal + deliveryFee).toFixed(2);
 
