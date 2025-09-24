@@ -1292,7 +1292,12 @@ function updatePlaceOrderButtonState() {
     }
 
     if (selectedOrderType.value === 'delivery') {
-        placeOrderBtn.disabled = deliveryFee <= 0;
+        // Check if delivery fee has been received (exists in localStorage or input has value)
+        const hasReceivedFee = localStorage.getItem('delivery_fee') !== null || deliveryFee >= 0;
+        const deliveryFeeInput = document.getElementById('delivery_fee_input');
+        const inputHasValue = deliveryFeeInput && deliveryFeeInput.value !== '';
+        
+        placeOrderBtn.disabled = !hasReceivedFee && !inputHasValue;
         if (placeOrderBtn.disabled) {
             placeOrderBtn.title = "Please request and receive delivery fee before placing order.";
             placeOrderBtn.classList.add('disabled-btn');
@@ -1692,7 +1697,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const deliveryFeeInput = document.getElementById('delivery_fee_input');
 
         // Restore delivery fee if it exists and is for delivery order type
-        if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee && savedDeliveryFeeTimestamp) {
+        if (savedOrderType === 'delivery' && deliveryFeeInput && savedDeliveryFee !== null && savedDeliveryFeeTimestamp) {
             deliveryFee = parseFloat(savedDeliveryFee);
             deliveryFeeInput.value = deliveryFee;
             
@@ -1717,8 +1722,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 radio.checked = true;
                 
                 // If delivery is selected and we have a saved fee, show the delivery fee UI
-                if (savedOrderType === 'delivery' && savedDeliveryFee) {
+                if (savedOrderType === 'delivery') {
                     showDeliveryFeeRequest();
+                    // If we have a saved fee, make sure the UI reflects it
+                    if (savedDeliveryFee !== null) {
+                        const feeRow = document.getElementById('delivery-fee-row');
+                        const feeDisplay = document.getElementById('delivery-fee-display');
+                        if (feeRow && feeDisplay) {
+                            feeRow.style.display = 'flex';
+                            feeDisplay.textContent = parseFloat(savedDeliveryFee).toFixed(2);
+                        }
+                    }
                 }
             }
         }
