@@ -1234,16 +1234,20 @@
 <script>
 // === CLEAR LOCAL STORAGE ONLY ON HOMEPAGE ===
 document.addEventListener("DOMContentLoaded", function() {
-    const currentPath = window.location.pathname.toLowerCase();
+    const currentPath = window.location.pathname.toLowerCase().replace(/\/+$/, ""); 
+    // strip trailing slashes
+
     const isHomePage =
-        currentPath === "/" ||
-        currentPath.includes("home") ||   // matches /home, /customer/home, /CustomerHomepage, etc.
-        currentPath.includes("customerhomepage");
+        currentPath === "" ||                 // root "/"
+        currentPath === "/home" ||
+        currentPath === "/customer/home" ||
+        currentPath === "/customerhomepage";
 
     if (isHomePage) {
         localStorage.removeItem("order_type");
         localStorage.removeItem("delivery_fee");
         localStorage.removeItem("delivery_fee_received");
+        localStorage.removeItem("delivery_fee_timer_expiry"); // clear timer too
         console.log("[CustomerHomepage] Cleared localStorage for order_type and delivery_fee");
     }
 });
