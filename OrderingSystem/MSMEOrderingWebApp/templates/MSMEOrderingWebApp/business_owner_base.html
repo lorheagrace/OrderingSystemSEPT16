@@ -1212,7 +1212,7 @@ function startGlobalQueueTimer() {
             
             // Calculate elapsed time since request was created locally
             const elapsedSeconds = Math.floor((currentTime - request.localCreatedAt) / 1000);
-            const newTimeRemaining = Math.max(0, request.timeRemaining - elapsedSeconds);
+            const newTimeRemaining = Math.max(0, 120 - elapsedSeconds); // Always start from 120 seconds
             
             // Update the request's time remaining
             request.currentTimeRemaining = newTimeRemaining;
@@ -1316,8 +1316,9 @@ function updateTimerFromServer(syncData) {
             queuedRequest.lastSyncTime = Date.now();
             queuedRequest.currentTimeRemaining = serverRequest.time_remaining;
             
-            // Reset local tracking based on server time
-            queuedRequest.localCreatedAt = Date.now() - ((queuedRequest.timeRemaining - serverRequest.time_remaining) * 1000);
+            // Reset local tracking based on server time - adjust localCreatedAt to match server timing
+            const elapsedFromServer = 120 - serverRequest.time_remaining;
+            queuedRequest.localCreatedAt = Date.now() - (elapsedFromServer * 1000);
         }
     }
     
@@ -1382,7 +1383,7 @@ function showNextModal() {
     currentRequestId = requestData.requestId;
     
     // Check if this request is still valid
-    const currentTimeRemaining = requestData.currentTimeRemaining || requestData.timeRemaining;
+    const currentTimeRemaining = requestData.currentTimeRemaining !== undefined ? requestData.currentTimeRemaining : requestData.timeRemaining;
     if (currentTimeRemaining <= 0) {
         console.log("[Owner JS] Skipping expired queued request:", requestData.requestId);
         isModalOpen = false;
@@ -1390,6 +1391,8 @@ function showNextModal() {
         showNextModal(); // Try next request
         return;
     }
+    
+    console.log("[Owner JS] Showing modal for request:", requestData.requestId, "with time remaining:", currentTimeRemaining);
     
     const container = document.getElementById('modalContainer');
     const { customer_email, order_details, requestId } = requestData;
