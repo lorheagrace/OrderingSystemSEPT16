@@ -1232,15 +1232,27 @@
 
 
 <script>
-// === CLEAR LOCAL STORAGE ON HOMEPAGE (only if coming from another page) ===
+// === CLEAR LOCAL STORAGE ON HOMEPAGE ===
 document.addEventListener("DOMContentLoaded", function() {
-    // Only clear if this is actually the homepage and user is navigating here
-    if (window.location.pathname === '/' || window.location.pathname === '/home/' || window.location.pathname.includes('home')) {
+    // Clear localStorage when on homepage - check multiple possible homepage paths
+    const currentPath = window.location.pathname;
+    const isHomePage = currentPath === '/' || 
+                      currentPath === '/home/' || 
+                      currentPath === '/home' ||
+                      currentPath.endsWith('/home/') ||
+                      currentPath.endsWith('/home') ||
+                      currentPath === '/customer/home/' ||
+                      currentPath === '/customer/home';
+    
+    if (isHomePage) {
+        // Clear all delivery-related localStorage
         localStorage.removeItem('order_type');
         localStorage.removeItem('delivery_fee');
         localStorage.removeItem('delivery_fee_timestamp');
+        localStorage.removeItem('delivery_fee_requested');
         localStorage.removeItem('delivery_fee_timer_expiry');
-        console.log("[CustomerHomepage] Cleared all localStorage on homepage");
+        localStorage.removeItem('delivery_fee_requested');
+        console.log("[CustomerHomepage] Cleared all delivery-related localStorage on homepage");
     }
 });
 
@@ -1314,8 +1326,9 @@ function startDeliveryFeeTimer(button, duration = 120) {
     const startTime = Date.now();
     const expiryTime = startTime + duration * 1000;
 
-    // Save expiry time in localStorage
+    // Save expiry time and requested state in localStorage
     localStorage.setItem("delivery_fee_timer_expiry", expiryTime);
+    localStorage.setItem("delivery_fee_requested", "true");
 
     runDeliveryFeeTimer(button, expiryTime);
 }
@@ -1345,6 +1358,7 @@ function runDeliveryFeeTimer(button, expiryTime) {
             clearInterval(deliveryFeeTimer);
             deliveryFeeTimer = null;
             localStorage.removeItem("delivery_fee_timer_expiry");
+            localStorage.removeItem("delivery_fee_requested");
 
             button.disabled = false;
             button.textContent = "Request Delivery Fee Again";
@@ -1365,7 +1379,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!requestBtn) return;
 
     const expiryTime = parseInt(localStorage.getItem("delivery_fee_timer_expiry"), 10);
-    if (expiryTime && Date.now() < expiryTime) {
+    const isRequested = localStorage.getItem("delivery_fee_requested") === "true";
+    
+    if (expiryTime && Date.now() < expiryTime && isRequested) {
         // Resume timer
         runDeliveryFeeTimer(requestBtn, expiryTime);
     }
@@ -1464,8 +1480,9 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
         const timerSpan = document.getElementById("delivery-fee-timer");
         if (timerSpan) timerSpan.textContent = "";
         
-        // Clear timer expiry from localStorage
+        // Clear timer expiry and requested state from localStorage
         localStorage.removeItem("delivery_fee_timer_expiry");
+        localStorage.removeItem("delivery_fee_requested");
         
     } else if (data.type === 'delivery_fee_rejected') {
         // Clear fee and reset UI
@@ -1492,7 +1509,7 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
             requestBtn.textContent = "Request Delivery Fee Again";
         }
         
-        // Clear the timer
+        // Clear the timer and requested state
         if (deliveryFeeTimer) {
             clearInterval(deliveryFeeTimer);
             deliveryFeeTimer = null;
@@ -1501,8 +1518,9 @@ deliveryFeeSocketCustomer.onmessage = function(event) {
         const timerSpan = document.getElementById("delivery-fee-timer");
         if (timerSpan) timerSpan.textContent = "";
         
-        // Clear timer expiry from localStorage
+        // Clear timer expiry and requested state from localStorage
         localStorage.removeItem("delivery_fee_timer_expiry");
+        localStorage.removeItem("delivery_fee_requested");
     }
 };
 
