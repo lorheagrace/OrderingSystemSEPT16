@@ -1805,56 +1805,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const saveBtn = document.getElementById("saveDetails");
     const socialInputs = document.querySelectorAll("#socialMediaContainer input, #socialMediaContainer button");
     const addSocialBtn = document.getElementById("addSocialMedia");
-
-    // Function to toggle fields
-    function toggleEditable(editing) {
-        socialInputs.forEach(input => input.disabled = !editing);
-        addSocialBtn.disabled = !editing;
-        saveBtn.disabled = !editing;
-    }
-
-    // Initially disabled
-    toggleEditable(false);
-
-    // Edit button click
-    editBtn.addEventListener("click", function() {
-        toggleEditable(true);
-    });
-
-    // Save button click
-    saveBtn.addEventListener("click", function() {
-        toggleEditable(false);
-        // ✅ The form will handle saving via POST
-    });
-
-    // Add Social Media Row
-    addSocialBtn.addEventListener("click", function() {
-        const container = document.getElementById("socialMediaContainer");
-        const newRow = document.createElement("div");
-        newRow.classList.add("row", "g-2", "mb-2", "social-media-row");
-        newRow.innerHTML = `
-            <div class="col-md-4">
-                <input type="text" name="social_platform[]" class="form-control" placeholder="Platform">
-            </div>
-            <div class="col-md-6">
-                <input type="text" name="social_username[]" class="form-control" placeholder="Username/Link">
-            </div>
-            <div class="col-md-2 d-flex align-items-center">
-                <button type="button" class="btn btn-danger btn-sm remove-social">&times;</button>
-            </div>
-        `;
-        container.appendChild(newRow);
-    });
-
-    // Remove Social Media Row
-    document.getElementById("socialMediaContainer").addEventListener("click", function(e) {
-        if (e.target.classList.contains("remove-social")) {
-            e.target.closest(".social-media-row").remove();
-        }
-    });
-});
-    
-document.addEventListener("DOMContentLoaded", function () {
     const onsiteCheckbox = document.getElementById("onsite");
     const wrapper = document.getElementById("onsiteServicesWrapper");
     const addServiceBtn = document.getElementById("addServiceBtn");
@@ -1863,8 +1813,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const logoPreview = document.getElementById("logoPreview");
     const uploadPlaceholder = document.getElementById("uploadPlaceholder");
     const settingsForm = document.getElementById("settingsForm");
-    const editButton = document.getElementById("editDetails");
-    const saveButton = document.getElementById("saveDetails");
+    const changePasswordButton = document.getElementById("changePasswordButton");
     
     // Track if we're currently restoring to prevent conflicts
     let isRestoring = false;
@@ -1873,9 +1822,295 @@ document.addEventListener("DOMContentLoaded", function () {
     if (logoInput) {
         logoInput.style.display = 'none';
     }
-    
-    // ---------- Functions ----------
 
+    // ---------- MAIN FIX: Improved toggleEditable function ----------
+    function toggleEditable(editing) {
+        // Toggle all editable fields
+        const allEditableFields = document.querySelectorAll('.editable-field');
+        allEditableFields.forEach(field => {
+            if (field.type !== 'file') { // Skip file inputs
+                field.disabled = !editing;
+            }
+        });
+
+        // Toggle social media inputs and buttons
+        socialInputs.forEach(input => {
+            input.disabled = !editing;
+        });
+        
+        if (addSocialBtn) {
+            addSocialBtn.disabled = !editing;
+        }
+
+        // Toggle service-related buttons
+        document.querySelectorAll('.removeServiceBtn').forEach(btn => {
+            btn.disabled = !editing;
+            btn.style.pointerEvents = editing ? 'auto' : 'none';
+            btn.style.opacity = editing ? '1' : '0.5';
+        });
+        
+        if (addServiceBtn) {
+            addServiceBtn.disabled = !editing;
+            addServiceBtn.style.pointerEvents = editing ? 'auto' : 'none';
+            addServiceBtn.style.opacity = editing ? '1' : '0.5';
+        }
+
+        // Toggle change password button
+        if (changePasswordButton) {
+            changePasswordButton.disabled = !editing;
+            changePasswordButton.style.pointerEvents = editing ? 'auto' : 'none';
+            changePasswordButton.style.opacity = editing ? '1' : '0.5';
+        }
+
+        // CRITICAL FIX: Enable/disable save button properly
+        if (saveBtn) {
+            saveBtn.disabled = !editing;
+            saveBtn.style.pointerEvents = editing ? 'auto' : 'none';
+            saveBtn.style.opacity = editing ? '1' : '0.5';
+        }
+
+        // Update edit button state
+        if (editBtn) {
+            editBtn.disabled = editing;
+            editBtn.textContent = editing ? 'Editing...' : 'Edit Details';
+            editBtn.style.opacity = editing ? '0.5' : '1';
+        }
+
+        // Save edit mode state (but not during restoration)
+        if (!isRestoring) {
+            localStorage.setItem('settings_edit_mode', editing ? 'true' : 'false');
+        }
+    }
+
+    // ---------- SIMPLIFIED INITIALIZATION ----------
+    function initializeEditMode() {
+        // Check if we should restore edit mode
+        const savedEditMode = localStorage.getItem('settings_edit_mode') === 'true';
+        const sessionEditMode = sessionStorage.getItem('returnToSettingsEditMode') === 'true';
+        const shouldBeEditing = savedEditMode || sessionEditMode;
+        
+        // Apply the edit mode
+        toggleEditable(shouldBeEditing);
+        
+        // Clean up session storage
+        if (sessionEditMode) {
+            sessionStorage.removeItem('returnToSettingsEditMode');
+        }
+    }
+
+    // Initially set to non-editing mode, then restore if needed
+    toggleEditable(false);
+    
+    // Restore edit mode after a short delay
+    setTimeout(() => {
+        initializeEditMode();
+    }, 100);
+
+    // ---------- EVENT LISTENERS ----------
+    
+    // Edit button click - FIXED
+    if (editBtn) {
+        editBtn.addEventListener("click", function() {
+            toggleEditable(true);
+            showToast('Edit mode enabled. Make your changes and click Save Details.', 'info');
+        });
+    }
+
+    // Save button click - FIXED
+    if (saveBtn) {
+        saveBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            
+            // Trigger form submission
+            if (settingsForm) {
+                settingsForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
+        });
+    }
+
+    // Add Social Media Row
+    if (addSocialBtn) {
+        addSocialBtn.addEventListener("click", function() {
+            const container = document.getElementById("socialMediaContainer");
+            const newRow = document.createElement("div");
+            newRow.classList.add("row", "g-2", "mb-2", "social-media-row");
+            newRow.innerHTML = `
+                <div class="col-md-4">
+                    <input type="text" name="social_platform[]" class="form-control editable-field" placeholder="Platform">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" name="social_username[]" class="form-control editable-field" placeholder="Username/Link">
+                </div>
+                <div class="col-md-2 d-flex align-items-center">
+                    <button type="button" class="btn btn-danger btn-sm remove-social">&times;</button>
+                </div>
+            `;
+            container.appendChild(newRow);
+            
+            // Apply current edit state to new elements
+            const isEditing = localStorage.getItem('settings_edit_mode') === 'true';
+            const newInputs = newRow.querySelectorAll('input, button');
+            newInputs.forEach(input => input.disabled = !isEditing);
+        });
+    }
+
+    // Remove Social Media Row
+    if (document.getElementById("socialMediaContainer")) {
+        document.getElementById("socialMediaContainer").addEventListener("click", function(e) {
+            if (e.target.classList.contains("remove-social")) {
+                e.target.closest(".social-media-row").remove();
+            }
+        });
+    }
+
+    // Onsite checkbox functionality
+    if (onsiteCheckbox && wrapper) {
+        // Set initial state
+        wrapper.style.display = onsiteCheckbox.checked ? "block" : "none";
+        
+        onsiteCheckbox.addEventListener("change", function() {
+            wrapper.style.display = this.checked ? "block" : "none";
+            if (!this.checked && serviceList) {
+                serviceList.innerHTML = "";
+            }
+        });
+    }
+
+    // Add service functionality
+    if (addServiceBtn) {
+        addServiceBtn.addEventListener("click", function() {
+            addServiceInput();
+        });
+    }
+
+    function addServiceInput(value = '') {
+        if (!serviceList) return;
+        
+        const inputGroup = document.createElement("div");
+        inputGroup.classList.add("input-group", "mb-2");
+        inputGroup.innerHTML = `
+            <input type="text" name="specific_services[]" class="form-control editable-field" placeholder="Enter service name" value="${value}">
+            <button type="button" class="btn btn-danger removeServiceBtn">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        serviceList.appendChild(inputGroup);
+
+        const removeBtn = inputGroup.querySelector(".removeServiceBtn");
+        const input = inputGroup.querySelector('input');
+        
+        // Apply current edit state
+        const isEditing = localStorage.getItem('settings_edit_mode') === 'true';
+        input.disabled = !isEditing;
+        removeBtn.disabled = !isEditing;
+        removeBtn.style.pointerEvents = isEditing ? 'auto' : 'none';
+        removeBtn.style.opacity = isEditing ? '1' : '0.5';
+        
+        removeBtn.addEventListener("click", function() {
+            inputGroup.remove();
+        });
+    }
+
+    // Logo upload functionality
+    if (logoInput && logoPreview && uploadPlaceholder) {
+        // Make upload area clickable
+        const logoUploadArea = document.querySelector('.logo-upload-area');
+        if (logoUploadArea) {
+            logoUploadArea.addEventListener('click', function() {
+                const isEditing = localStorage.getItem('settings_edit_mode') === 'true';
+                if (isEditing && logoInput && !logoInput.disabled) {
+                    logoInput.click();
+                }
+            });
+        }
+
+        logoInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("logo", file);
+            formData.append("csrfmiddlewaretoken", document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            fetch("/upload_logo/", {
+                method: "POST",
+                body: formData,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    logoPreview.src = data.logo_url;
+                    logoPreview.style.display = 'block';
+                    uploadPlaceholder.style.display = 'none';
+                    showToast('Logo uploaded successfully!', 'success');
+                } else {
+                    showToast('Error uploading logo: ' + (data.error || 'Unknown error'), 'danger');
+                }
+            })
+            .catch(error => {
+                showToast('Upload failed. Try again.', 'danger');
+            });
+        });
+    }
+
+    // Form submission with proper handling
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            if (saveBtn) {
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                saveBtn.disabled = true;
+            }
+            
+            // Create FormData from the form
+            const formData = new FormData(this);
+            
+            // Submit via AJAX
+            fetch(this.action || window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear localStorage and reset edit mode
+                    localStorage.removeItem('settings_edit_mode');
+                    toggleEditable(false);
+                    
+                    showToast(data.message || 'Settings saved successfully!', 'success');
+                    
+                    // Reload page after short delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showToast('Error saving settings: ' + (data.error || 'Unknown error'), 'danger');
+                    toggleEditable(true); // Re-enable editing on error
+                }
+            })
+            .catch(error => {
+                console.error('Save error:', error);
+                showToast('Failed to save settings. Please try again.', 'danger');
+                toggleEditable(true); // Re-enable editing on error
+            })
+            .finally(() => {
+                // Reset button state
+                if (saveBtn) {
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Details';
+                    // Don't disable here - let toggleEditable handle it
+                }
+            });
+        });
+    }
+
+    // Toast notification function
     function showToast(message, type = 'info') {
         let toastContainer = document.getElementById('toast-container');
         if (!toastContainer) {
@@ -1889,6 +2124,7 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
             document.body.appendChild(toastContainer);
         }
+        
         const toast = document.createElement('div');
         toast.className = `alert alert-${type} alert-dismissible fade show`;
         toast.style.cssText = 'margin-bottom: 10px; min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
@@ -1897,7 +2133,12 @@ document.addEventListener("DOMContentLoaded", function () {
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
         toastContainer.appendChild(toast);
-        setTimeout(() => toast.remove(), 5000);
+        
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 5000);
     }
 
     // Function to clear localStorage after successful save
