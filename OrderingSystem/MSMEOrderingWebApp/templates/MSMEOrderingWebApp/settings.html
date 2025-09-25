@@ -1578,18 +1578,26 @@
                                 <small class="text-muted">Store address will be displayed when Customer Pickup is enabled.</small>
                             </div>
 
-                            <div class="form-group mt-3">
-                                <label>Social Media Accounts</label>
-                                <div id="social-media-container">
+                            <div class="social-media-section mt-3">
+                                <label class="form-label">Social Media</label>
+                                <div id="socialMediaContainer">
                                     {% for sm in social_media_list %}
-                                    <div class="social-media-row d-flex mb-2">
-                                        <input type="text" name="social_platform[]" value="{{ sm.platform }}" placeholder="Platform" class="form-control me-2" style="max-width: 150px;">
-                                        <input type="text" name="social_username[]" value="{{ sm.username_or_link }}" placeholder="Username/Link" class="form-control me-2">
-                                        <button type="button" class="btn btn-danger remove-social">Delete</button>
+                                    <div class="row g-2 mb-2 social-media-row">
+                                        <div class="col-md-4">
+                                            <input type="text" name="social_platform[]" value="{{ sm.platform }}" class="form-control" placeholder="Platform" disabled>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" name="social_username[]" value="{{ sm.username_or_link }}" class="form-control" placeholder="Username/Link" disabled>
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-center">
+                                            <button type="button" class="btn btn-danger btn-sm remove-social" disabled>&times;</button>
+                                        </div>
                                     </div>
                                     {% endfor %}
                                 </div>
-                                <button type="button" id="add-social-media" class="btn btn-primary mt-2">Add Social Media Platform</button>
+                                <button type="button" class="btn btn-secondary btn-sm mt-2" id="addSocialMedia" disabled>
+                                    <i class="fas fa-plus"></i> Add Social Media
+                                </button>
                             </div>
                             
                         </div>
@@ -1793,28 +1801,56 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const container = document.getElementById("social-media-container");
-    const addBtn = document.getElementById("add-social-media");
+    const editBtn = document.getElementById("editDetails");
+    const saveBtn = document.getElementById("saveDetails");
+    const socialInputs = document.querySelectorAll("#socialMediaContainer input, #socialMediaContainer button");
+    const addSocialBtn = document.getElementById("addSocialMedia");
 
-    addBtn.addEventListener("click", function() {
-        const row = document.createElement("div");
-        row.classList.add("social-media-row", "d-flex", "mb-2");
-        row.innerHTML = `
-            <input type="text" name="social_platform[]" placeholder="Platform" class="form-control me-2" style="max-width: 150px;">
-            <input type="text" name="social_username[]" placeholder="Username/Link" class="form-control me-2">
-            <button type="button" class="btn btn-danger remove-social">Delete</button>
-        `;
-        container.appendChild(row);
+    // Function to toggle fields
+    function toggleEditable(editing) {
+        socialInputs.forEach(input => input.disabled = !editing);
+        addSocialBtn.disabled = !editing;
+        saveBtn.disabled = !editing;
+    }
 
-        row.querySelector(".remove-social").addEventListener("click", function() {
-            row.remove();
-        });
+    // Initially disabled
+    toggleEditable(false);
+
+    // Edit button click
+    editBtn.addEventListener("click", function() {
+        toggleEditable(true);
     });
 
-    document.querySelectorAll(".remove-social").forEach(btn => {
-        btn.addEventListener("click", function() {
-            btn.closest(".social-media-row").remove();
-        });
+    // Save button click
+    saveBtn.addEventListener("click", function() {
+        toggleEditable(false);
+        // ✅ The form will handle saving via POST
+    });
+
+    // Add Social Media Row
+    addSocialBtn.addEventListener("click", function() {
+        const container = document.getElementById("socialMediaContainer");
+        const newRow = document.createElement("div");
+        newRow.classList.add("row", "g-2", "mb-2", "social-media-row");
+        newRow.innerHTML = `
+            <div class="col-md-4">
+                <input type="text" name="social_platform[]" class="form-control" placeholder="Platform">
+            </div>
+            <div class="col-md-6">
+                <input type="text" name="social_username[]" class="form-control" placeholder="Username/Link">
+            </div>
+            <div class="col-md-2 d-flex align-items-center">
+                <button type="button" class="btn btn-danger btn-sm remove-social">&times;</button>
+            </div>
+        `;
+        container.appendChild(newRow);
+    });
+
+    // Remove Social Media Row
+    document.getElementById("socialMediaContainer").addEventListener("click", function(e) {
+        if (e.target.classList.contains("remove-social")) {
+            e.target.closest(".social-media-row").remove();
+        }
     });
 });
     
