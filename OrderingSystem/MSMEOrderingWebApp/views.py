@@ -4560,30 +4560,40 @@ def customer_reviews(request):
 @login_required_session
 def customer_cart(request):
     business = BusinessDetails.objects.first()
-
     if 'user_id' in request.session and request.session.get('user_type') == 'customer':
         user = User.objects.get(id=request.session['user_id'])
         cart_items = Cart.objects.filter(email=user.email)
-
-        # Get product data for each cart item
+        
+        # Get product data for each cart item - FIXED parsing logic
         for item in cart_items:
-            product_name = item.product_name.split(' - ')[0]
-            variation_name = item.product_name.split(' - ')[1] if ' - ' in item.product_name else 'Default'
-            item.product = Products.objects.filter(name=product_name, variation_name=variation_name).first()
-
+            # Fix: Handle multiple dashes properly
+            parts = item.product_name.split(' - ')
+            if len(parts) >= 2:
+                product_name = parts[0]  # First part is always the product name
+                # Join all remaining parts as the variation name
+                variation_name = ' - '.join(parts[1:])
+            else:
+                product_name = item.product_name
+                variation_name = 'Default'
+            
+            # Find the matching product
+            item.product = Products.objects.filter(
+                name=product_name, 
+                variation_name=variation_name
+            ).first()
+        
         subtotal = sum(item.price for item in cart_items)
         customization = get_or_create_customization()
-
+        
         return render(request, 'MSMEOrderingWebApp/customer_cart.html', {
             'cart_items': cart_items,
             'subtotal': subtotal,
             'customization': customization,
             'business': business,
-            'user_email': user.email,  # <-- add this line!
+            'user_email': user.email,
         })
     else:
         return redirect('login')
-
 
 def delete_cart_item(request, cart_id):
     if request.method == 'POST':
