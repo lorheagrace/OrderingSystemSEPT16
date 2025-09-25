@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import OTP, BusinessOwnerAccount, User, Products, ProductCategory, OnlinePaymentDetails, BusinessDetails, StaffAccount, ArchivedProducts, ProductEditHistory
+from .models import OTP, BusinessOwnerAccount, User, Products, ProductCategory, OnlinePaymentDetails, BusinessDetails, StaffAccount, ArchivedProducts, ProductEditHistory, SocialMedia
 from django.contrib import messages
 from django.db.models import Min, Max
 from collections import defaultdict
@@ -1215,6 +1215,22 @@ def business_settings(request):
 
         business.save()
 
+        # ✅ Handle social media
+        platforms = request.POST.getlist('social_platform[]')
+        usernames = request.POST.getlist('social_username[]')
+
+        # Clear old ones
+        SocialMedia.objects.filter(business=business).delete()
+
+        # Save new ones
+        for platform, username in zip(platforms, usernames):
+            if platform.strip() and username.strip():
+                SocialMedia.objects.create(
+                    business=business,
+                    platform=platform.strip(),
+                    username_or_link=username.strip()
+                )
+
         # ✅ Update first_login2 right after saving business
         owner_id = request.session.get('owner_id')
         if owner_id:
@@ -1230,7 +1246,7 @@ def business_settings(request):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': True, 'message': 'Settings saved successfully.'})
         else:
-            return redirect('dashboard') 
+            return redirect('dashboard')
 
     else:
         # Get the owner and business details
@@ -1242,6 +1258,11 @@ def business_settings(request):
         if business and business.specific_onsite_service:
             specific_services_list = [s.strip() for s in business.specific_onsite_service.split(",") if s.strip()]
 
+        # ✅ Fetch existing social media
+        social_media_list = []
+        if business:
+            social_media_list = business.social_media.all()
+
         return render(request, 'MSMEOrderingWebApp/settings.html', {
             'business': business,
             'owner': owner,  # Pass the owner object so the email can be accessed
@@ -1249,6 +1270,7 @@ def business_settings(request):
             'customization': customization,
             'title': 'Settings',
             'specific_services_list': specific_services_list,  # ✅ Pass to template
+            'social_media_list': social_media_list,  # ✅ Pass to template
         })
 
 @csrf_exempt
