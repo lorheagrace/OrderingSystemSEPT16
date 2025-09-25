@@ -1577,6 +1577,21 @@
                                 <textarea id="storeAddress" name="store_address" class="form-control editable-field" rows="3" placeholder="House/Building No., Street, Barangay/Subdivision, City/Municipality, Province, ZIP Code" disabled>{{ business.store_address|default_if_none:'' }}</textarea>
                                 <small class="text-muted">Store address will be displayed when Customer Pickup is enabled.</small>
                             </div>
+
+                            <div class="form-group mt-3">
+                                <label>Social Media Accounts</label>
+                                <div id="social-media-container">
+                                    {% for sm in social_media_list %}
+                                    <div class="social-media-row d-flex mb-2">
+                                        <input type="text" name="social_platform[]" value="{{ sm.platform }}" placeholder="Platform" class="form-control me-2" style="max-width: 150px;">
+                                        <input type="text" name="social_username[]" value="{{ sm.username_or_link }}" placeholder="Username/Link" class="form-control me-2">
+                                        <button type="button" class="btn btn-danger remove-social">Delete</button>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <button type="button" id="add-social-media" class="btn btn-primary mt-2">Add Social Media Platform</button>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -1777,6 +1792,32 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const container = document.getElementById("social-media-container");
+    const addBtn = document.getElementById("add-social-media");
+
+    addBtn.addEventListener("click", function() {
+        const row = document.createElement("div");
+        row.classList.add("social-media-row", "d-flex", "mb-2");
+        row.innerHTML = `
+            <input type="text" name="social_platform[]" placeholder="Platform" class="form-control me-2" style="max-width: 150px;">
+            <input type="text" name="social_username[]" placeholder="Username/Link" class="form-control me-2">
+            <button type="button" class="btn btn-danger remove-social">Delete</button>
+        `;
+        container.appendChild(row);
+
+        row.querySelector(".remove-social").addEventListener("click", function() {
+            row.remove();
+        });
+    });
+
+    document.querySelectorAll(".remove-social").forEach(btn => {
+        btn.addEventListener("click", function() {
+            btn.closest(".social-media-row").remove();
+        });
+    });
+});
+    
 document.addEventListener("DOMContentLoaded", function () {
     const onsiteCheckbox = document.getElementById("onsite");
     const wrapper = document.getElementById("onsiteServicesWrapper");
@@ -1992,6 +2033,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         localStorage.setItem('specific_services', JSON.stringify(services));
     }
+
 
     function addServiceInput(value = '') {
         if (!serviceList) return;
