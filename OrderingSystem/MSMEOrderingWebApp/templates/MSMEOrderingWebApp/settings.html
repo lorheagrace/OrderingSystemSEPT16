@@ -1468,118 +1468,52 @@
                     </button>
                 </div>
 
-        <!-- Business Profile Card -->
-        <div class="settings-card">
-            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-                <h2 class="card-title d-flex align-items-center mb-0 mb-md-0">
-                    <i class="fas fa-building me-2"></i>
-                    Business Profile
-                </h2>
-                <div class="d-flex gap-2">
-                    <button type="button" class="save-button" id="editDetails">
-                        <i class="fas fa-pen"></i> Edit Details
-                    </button>
-                    <button type="submit" class="save-button" id="saveDetails" disabled>
-                        <i class="fas fa-save"></i> Save Details
-                    </button>
-                </div>
-            </div>
-
-            <div class="card-body">
-                <div class="row g-4">
-                    <!-- Logo Upload Section -->
-                    <div class="col-lg-4">
-                        <label class="form-label">Business Logo</label>
-                        
-                        <!-- Square Wrapper Ensures 1:1 Aspect Ratio -->
-                        <div class="square-wrapper">
-                            <div class="logo-upload-area">
-                                {% if business.logo %}
-                                    <img id="logoPreview" src="{{ business.logo.url }}" class="logo-preview">
-                                {% else %}
-                                    <img id="logoPreview" src="" class="logo-preview" style="display:none;">
-                                {% endif %}
-
-                                <div class="upload-placeholder" id="uploadPlaceholder" style="{% if business.logo %}display: none;{% endif %}">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <h4>Upload Logo</h4>
-                                    <p>Drag & drop or click to browse</p>
-                                    <small>PNG, JPG up to 2MB</small>
-                                </div>
-
-
-                                <!-- Make this invisible but clickable -->
-                                <input type="file" id="logoInput" name="logo" accept="image/png,image/jpeg" class="logo-file-input editable-field" disabled>
-                            </div>
-                        </div>
-
-                        <div class="action-buttons mt-3">
-                            <button type="button" class="payment-change w-100" id="changePasswordButton" data-bs-toggle="modal" data-bs-target="#changePasswordModal" disabled>
-                                <i class="fas fa-key"></i> Change Password
-                            </button>
-                        </div>
-
+            <!-- Business Profile Card -->
+            <div class="settings-card">
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                    <h2 class="card-title d-flex align-items-center mb-0 mb-md-0">
+                        <i class="fas fa-building me-2"></i>
+                        Business Profile
+                    </h2>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="save-button" id="editDetails">
+                            <i class="fas fa-pen"></i> Edit Details
+                        </button>
+                        <button type="submit" class="save-button" id="saveDetails" disabled>
+                            <i class="fas fa-save"></i> Save Details
+                        </button>
                     </div>
+                </div>
 
-                    <!-- Business Details -->
-                    <div class="col-lg-8">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label for="businessName" class="form-label">Business Name</label>
-                                <input type="text" id="businessName" name="business_name" class="form-control editable-field" disabled placeholder="Enter your business name" value="{{ business.business_name|default_if_none:'' }}">
-                            </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Logo Upload Section -->
+                        <div class="col-lg-4">
+                            <label class="form-label">Business Logo</label>
+                            
+                            <!-- Square Wrapper Ensures 1:1 Aspect Ratio -->
+                            <div class="square-wrapper">
+                                <div class="logo-upload-area">
+                                    {% if business.logo %}
+                                        <img id="logoPreview" src="{{ business.logo.url }}" class="logo-preview">
+                                    {% else %}
+                                        <img id="logoPreview" src="" class="logo-preview" style="display:none;">
+                                    {% endif %}
 
-                            <div class="col-md-4">
-                                <label for="contactNumber" class="form-label">Contact Number</label>
-                                <input type="tel" id="contactNumber" name="contact_number" class="form-control editable-field" disabled placeholder="+63 xxx xxx xxxx" value="{{ business.contact_number|default_if_none:'' }}">
-                            </div>
+                                    <div class="upload-placeholder" id="uploadPlaceholder" style="{% if business.logo %}display: none;{% endif %}">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <h4>Upload Logo</h4>
+                                        <p>Drag & drop or click to browse</p>
+                                        <small>PNG, JPG up to 2MB</small>
+                                    </div>
 
-                            <div class="col-md-8">
-                                <label for="emailAddress" class="form-label">Email Address</label>
-                                <!-- Display the existing email address of the business owner -->
-                                <input type="email" id="emailAddress" name="email_address" class="form-control editable-field" disabled placeholder="businessowner@gmail.com" value="{{ owner.email|default_if_none:'' }}" readonly>
-                            </div>
-
-                            <!-- Operating Days Section -->
-                            <div class="col-12">
-                                <label class="form-label">Operating Days</label>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <select id="startDay" name="start_day" class="form-select editable-field" disabled>
-                                        <option value="">Start Day</option>
-                                        {% for day in days %}
-                                            <option value="{{ day }}" {% if business.start_day == day %}selected{% endif %}>{{ day }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    <span class="time-separator">to</span>
-                                    <select id="endDay" name="end_day" class="form-select editable-field" disabled>
-                                        <option value="">End Day</option>
-                                        {% for day in days %}
-                                            <option value="{{ day }}" {% if business.end_day == day %}selected{% endif %}>{{ day }}</option>
-                                        {% endfor %}
-                                    </select>
+                                    <!-- Make this invisible but clickable -->
+                                    <input type="file" id="logoInput" name="logo" accept="image/png,image/jpeg" class="logo-file-input editable-field" disabled>
                                 </div>
-                            </div>
-
-                            <!-- Operating Hours Section -->
-                            <div class="col-12">
-                                <label class="form-label">Operating Hours</label>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <input type="time" id="openingTime" name="opening_time" class="form-control editable-field" disabled value="{{ business.opening_time|default_if_none:''|time:'H:i' }}">
-                                    <span class="time-separator">to</span>
-                                    <input type="time" id="closingTime" name="closing_time" class="form-control editable-field" disabled value="{{ business.closing_time|default_if_none:''|time:'H:i' }}">
-                                </div>
-                            </div>
-
-
-
-                            <div class="col-12">
-                                <label for="storeAddress" class="form-label">Store Address</label>
-                                <textarea id="storeAddress" name="store_address" class="form-control editable-field" rows="3" placeholder="House/Building No., Street, Barangay/Subdivision, City/Municipality, Province, ZIP Code" disabled>{{ business.store_address|default_if_none:'' }}</textarea>
-                                <small class="text-muted">Store address will be displayed when Customer Pickup is enabled.</small>
                             </div>
 
                             <div class="social-media-section mt-3">
-                                <label class="form-label">Social Media</label>
+                                <label class="form-label">Social Media Links</label>
                                 <div id="socialMediaContainer">
                                     {% for sm in social_media_list %}
                                     <div class="row g-2 mb-2 social-media-row">
@@ -1587,7 +1521,7 @@
                                             <input type="text" name="social_platform[]" value="{{ sm.platform }}" class="form-control" placeholder="Platform" disabled>
                                         </div>
                                         <div class="col-md-6">
-                                            <input type="text" name="social_username[]" value="{{ sm.username_or_link }}" class="form-control" placeholder="Username/Link" disabled>
+                                            <input type="text" name="social_username[]" value="{{ sm.username_or_link }}" class="form-control" placeholder="Link" disabled>
                                         </div>
                                         <div class="col-md-2 d-flex align-items-center">
                                             <button type="button" class="btn btn-danger btn-sm remove-social" disabled>&times;</button>
@@ -1599,10 +1533,73 @@
                                     <i class="fas fa-plus"></i> Add Social Media
                                 </button>
                             </div>
-                            
-                        </div>
+
+                            <div class="action-buttons mt-3">
+                                <button type="button" class="payment-change w-100" id="changePasswordButton" data-bs-toggle="modal" data-bs-target="#changePasswordModal" disabled>
+                                    <i class="fas fa-key"></i> Change Password
+                                </button>
+                            </div>
+                        </div> <!-- ✅ properly close col-lg-4 -->
+
+                        <!-- Business Details -->
+                        <div class="col-lg-8">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="businessName" class="form-label">Business Name</label>
+                                    <input type="text" id="businessName" name="business_name" class="form-control editable-field" disabled placeholder="Enter your business name" value="{{ business.business_name|default_if_none:'' }}">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="contactNumber" class="form-label">Contact Number</label>
+                                    <input type="tel" id="contactNumber" name="contact_number" class="form-control editable-field" disabled placeholder="+63 xxx xxx xxxx" value="{{ business.contact_number|default_if_none:'' }}">
+                                </div>
+
+                                <div class="col-md-8">
+                                    <label for="emailAddress" class="form-label">Email Address</label>
+                                    <input type="email" id="emailAddress" name="email_address" class="form-control editable-field" disabled placeholder="businessowner@gmail.com" value="{{ owner.email|default_if_none:'' }}" readonly>
+                                </div>
+
+                                <!-- Operating Days Section -->
+                                <div class="col-12">
+                                    <label class="form-label">Operating Days</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <select id="startDay" name="start_day" class="form-select editable-field" disabled>
+                                            <option value="">Start Day</option>
+                                            {% for day in days %}
+                                                <option value="{{ day }}" {% if business.start_day == day %}selected{% endif %}>{{ day }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <span class="time-separator">to</span>
+                                        <select id="endDay" name="end_day" class="form-select editable-field" disabled>
+                                            <option value="">End Day</option>
+                                            {% for day in days %}
+                                                <option value="{{ day }}" {% if business.end_day == day %}selected{% endif %}>{{ day }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Operating Hours Section -->
+                                <div class="col-12">
+                                    <label class="form-label">Operating Hours</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <input type="time" id="openingTime" name="opening_time" class="form-control editable-field" disabled value="{{ business.opening_time|default_if_none:''|time:'H:i' }}">
+                                        <span class="time-separator">to</span>
+                                        <input type="time" id="closingTime" name="closing_time" class="form-control editable-field" disabled value="{{ business.closing_time|default_if_none:''|time:'H:i' }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="storeAddress" class="form-label">Store Address</label>
+                                    <textarea id="storeAddress" name="store_address" class="form-control editable-field" rows="3" placeholder="House/Building No., Street, Barangay/Subdivision, City/Municipality, Province, ZIP Code" disabled>{{ business.store_address|default_if_none:'' }}</textarea>
+                                    <small class="text-muted">Store address will be displayed when Customer Pickup is enabled.</small>
+                                </div>
+                            </div>
+                        </div> <!-- ✅ properly close col-lg-8 -->
                     </div>
                 </div>
+            </div>
+
 
                 <div class="section-divider"></div>
 
