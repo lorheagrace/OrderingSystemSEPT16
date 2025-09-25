@@ -145,6 +145,10 @@ class BusinessDetails(models.Model):
     email_address = models.EmailField(max_length=255, blank=True, null=True)
     store_address = models.TextField(blank=True, null=True)
 
+    business_description = models.TextField(blank=True, null=True)
+    business_mission = models.TextField(blank=True, null=True)
+    business_vision = models.TextField(blank=True, null=True)
+
     start_day = models.CharField(max_length=20, blank=True, null=True)
     end_day = models.CharField(max_length=20, blank=True, null=True)
     opening_time = models.TimeField(blank=True, null=True)
