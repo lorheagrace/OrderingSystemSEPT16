@@ -334,7 +334,14 @@ class OTP(models.Model):
             raise ValidationError("OTP must only contain numbers.")
         if len(self.otp) != 6:  # Ensuring OTP is 6 digits
             raise ValidationError("OTP must be exactly 6 digits.")
-        
+
+class SocialMedia(models.Model):
+    business = models.ForeignKey("BusinessDetails", on_delete=models.CASCADE, related_name="social_media")
+    platform = models.CharField(max_length=100)  # e.g. Facebook, Instagram
+    username_or_link = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.business.business_name} - {self.platform}"
 
 #sample customize
 
