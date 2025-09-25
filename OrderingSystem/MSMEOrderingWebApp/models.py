@@ -173,7 +173,8 @@ class BusinessDetails(models.Model):
             return self.base_fare + (extra_km * self.additional_fare_per_km)
 
 class SocialMedia(models.Model):
-    platform = models.CharField(max_length=100)  # e.g. Facebook, Instagram
+    business = models.ForeignKey("BusinessDetails", on_delete=models.CASCADE, related_name="social_media")
+    platform = models.CharField(max_length=100)
     username_or_link = models.CharField(max_length=255)
 
     def __str__(self):
