@@ -1594,6 +1594,22 @@
                                     <textarea id="storeAddress" name="store_address" class="form-control editable-field" rows="3" placeholder="House/Building No., Street, Barangay/Subdivision, City/Municipality, Province, ZIP Code" disabled>{{ business.store_address|default_if_none:'' }}</textarea>
                                     <small class="text-muted">Store address will be displayed when Customer Pickup is enabled.</small>
                                 </div>
+                                
+                                <div class="form-group">
+                                    <label for="business_description">Business Description</label>
+                                    <textarea name="business_description" id="business_description" class="form-control">{{ business.business_description }}</textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="business_mission">Business Mission</label>
+                                    <textarea name="business_mission" id="business_mission" class="form-control">{{ business.business_mission }}</textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="business_vision">Business Vision</label>
+                                    <textarea name="business_vision" id="business_vision" class="form-control">{{ business.business_vision }}</textarea>
+                                </div>
+                                
                             </div>
                         </div> <!-- ✅ properly close col-lg-8 -->
                     </div>
