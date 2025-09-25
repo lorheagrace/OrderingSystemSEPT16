@@ -3422,16 +3422,20 @@ def pos_add_to_cart(request):
             data = json.loads(request.body)
             product_name = data.get('product_name')
             quantity = int(data.get('quantity'))
-            price = float(data.get('price'))  # <-- This should be UNIT price, not total
+            price = float(data.get('price'))  # This should be UNIT price, not total
 
-            # Extract name and variation
-            name = product_name.split(" - ")[0]
-            variation = product_name.split(" - ")[1].split(" (₱")[0]
+            # Extract name and variation - FIX: Handle multiple dashes properly
+            parts = product_name.split(" - ")
+            name = parts[0]  # First part is the name
+            
+            # Join all parts except the first one, then split by " (₱" to remove price part
+            variation_with_price = " - ".join(parts[1:]) if len(parts) > 1 else ""
+            variation = variation_with_price.split(" (₱")[0] if " (₱" in variation_with_price else variation_with_price
 
             # Get the product that matches the name and variation
             product = Products.objects.filter(name=name, variation_name=variation).first()
 
-            # ✅ Always save the unit price (base price)
+            # ✅ Always save the unit price (base price) - NOT the total
             Cart.objects.create(
                 first_name="Walk-in",
                 last_name="Customer",
@@ -3440,7 +3444,7 @@ def pos_add_to_cart(request):
                 email="walkin@store.com",
                 product_name=product_name,
                 quantity=quantity,
-                price=product.price if product else price,  # use DB base price if available
+                price=product.price if product else (price / quantity),  # Use DB unit price or calculate unit price
                 image=product.image if product and product.image else None
             )
 
@@ -3458,10 +3462,14 @@ def pos_add_to_cart_variation(request):
             for item in data.get("items", []):
                 product_name = f"{item['productName']} - {item['variationName']}"
                 quantity = int(item['quantity'])
-                price = float(item['price'])
+                total_price = float(item['price'])  # This comes as total from frontend
+                unit_price = total_price / quantity  # Calculate unit price
 
                 # Get product
-                product = Products.objects.filter(name=item['productName'], variation_name=item['variationName']).first()
+                product = Products.objects.filter(
+                    name=item['productName'], 
+                    variation_name=item['variationName']
+                ).first()
 
                 Cart.objects.create(
                     first_name="Walk-in",
@@ -3471,7 +3479,7 @@ def pos_add_to_cart_variation(request):
                     email="walkin@store.com",
                     product_name=product_name,
                     quantity=quantity,
-                    price=price,
+                    price=product.price if product else unit_price,  # Use DB unit price or calculated unit price
                     image=product.image if product and product.image else None
                 )
             return JsonResponse({'success': True, 'cart_count': Cart.objects.count()})
@@ -3539,12 +3547,14 @@ def update_pos_cart_quantity(request):
             quantity = int(data.get('quantity'))
 
             cart_item = get_object_or_404(Cart, id=cart_id)
-            unit_price = cart_item.price / cart_item.quantity if cart_item.quantity > 0 else 0
+            # ✅ FIX: Don't change the unit price, keep it as is
+            # The price field should always store unit price
             cart_item.quantity = quantity
-            cart_item.price = unit_price * quantity
             cart_item.save()
 
-            return JsonResponse({'success': True, 'new_price': cart_item.price})
+            # Return the new total (unit price * quantity) for frontend display
+            new_total = cart_item.price * quantity
+            return JsonResponse({'success': True, 'new_total': float(new_total)})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid method'})
