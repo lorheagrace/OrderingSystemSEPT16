@@ -1174,6 +1174,12 @@ def business_settings(request):
         business.contact_number = request.POST.get('contact_number')
         business.email_address = request.POST.get('email_address')  # Saving the new email
         business.store_address = request.POST.get('store_address')
+
+        # ✅ New fields
+        business.business_description = request.POST.get('business_description')
+        business.business_mission = request.POST.get('business_mission')
+        business.business_vision = request.POST.get('business_vision')
+
         business.start_day = request.POST.get('start_day')
         business.end_day = request.POST.get('end_day')
 
