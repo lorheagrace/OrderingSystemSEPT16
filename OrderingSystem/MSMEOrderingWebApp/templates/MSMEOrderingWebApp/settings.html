@@ -1596,18 +1596,18 @@
                                 </div>
                                 
                                 <div class="col-12">
-                                    <label for="business_description">Business Description</label>
-                                    <textarea name="business_description" id="business_description" class="form-control">{{ business.business_description }}</textarea>
+                                    <label for="business_description" class="form-label">Business Description</label>
+                                    <textarea name="business_description" id="business_description" class="form-control editable-field" rows="3" disabled>{{ business.business_description|default_if_none:'' }}</textarea>
                                 </div>
                                 
                                 <div class="col-12">
-                                    <label for="business_mission">Business Mission</label>
-                                    <textarea name="business_mission" id="business_mission" class="form-control">{{ business.business_mission }}</textarea>
+                                    <label for="business_mission" class="form-label">Business Mission</label>
+                                    <textarea name="business_mission" id="business_mission" class="form-control editable-field" rows="3" disabled>{{ business.business_mission|default_if_none:'' }}</textarea>
                                 </div>
                                 
                                 <div class="col-12">
-                                    <label for="business_vision">Business Vision</label>
-                                    <textarea name="business_vision" id="business_vision" class="form-control">{{ business.business_vision }}</textarea>
+                                    <label for="business_vision" class="form-label">Business Vision</label>
+                                    <textarea name="business_vision" id="business_vision" class="form-control editable-field" rows="3" disabled>{{ business.business_vision|default_if_none:'' }}</textarea>
                                 </div>
                                 
                             </div>
