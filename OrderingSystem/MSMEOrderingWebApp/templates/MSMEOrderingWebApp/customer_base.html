@@ -565,6 +565,42 @@
             font-size: clamp(12px, 1.5vw, 16px);
         }
 
+        .aboutus-modal .description {
+            margin-bottom: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: clamp(12px, 1.4vw, 15px);
+            position: relative;
+            z-index: 1;
+            line-height: 1.4;
+            color: {{ customization.body_font_color|default:"#000000" }};
+            font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        }
+
+        .aboutus-modal .mission-vision-section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .aboutus-modal .mission-vision-section h6 {
+            font-size: clamp(13px, 1.6vw, 16px);
+            margin-bottom: 0.4rem;
+            text-align: left;
+            font-family: {{ customization.header_font_family|default:"Arial" }};
+            color: {{ customization.header_font_color|default:"#1f2937" }};
+            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
+            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+        }
+
+        .aboutus-modal .mission-vision-section p {
+            font-size: clamp(11px, 1.3vw, 14px);
+            line-height: 1.3;
+            margin-bottom: 0.75rem;
+            text-align: left;
+            color: {{ customization.body_font_color|default:"#000000" }};
+            font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        }
+
         .aboutus-modal .contact-section {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
@@ -652,6 +688,7 @@
             height: auto;
         }
 
+        
 
                 
     </style>
@@ -768,61 +805,88 @@
         {% endblock %}
     </main>
 
-
     <!-- About Us Modal -->
     <div class="modal fade aboutus-modal" id="aboutUsModal" tabindex="-1" aria-labelledby="aboutUsLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="aboutUsLabel">About Us</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            
-            <!-- Business Logo -->
-            <div class="text-center mb-3">
-                {% if business.logo %}
-                    <img src="{{ business.logo.url }}" alt="{{ business.business_name }}" style="max-height:100px;">
-                {% endif %}
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="aboutUsLabel">About Us</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body">
 
-            <!-- Business Name & Description -->
-            <h4 class="text-center business-name">{{ business.business_name }}</h4>
-            <p class="text-center description">{{ customization.dynamic_description }}</p>
-            
-            <!-- Contact Info -->
-            <div class="contact-section">
-            <div class="contact-item">
-                <i class="bi bi-telephone"></i>
-                <span>{{ business.contact_number }}</span>
-            </div>
-            <div class="contact-item">
-                <i class="bi bi-envelope"></i>
-                <span>{{ business.email_address }}</span>
-            </div>
-            <div class="contact-item">
-                <i class="bi bi-geo-alt"></i>
-                <span>{{ business.store_address }}</span>
-            </div>
-            </div>
-            
-            <!-- Social Media -->
-            {% if business.social_media.all %}
-            <div class="social-section mt-3">
-                <h6 class="social-title text-center mb-2">Follow us:</h6>
-                <div class="social-links">
-                {% for sm in business.social_media.all %}
-                    <div class="social-item">
-                    <i class="bi bi-{{ sm.platform|lower }}"></i> 
-                    <a href="{{ sm.username_or_link }}" target="_blank">{{ sm.platform }}</a>
-                    </div>
-                {% endfor %}
+                <!-- Main Content Row -->
+                <div class="main-content-row d-flex align-items-start gap-4">
+                
+                <!-- Business Logo -->
+                <div class="logo-section text-center flex-shrink-0">
+                    {% if business.logo %}
+                    <img src="{{ business.logo.url }}" alt="{{ business.business_name }}" class="img-fluid rounded" style="max-height:120px;">
+                    {% endif %}
                 </div>
+
+                <!-- Business Info -->
+                <div class="business-info-section">
+                    <!-- Business Name -->
+                    <h4 class="business-name">{{ business.business_name }}</h4>
+                    
+                    <!-- Description -->
+                    {% if business.business_description %}
+                    <p class="description">{{ business.business_description }}</p>
+                    {% endif %}
+                    
+                    <!-- Mission -->
+                    {% if business.business_mission %}
+                    <div class="mt-3">
+                        <h6>Our Mission</h6>
+                        <p>{{ business.business_mission }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Vision -->
+                    {% if business.business_vision %}
+                    <div class="mt-3">
+                        <h6>Our Vision</h6>
+                        <p>{{ business.business_vision }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="contact-section mt-4">
+                <div class="contact-item">
+                    <i class="bi bi-telephone"></i>
+                    <span>{{ business.contact_number }}</span>
+                </div>
+                <div class="contact-item">
+                    <i class="bi bi-envelope"></i>
+                    <span>{{ business.email_address }}</span>
+                </div>
+                <div class="contact-item">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>{{ business.store_address }}</span>
+                </div>
+                </div>
+                
+                <!-- Social Media -->
+                {% if business.social_media.all %}
+                <div class="social-section mt-3">
+                    <h6 class="social-title text-center mb-2">Follow us on:</h6>
+                    <div class="social-links">
+                    {% for sm in business.social_media.all %}
+                        <div class="social-item">
+                        <i class="bi bi-{{ sm.platform|lower }}"></i> 
+                        <a href="{{ sm.username_or_link }}" target="_blank">{{ sm.platform }}</a>
+                        </div>
+                    {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
             </div>
-            {% endif %}
+            </div>
         </div>
-        </div>
-    </div>
     </div>
 
 
