@@ -187,7 +187,19 @@
 
         .logo-upload-area:hover {
             transform: scale(1.01);
+            border-color: var(--secondary-color);
         }
+        
+        .logo-upload-area.disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+        
+        .logo-upload-area.disabled:hover {
+            transform: none;
+            border-color: var(--primary-color);
+        }
+
 
         .logo-upload-area.dragover {
             border-color: var(--accent-color);
@@ -237,6 +249,7 @@
             inset: 0;
             opacity: 0;
             cursor: pointer;
+            z-index: 10; /* Make sure it's above other elements */
         }
 
         /* Form Controls */
@@ -1836,11 +1849,26 @@ document.addEventListener("DOMContentLoaded", function() {
         // Toggle all editable fields
         const allEditableFields = document.querySelectorAll('.editable-field');
         allEditableFields.forEach(field => {
-            if (field.type !== 'file') { // Skip file inputs
-                field.disabled = !editing;
+            field.disabled = !editing;
+            
+            // Special handling for file inputs - don't skip them, handle them properly
+            if (field.type === 'file') {
+                // Update visual feedback for logo upload area
+                const uploadArea = field.closest('.logo-upload-area');
+                if (uploadArea) {
+                    if (editing) {
+                        uploadArea.style.cursor = 'pointer';
+                        uploadArea.style.opacity = '1';
+                        uploadArea.classList.remove('disabled');
+                    } else {
+                        uploadArea.style.cursor = 'default';
+                        uploadArea.style.opacity = '0.7';
+                        uploadArea.classList.add('disabled');
+                    }
+                }
             }
         });
-
+        
         // Toggle social media inputs and buttons
         socialInputs.forEach(input => {
             input.disabled = !editing;
@@ -1848,8 +1876,10 @@ document.addEventListener("DOMContentLoaded", function() {
         
         if (addSocialBtn) {
             addSocialBtn.disabled = !editing;
+            addSocialBtn.style.pointerEvents = editing ? 'auto' : 'none';
+            addSocialBtn.style.opacity = editing ? '1' : '0.5';
         }
-
+        
         // Toggle service-related buttons
         document.querySelectorAll('.removeServiceBtn').forEach(btn => {
             btn.disabled = !editing;
@@ -1862,28 +1892,28 @@ document.addEventListener("DOMContentLoaded", function() {
             addServiceBtn.style.pointerEvents = editing ? 'auto' : 'none';
             addServiceBtn.style.opacity = editing ? '1' : '0.5';
         }
-
+        
         // Toggle change password button
         if (changePasswordButton) {
             changePasswordButton.disabled = !editing;
             changePasswordButton.style.pointerEvents = editing ? 'auto' : 'none';
             changePasswordButton.style.opacity = editing ? '1' : '0.5';
         }
-
-        // CRITICAL FIX: Enable/disable save button properly
+        
+        // Enable/disable save button properly
         if (saveBtn) {
             saveBtn.disabled = !editing;
             saveBtn.style.pointerEvents = editing ? 'auto' : 'none';
             saveBtn.style.opacity = editing ? '1' : '0.5';
         }
-
+        
         // Update edit button state
         if (editBtn) {
             editBtn.disabled = editing;
             editBtn.textContent = editing ? 'Editing...' : 'Edit Details';
             editBtn.style.opacity = editing ? '0.5' : '1';
         }
-
+        
         // Save edit mode state (but not during restoration)
         if (!isRestoring) {
             localStorage.setItem('settings_edit_mode', editing ? 'true' : 'false');
@@ -2023,23 +2053,71 @@ document.addEventListener("DOMContentLoaded", function() {
     if (logoInput && logoPreview && uploadPlaceholder) {
         // Make upload area clickable
         const logoUploadArea = document.querySelector('.logo-upload-area');
+        
         if (logoUploadArea) {
-            logoUploadArea.addEventListener('click', function() {
-                const isEditing = localStorage.getItem('settings_edit_mode') === 'true';
-                if (isEditing && logoInput && !logoInput.disabled) {
+            logoUploadArea.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Check if we're in edit mode
+                const isEditing = !logoInput.disabled;
+                console.log('Logo area clicked, editing mode:', isEditing); // Debug log
+                
+                if (isEditing) {
                     logoInput.click();
+                } else {
+                    showToast('Please click "Edit Details" first to upload a logo', 'warning');
                 }
             });
         }
-
-        logoInput.addEventListener('change', function() {
+    
+        // Also make the placeholder clickable separately
+        if (uploadPlaceholder) {
+            uploadPlaceholder.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isEditing = !logoInput.disabled;
+                console.log('Placeholder clicked, editing mode:', isEditing); // Debug log
+                
+                if (isEditing) {
+                    logoInput.click();
+                } else {
+                    showToast('Please click "Edit Details" first to upload a logo', 'warning');
+                }
+            });
+        }
+    
+        // Handle file selection
+        logoInput.addEventListener('change', function(e) {
+            console.log('File selected:', this.files[0]); // Debug log
+            
             const file = this.files[0];
             if (!file) return;
-
+    
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select an image file', 'danger');
+                this.value = ''; // Clear the input
+                return;
+            }
+    
+            // Validate file size (2MB limit)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('File size must be less than 2MB', 'danger');
+                this.value = ''; // Clear the input
+                return;
+            }
+    
             const formData = new FormData();
             formData.append("logo", file);
             formData.append("csrfmiddlewaretoken", document.querySelector('[name=csrfmiddlewaretoken]').value);
-
+    
+            // Show loading state
+            if (uploadPlaceholder) {
+                uploadPlaceholder.innerHTML = '<i class="fas fa-spinner fa-spin"></i><h4>Uploading...</h4>';
+            }
+    
             fetch("/upload_logo/", {
                 method: "POST",
                 body: formData,
@@ -2054,14 +2132,33 @@ document.addEventListener("DOMContentLoaded", function() {
                     showToast('Logo uploaded successfully!', 'success');
                 } else {
                     showToast('Error uploading logo: ' + (data.error || 'Unknown error'), 'danger');
+                    // Restore placeholder on error
+                    if (uploadPlaceholder) {
+                        uploadPlaceholder.innerHTML = `
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>Upload Logo</h4>
+                            <p>Drag & drop or click to browse</p>
+                            <small>PNG, JPG up to 2MB</small>
+                        `;
+                    }
                 }
             })
             .catch(error => {
+                console.error('Upload error:', error);
                 showToast('Upload failed. Try again.', 'danger');
+                // Restore placeholder on error
+                if (uploadPlaceholder) {
+                    uploadPlaceholder.innerHTML = `
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>Upload Logo</h4>
+                        <p>Drag & drop or click to browse</p>
+                        <small>PNG, JPG up to 2MB</small>
+                    `;
+                }
             });
         });
     }
-
+    
     // Form submission with proper handling
     if (settingsForm) {
         settingsForm.addEventListener('submit', function(e) {
