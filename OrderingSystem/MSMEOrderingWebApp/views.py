@@ -192,6 +192,18 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         <p style="font-size: 15px; color: #008000; font-weight: bold; line-height: 1.6;">Your order has been successfully completed!</p>
         <p style="font-size: 13px; color: #333; margin-top: 10px;">Thank you for shopping with us. We hope you love your purchase! Please feel free to reach out for any future needs.</p>
         """
+	elif status.lower() == "void":
+	    message_content = f"""
+	    <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
+	        Your order has been voided.
+	    </p>
+	    <p style="font-size: 13px; color: #555; margin-top: 10px;">
+	        Reason: <span style="color: #333;">{void_reason if void_reason else "No reason specified"}</span>
+	    </p>
+	    <p style="font-size: 13px; color: #555; margin-top: 10px;">
+	        If you have questions, please contact us for assistance.
+	    </p>
+	    """
     else:
         message_content = f"""
         <p style="font-size: 15px; color: #333; line-height: 1.6;">Your order status is now {status}.</p>
@@ -481,6 +493,18 @@ def send_email_notification(recipient_email, status, order_code, orders):
         <p style="font-size: 15px; color: #008000; font-weight: bold; line-height: 1.6;">Your order has been successfully completed!</p>
         <p style="font-size: 13px; color: #333; margin-top: 10px;">Thank you for shopping with us. We hope you love your purchase! Please feel free to reach out for any future needs.</p>
         """
+	elif status.lower() == "void":
+	    message_content = f"""
+	    <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
+	        Your order has been voided.
+	    </p>
+	    <p style="font-size: 13px; color: #555; margin-top: 10px;">
+	        Reason: <span style="color: #333;">{void_reason if void_reason else "No reason specified"}</span>
+	    </p>
+	    <p style="font-size: 13px; color: #555; margin-top: 10px;">
+	        If you have questions, please contact us for assistance.
+	    </p>
+	    """
     else:
         message_content = f"""
         <p style="font-size: 15px; color: #333; line-height: 1.6;">Your order status is now {status}.</p>
@@ -630,15 +654,15 @@ def update_order_status_progress(request):
                 group_id=group_id  # ✅ Only this order group
             ).values("order_code").distinct().count()
 
-            async_to_sync(channel_layer.group_send)(
-                group_name,
-                {
-                    "type": "send_customer_notification",
-                    "message": f"Your order is now {status}"
-                              + (f" ({void_reason})" if status.lower() == "void" and void_reason else ""),
-                    "customer_count": customer_count,
-                }
-            )
+			async_to_sync(channel_layer.group_send)(
+			    group_name,
+			    {
+			        "type": "send_customer_notification",
+			        "message": f"Your order has been voided"
+			                  + (f" ({void_reason})" if void_reason else ""),
+			        "customer_count": customer_count,
+			    }
+			)
 
             return JsonResponse({'success': True})
 
@@ -4899,7 +4923,7 @@ def customer_notifications(request):
         email=email,
         status__in=[
             "accepted", "rejected", "Preparing", "Packed", 
-            "Ready for Pickup", "Out for Delivery", "Completed"
+            "Ready for Pickup", "Out for Delivery", "Completed", "Void"
         ]
     ).order_by('-created_at')
 
@@ -4952,7 +4976,7 @@ def partial_customer_notifications(request):
         email=email,
         status__in=[
             "accepted", "rejected", "Preparing", "Packed",
-            "Ready for Pickup", "Out for Delivery", "Completed"
+            "Ready for Pickup", "Out for Delivery", "Completed", "Void"
         ]
     ).order_by('-created_at')
 
@@ -4976,6 +5000,7 @@ def partial_customer_notifications(request):
             'items': items,
             'sub_total': first_item.sub_total,
             'rejection_reason': first_item.rejection_reason if first_item.status == "rejected" else None,
+			'void_reason': first_item.void_reason if first_item.status.lower() == "void" else None,
             'order_type': first_item.order_type,
             'delivery_fee': first_item.delivery_fee,
             'final_total': (first_item.sub_total + first_item.delivery_fee) if first_item.order_type and first_item.order_type.lower() == "delivery" and first_item.delivery_fee else first_item.sub_total,
