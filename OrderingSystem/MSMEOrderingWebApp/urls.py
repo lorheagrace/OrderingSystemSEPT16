@@ -33,6 +33,7 @@ urlpatterns = [
     path('CustomerCheckout/', views.customer_checkout, name='customer_checkout'),
     path('customer/online-payment/', views.customer_viewonlinepayment, name='customer_viewonlinepayment'),
     path('business/online-payment/', views.business_viewonlinepayment, name='business_viewonlinepayment'),
+    path('cashier/online-payment/', views.cashier_viewonlinepayment, name='cashier_viewonlinepayment'),
     path('CustomerNotifications/', views.customer_notifications, name='customer_notifications'),
     path('CustomerProfile/', views.customer_profile, name='customer_profile'),
     path('CustomerProfile/change-password/', views.customer_changepassword, name='customer_changepassword'),
