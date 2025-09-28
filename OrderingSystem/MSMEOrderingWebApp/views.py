@@ -654,15 +654,17 @@ def update_order_status_progress(request):
                 group_id=group_id  # ✅ Only this order group
             ).values("order_code").distinct().count()
 
-			async_to_sync(channel_layer.group_send)(
-			    group_name,
-			    {
-			        "type": "send_customer_notification",
-			        "message": f"Your order has been voided"
-			                  + (f" ({void_reason})" if void_reason else ""),
-			        "customer_count": customer_count,
-			    }
-			)
+            async_to_sync(channel_layer.group_send)(
+                group_name,
+                {
+                    "type": "send_customer_notification",
+                    "message": f"Your order has been voided"
+                              + (f" ({void_reason})" if void_reason else ""),
+                    "customer_count": customer_count,
+                }
+            )
+
+
 
             return JsonResponse({'success': True})
 
