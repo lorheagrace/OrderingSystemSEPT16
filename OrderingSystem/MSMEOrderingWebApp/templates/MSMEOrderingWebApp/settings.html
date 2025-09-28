@@ -2054,19 +2054,21 @@ document.addEventListener("DOMContentLoaded", function() {
     // Logo upload functionality - FIXED
     if (logoInput && logoPreview && uploadPlaceholder) {
         const logoUploadArea = document.querySelector('.logo-upload-area');
+    
+    // Single click handler for the upload area only
+        logoUploadArea.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
         
-        // Logo upload area click
-        if (logoUploadArea) {
-            logoUploadArea.addEventListener('click', function(e) {
-                const isEditing = !logoInput.disabled;
-                if (isEditing) {
-                    logoInput.click();
-                } else {
-                    showToast('Please click "Edit Details" first to upload a logo', 'warning');
-                }
-            });
-        }
+            const isEditing = !logoInput.disabled;
+            if (isEditing) {
+                logoInput.click();
+            } else {
+                showToast('Please click "Edit Details" first to upload a logo', 'warning');
+            }
+        });
 
+        // Handle file input change
         logoInput.addEventListener('change', function(e) {
             const file = this.files[0];
             if (!file) return;
@@ -2103,7 +2105,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     logoPreview.src = data.logo_url;
                     logoPreview.style.display = 'block';
                     uploadPlaceholder.style.display = 'none';
-                    showToast('Logo uploaded successfully!', 'success');
+                    localStorage.setItem('logo_preview', data.logo_url);
+                showToast('Logo uploaded successfully!', 'success');
                 } else {
                     throw new Error(data.error || 'Upload failed');
                 }
@@ -2538,14 +2541,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     logoPreview.src = savedLogo;
                     logoPreview.style.display = 'block';
                     uploadPlaceholder.style.display = 'none';
-                    
-                    // Make the logo preview clickable to trigger file upload
-                    logoPreview.style.cursor = 'pointer';
-                    logoPreview.addEventListener('click', function() {
-                        if (logoInput && !logoInput.disabled) {
-                            logoInput.click();
-                        }
-                    });
                 }, 50);
             }
             
@@ -2597,58 +2592,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
 
-        // Make upload placeholder clickable to trigger file upload
-        if (uploadPlaceholder && logoInput) {
-            uploadPlaceholder.style.cursor = 'pointer';
-            uploadPlaceholder.addEventListener('click', function() {
-                if (!logoInput.disabled) {
-                    logoInput.click();
-                }
-            });
-        }
-
-        // Logo upload
-        if (logoInput) {
-            logoInput.addEventListener('change', function () {
-                const file = this.files[0];
-                if (!file) return;
-
-                const formData = new FormData();
-                formData.append("logo", file);
-
-                fetch("{% url 'upload_logo' %}", {
-                    method: "POST",
-                    body: formData,
-                    headers: { "X-Requested-With": "XMLHttpRequest" }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        if (logoPreview && uploadPlaceholder) {
-                            logoPreview.src = data.logo_url;
-                            logoPreview.style.display = 'block';
-                            logoPreview.style.cursor = 'pointer';
-                            uploadPlaceholder.style.display = 'none';
-                            
-                            // Make the new logo preview clickable
-                            logoPreview.addEventListener('click', function() {
-                                if (!logoInput.disabled) {
-                                    logoInput.click();
-                                }
-                            });
-                        }
-                        
-                        localStorage.setItem('logo_preview', data.logo_url);
-                        showToast('Logo uploaded successfully!', 'success');
-                    } else {
-                        showToast('Error uploading logo: ' + data.error, 'danger');
-                    }
-                })
-                .catch(error => {
-                    showToast('Upload failed. Try again.', 'danger');
-                });
-            });
-        }
 
         // Edit button
         if (editButton) {
