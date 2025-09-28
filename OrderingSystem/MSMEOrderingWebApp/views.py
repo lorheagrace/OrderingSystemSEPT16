@@ -192,18 +192,18 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         <p style="font-size: 15px; color: #008000; font-weight: bold; line-height: 1.6;">Your order has been successfully completed!</p>
         <p style="font-size: 13px; color: #333; margin-top: 10px;">Thank you for shopping with us. We hope you love your purchase! Please feel free to reach out for any future needs.</p>
         """
-	elif status.lower() == "void":
-	    message_content = f"""
-	    <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
-	        Your order has been voided.
-	    </p>
-	    <p style="font-size: 13px; color: #555; margin-top: 10px;">
-	        Reason: <span style="color: #333;">{void_reason if void_reason else "No reason specified"}</span>
-	    </p>
-	    <p style="font-size: 13px; color: #555; margin-top: 10px;">
-	        If you have questions, please contact us for assistance.
-	    </p>
-	    """
+    elif status.lower() == "void":
+        message_content = f"""
+        <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
+            Your order has been voided.
+        </p>
+        <p style="font-size: 13px; color: #555; margin-top: 10px;">
+            Reason: <span style="color: #333;">{void_reason if void_reason else "No reason specified"}</span>
+        </p>
+        <p style="font-size: 13px; color: #555; margin-top: 10px;">
+            If you have questions, please contact us for assistance.
+        </p>
+        """
     else:
         message_content = f"""
         <p style="font-size: 15px; color: #333; line-height: 1.6;">Your order status is now {status}.</p>
@@ -493,18 +493,18 @@ def send_email_notification(recipient_email, status, order_code, orders):
         <p style="font-size: 15px; color: #008000; font-weight: bold; line-height: 1.6;">Your order has been successfully completed!</p>
         <p style="font-size: 13px; color: #333; margin-top: 10px;">Thank you for shopping with us. We hope you love your purchase! Please feel free to reach out for any future needs.</p>
         """
-	elif status.lower() == "void":
-	    message_content = f"""
-	    <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
-	        Your order has been voided.
-	    </p>
-	    <p style="font-size: 13px; color: #555; margin-top: 10px;">
-	        Reason: <span style="color: #333;">{void_reason if void_reason else "No reason specified"}</span>
-	    </p>
-	    <p style="font-size: 13px; color: #555; margin-top: 10px;">
-	        If you have questions, please contact us for assistance.
-	    </p>
-	    """
+    elif status.lower() == "void":
+        message_content = f"""
+        <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
+            Your order has been voided.
+        </p>
+        <p style="font-size: 13px; color: #555; margin-top: 10px;">
+            Reason: <span style="color: #333;">{void_reason if void_reason else "No reason specified"}</span>
+        </p>
+        <p style="font-size: 13px; color: #555; margin-top: 10px;">
+            If you have questions, please contact us for assistance.
+        </p>
+        """
     else:
         message_content = f"""
         <p style="font-size: 15px; color: #333; line-height: 1.6;">Your order status is now {status}.</p>
