@@ -4054,8 +4054,17 @@ def cashier_dashboard(request):
 
     total_inventory = Products.objects.values('name').distinct().count()
     total_pending = count_unique_orders(Checkout.objects.filter(status__iexact="pending"))
-    total_preparing = count_unique_orders(Checkout.objects.filter(status__iexact="preparing"))
-    total_declined = count_unique_orders(Checkout.objects.filter(status__iexact="rejected"))
+
+	total_preparing = count_unique_orders(
+	    Checkout.objects.filter(
+	        status__in=["accepted", "Preparing", "Packed", "Out for Delivery", "Ready for Pickup", "Delivered"]
+	    )
+	)
+
+	total_declined = count_unique_orders(
+	    Checkout.objects.filter(status__in=["rejected", "Void"])
+	)
+
 
     # ✅ Completed orders updated today (for stats and sales)
     today = localdate()
