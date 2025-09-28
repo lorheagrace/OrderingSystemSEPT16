@@ -880,11 +880,11 @@
 
                     <!-- Online Payment Info Link (Initially hidden) -->
                     <div id="online-payment-info" style="display: none; margin-top: 15px; display: flex; justify-content: center;">
-                        <a href="{% url 'business_viewonlinepayment' %}" class="btn btn-outline-primary">
+                        <a href="{% url payment_url %}" class="btn btn-outline-primary">
                             <i class="fas fa-info-circle"></i> View Online Payment Details
                         </a>
                     </div>
-
+                    
                     <!-- Cash Payment Details -->
                     <div class="cash-details" id="cash-details">
                         <h5 style="margin-bottom: 15px; color: var(--dark-color); font-family: {{ customization.header_font_family|default:'Montserrat' }};">
