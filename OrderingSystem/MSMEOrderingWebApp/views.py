@@ -192,7 +192,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         <p style="font-size: 15px; color: #008000; font-weight: bold; line-height: 1.6;">Your order has been successfully completed!</p>
         <p style="font-size: 13px; color: #333; margin-top: 10px;">Thank you for shopping with us. We hope you love your purchase! Please feel free to reach out for any future needs.</p>
         """
-    elif status.lower() == "void":
+    elif status.lower() == "Void":
         message_content = f"""
         <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
             Your order has been voided.
@@ -493,7 +493,7 @@ def send_email_notification(recipient_email, status, order_code, orders):
         <p style="font-size: 15px; color: #008000; font-weight: bold; line-height: 1.6;">Your order has been successfully completed!</p>
         <p style="font-size: 13px; color: #333; margin-top: 10px;">Thank you for shopping with us. We hope you love your purchase! Please feel free to reach out for any future needs.</p>
         """
-    elif status.lower() == "void":
+    elif status.lower() == "Void":
         message_content = f"""
         <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
             Your order has been voided.
