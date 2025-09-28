@@ -3549,6 +3549,7 @@ def pos_cart_view(request):
         'business': business,
         'services': services,   # ✅ Pass services list for dropdown
         'back_url': 'pos',
+		"payment_url": "business_viewonlinepayment",
     })
 
 @csrf_exempt
@@ -4247,6 +4248,7 @@ def cashier_pos_cart_view(request):
         'customization': customization,
         'business': business,  # Pass business settings
         'back_url': 'cashier_pos',
+		"payment_url": "cashier_viewonlinepayment",
     })
 
 def cashier_notifications(request):
@@ -5171,7 +5173,7 @@ def business_viewonlinepayment(request):
     return render(request, 'MSMEOrderingWebApp/business_viewonlinepayment.html', {
         'customization': customization,
         'payment_methods': payment_methods,
-        'business': business
+        'business': business,
     })
 
 def cashier_viewonlinepayment(request):
@@ -5182,7 +5184,7 @@ def cashier_viewonlinepayment(request):
     return render(request, 'MSMEOrderingWebApp/cashier_viewonlinepayment.html', {
         'customization': customization,
         'payment_methods': payment_methods,
-        'business': business
+        'business': business,
     })
 	
 @login_required_session
