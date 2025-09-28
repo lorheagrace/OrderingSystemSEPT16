@@ -144,7 +144,7 @@ def notifications_redirect(request):
     else:
         return redirect('login')  # fallback if session is missing or unknown
     
-def send_order_status_email(recipient_email, order_code, status, orders, rejection_reason=None):
+def send_order_status_email(recipient_email, order_code, status, orders, rejection_reason=None, void_reason=None):
     # Get customization settings
     customization = get_or_create_customization()
     business = BusinessDetails.objects.first()
@@ -192,7 +192,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         <p style="font-size: 15px; color: #008000; font-weight: bold; line-height: 1.6;">Your order has been successfully completed!</p>
         <p style="font-size: 13px; color: #333; margin-top: 10px;">Thank you for shopping with us. We hope you love your purchase! Please feel free to reach out for any future needs.</p>
         """
-    elif status.lower() == "Void":
+    elif status == "Void":
         message_content = f"""
         <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
             Your order has been voided.
@@ -317,7 +317,7 @@ def update_order_status(request):
             order.save()
 
         # Send email to customer
-        send_order_status_email(customer_email, order_code, status, orders)
+        send_order_status_email(customer_email, order_code, status, orders, void_reason=void_reason)
 
         channel_layer = get_channel_layer()
 
@@ -440,7 +440,7 @@ def update_order_status(request):
 
     return JsonResponse({"success": False, "error": "Invalid request"})
 
-def send_email_notification(recipient_email, status, order_code, orders):
+def send_email_notification(recipient_email, status, order_code, orders, void_reason=None):
     # Get customization settings
     customization = get_or_create_customization()
     business = BusinessDetails.objects.first()
@@ -493,7 +493,7 @@ def send_email_notification(recipient_email, status, order_code, orders):
         <p style="font-size: 15px; color: #008000; font-weight: bold; line-height: 1.6;">Your order has been successfully completed!</p>
         <p style="font-size: 13px; color: #333; margin-top: 10px;">Thank you for shopping with us. We hope you love your purchase! Please feel free to reach out for any future needs.</p>
         """
-    elif status.lower() == "Void":
+    elif status == "Void":
         message_content = f"""
         <p style="font-size: 15px; color: #8B0000; font-weight: bold; line-height: 1.6;">
             Your order has been voided.
@@ -640,7 +640,7 @@ def update_order_status_progress(request):
                 
             # ✅ Email notification (sent once for the group)
             reference_order = orders.first()
-            send_email_notification(reference_order.email, status, order_code, orders)
+            send_email_notification(reference_order.email, status, order_code, orders, void_reason=void_reason)
 
             # ✅ WebSocket Notification
             sanitized_email = reference_order.email.replace('@', 'at').replace('.', 'dot')
