@@ -5174,6 +5174,17 @@ def business_viewonlinepayment(request):
         'business': business
     })
 
+def cashier_viewonlinepayment(request):
+    customization = get_or_create_customization()
+    payment_methods = OnlinePaymentDetails.objects.all().order_by('-id')
+    business = BusinessDetails.objects.first()
+
+    return render(request, 'MSMEOrderingWebApp/cashier_viewonlinepayment.html', {
+        'customization': customization,
+        'payment_methods': payment_methods,
+        'business': business
+    })
+	
 @login_required_session
 def business_changepassword(request):
     owner_id = request.session.get('owner_id')
