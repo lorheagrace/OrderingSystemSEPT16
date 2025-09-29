@@ -673,7 +673,7 @@ def update_order_status_progress(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-
+@login_required_session
 def partial_pending_orders(request):
     customization = get_or_create_customization()
     pending_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
@@ -1305,6 +1305,7 @@ def business_settings(request):
             'social_media_list': social_media_list,  # ✅ Pass to template
         })
 
+@login_required_session
 @csrf_exempt
 def upload_logo(request):
     if request.method == "POST" and 'logo' in request.FILES:
@@ -1868,6 +1869,7 @@ def register_user(request):
         'business': business,
     })
 
+@login_required_session
 def dashboard(request):
     customization = get_or_create_customization()
     business = BusinessDetails.objects.first()
@@ -3421,8 +3423,7 @@ def edit_product_price(request):
 
     return redirect('inventory')
 
-
-
+@login_required_session
 def delete_product(request, product_id):
     product = get_object_or_404(Products, id=product_id)
 
@@ -3505,6 +3506,7 @@ def pos(request):
         'cart_url': 'pos_cart',
     })
 
+@login_required_session
 @csrf_exempt
 def pos_add_to_cart(request):
     if request.method == "POST":
@@ -3544,6 +3546,7 @@ def pos_add_to_cart(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
+@login_required_session
 @csrf_exempt
 def pos_add_to_cart_variation(request):
     if request.method == "POST":
@@ -3578,6 +3581,7 @@ def pos_add_to_cart_variation(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
+@login_required_session
 def pos_cart_view(request):
     cart_items = Cart.objects.filter(email="walkin@store.com")
     for item in cart_items:
@@ -3605,6 +3609,7 @@ def pos_cart_view(request):
 		"payment_url": "business_viewonlinepayment",
     })
 
+@login_required_session
 @csrf_exempt
 def remove_cart_item(request, item_id):
     if request.method == 'POST':
@@ -3617,7 +3622,8 @@ def remove_cart_item(request, item_id):
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
 
-@csrf_exempt  # TEMP for testing; use CSRF protection in production
+@login_required_session
+@csrf_exempt  
 def clear_cart_items(request):
     if request.method == 'POST':
         try:
@@ -3629,6 +3635,7 @@ def clear_cart_items(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
+@login_required_session
 @csrf_exempt
 def update_pos_cart_quantity(request):
     if request.method == 'POST':
@@ -3649,7 +3656,8 @@ def update_pos_cart_quantity(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid method'})
-    
+
+@login_required_session	
 @csrf_exempt
 def pos_place_order(request):
     if request.method == 'POST':
@@ -3892,6 +3900,7 @@ def reviews(request):
 
     return render(request, 'MSMEOrderingWebApp/reviews.html', context)
 
+@login_required_session
 def users(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
@@ -3945,6 +3954,7 @@ def users(request):
 
     return render(request, 'MSMEOrderingWebApp/users.html', context)
 
+@login_required_session
 @require_POST
 def disable_user(request, role, user_id):
     try:
@@ -3964,6 +3974,7 @@ def disable_user(request, role, user_id):
         messages.error(request, 'User or Staff not found.')
     return redirect('users')
 
+@login_required_session
 @require_POST
 def enable_user(request, role, user_id):
     try:
@@ -3983,6 +3994,7 @@ def enable_user(request, role, user_id):
         messages.error(request, 'User or Staff not found.')
     return redirect('users')
 
+@login_required_session
 def create_staff_account(request):
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
@@ -4071,6 +4083,7 @@ def settings(request):
     }
     return render(request, 'MSMEOrderingWebApp/settings.html', context)
 
+@login_required_session
 def business_dashboard(request):
     # Get or create customization
     customization = get_or_create_customization()
@@ -4084,6 +4097,7 @@ def business_dashboard(request):
         'business': business
     })
 
+@login_required_session
 def customer_dashboard(request):
     # Get or create customization settings
     customization = get_or_create_customization()
@@ -4093,6 +4107,7 @@ def customer_dashboard(request):
         'customization': customization,
     })
 
+@login_required_session
 def deliveryrider_dashboard(request):
     customization = get_or_create_customization()
 
@@ -4100,6 +4115,7 @@ def deliveryrider_dashboard(request):
         'customization': customization,
     })
 
+@login_required_session
 def cashier_dashboard(request):
     customization = get_or_create_customization()
     business = BusinessDetails.objects.first()
@@ -4238,6 +4254,7 @@ def cashier_dashboard(request):
 
     return render(request, 'MSMEOrderingWebApp/cashier_dashboard.html', context)
 
+@login_required_session
 def cashier_pos(request):
     business = BusinessDetails.objects.first()
     products = Products.objects.select_related('category').filter(available=True)
@@ -4283,6 +4300,7 @@ def cashier_pos(request):
         'cart_url': 'cashier_poscart',
     })
 
+@login_required_session
 def cashier_pos_cart_view(request):
     cart_items = Cart.objects.filter(email="walkin@store.com")
     for item in cart_items:
@@ -4304,6 +4322,7 @@ def cashier_pos_cart_view(request):
 		"payment_url": "cashier_viewonlinepayment",
     })
 
+@login_required_session
 def cashier_notifications(request):
 
     raw_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
@@ -4340,6 +4359,7 @@ def cashier_notifications(request):
     })
 
 
+@login_required_session
 def deliveryrider_home(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
@@ -4399,6 +4419,7 @@ def deliveryrider_home(request):
 
     return render(request, 'MSMEOrderingWebApp/deliveryrider_home.html', context)
 
+@login_required_session
 def mark_as_delivered(request):
     order_code = request.POST.get('order_code')
     group_id = request.POST.get('group_id')  # ✅ require group_id
@@ -4423,6 +4444,7 @@ def mark_as_delivered(request):
     messages.success(request, f"Order #{order_code} marked as delivered.")
     return redirect('deliveryrider_home')
 
+@login_required_session
 def business_notifications(request):
     # Mark unseen pending orders as seen
     Checkout.objects.filter(status="pending", is_seen_by_owner=False).update(is_seen_by_owner=True)
@@ -4544,6 +4566,7 @@ def customer_home(request):
         'closing_time': closing_time,
     })
 
+@login_required_session
 def staff_profile(request):
     # Ensure the user is logged in as staff
     staff_id = request.session.get('staff_id')
@@ -4579,6 +4602,7 @@ def staff_profile(request):
 
     return render(request, 'MSMEOrderingWebApp/staff_profile.html', context)
 
+@login_required_session
 def update_customization(request):
     customization = get_object_or_404(Customization, pk=1)
     if request.method == 'POST':
@@ -4696,12 +4720,14 @@ def customer_cart(request):
     else:
         return redirect('login')
 
+@login_required_session
 def delete_cart_item(request, cart_id):
     if request.method == 'POST':
         cart_item = get_object_or_404(Cart, id=cart_id)
         cart_item.delete()
     return redirect('customer_cart')
 
+@login_required_session
 @csrf_exempt
 def update_cart(request, cart_id):
     if request.method == 'POST':
@@ -4995,6 +5021,7 @@ def customer_notifications(request):
         'closing_time': closing_time,
     })
 
+@login_required_session
 def partial_customer_notifications(request):
     customization = get_or_create_customization()
     email = request.session.get('email')
@@ -5230,6 +5257,7 @@ def business_viewonlinepayment(request):
         'business': business,
     })
 
+@login_required_session
 def cashier_viewonlinepayment(request):
     customization = get_or_create_customization()
     payment_methods = OnlinePaymentDetails.objects.all().order_by('-id')
@@ -5313,6 +5341,7 @@ def customer_changepassword(request):
     # If not AJAX or not POST
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
 
+@login_required_session
 def add_to_cart(request):
     print("add_to_cart called")
     if request.method == 'POST':
