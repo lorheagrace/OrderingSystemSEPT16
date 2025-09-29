@@ -41,7 +41,7 @@ from django.urls import resolve, reverse
 from escpos.printer import Usb
 from .utils import get_business_day_range
 import uuid
-
+import os
 from django.utils.timezone import make_aware
 from datetime import datetime, timedelta
 import io
@@ -2122,12 +2122,14 @@ from reportlab.lib import colors
 def _build_report_header(logo_path, business_name, address, email, contact, styles):
     """Generate a modern header with correct spacing, background, and logo separator line."""
 
-    if logo_path:
-        logo = Image(logo_path, width=70, height=70)
-        header_content = [[logo, details_table]]
-    else:
-        header_content = [[details_table]]
-		
+    # Only create logo if path exists and is valid
+    logo = None
+    if logo_path and os.path.exists(logo_path):
+        try:
+            logo = Image(logo_path, width=70, height=70)
+        except:
+            logo = None  # If there's any error creating the image, skip it
+
     # Business Name (uppercase, bold)
     business_name_para = Paragraph(
         f'<font size="18" color="#000000"><b>{business_name.upper()}</b></font>',
@@ -2166,33 +2168,54 @@ def _build_report_header(logo_path, business_name, address, email, contact, styl
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    # Main header
-    header_content = [[logo, details_table]]
-    header_table = Table(header_content)
-    header_table.setStyle(TableStyle([
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("ALIGN", (1, 0), (1, 0), "CENTER"),
+    # Main header - adjust based on whether logo exists
+    if logo:
+        # With logo: logo on left, details on right
+        header_content = [[logo, details_table]]
+        header_table = Table(header_content)
+        header_table.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (1, 0), (1, 0), "CENTER"),
 
-        # Padding for logo + details
-        ("LEFTPADDING", (0, 0), (0, 0), 150),
-        ("RIGHTPADDING", (0, 0), (0, 0), 0),
-        ("TOPPADDING", (0, 0), (0, 0), 12),
-        ("BOTTOMPADDING", (0, 0), (0, 0), 12),
+            # Padding for logo + details
+            ("LEFTPADDING", (0, 0), (0, 0), 150),
+            ("RIGHTPADDING", (0, 0), (0, 0), 0),
+            ("TOPPADDING", (0, 0), (0, 0), 12),
+            ("BOTTOMPADDING", (0, 0), (0, 0), 12),
 
-        ("LEFTPADDING", (1, 0), (1, 0), 100),
-        ("RIGHTPADDING", (1, 0), (1, 0), 20),
-        ("TOPPADDING", (1, 0), (1, 0), 18),
-        ("BOTTOMPADDING", (1, 0), (1, 0), 18),
+            ("LEFTPADDING", (1, 0), (1, 0), 100),
+            ("RIGHTPADDING", (1, 0), (1, 0), 20),
+            ("TOPPADDING", (1, 0), (1, 0), 18),
+            ("BOTTOMPADDING", (1, 0), (1, 0), 18),
 
-        # Background color
-        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#DBDBDB")),
+            # Background color
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#DBDBDB")),
 
-        # Subtle bottom border
-        ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#8A8A8A")),
-    ]))
+            # Subtle bottom border
+            ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#8A8A8A")),
+        ]))
+    else:
+        # Without logo: just center the details
+        header_content = [[details_table]]
+        header_table = Table(header_content, colWidths=[500])
+        header_table.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+
+            # Centered padding
+            ("LEFTPADDING", (0, 0), (0, 0), 50),
+            ("RIGHTPADDING", (0, 0), (0, 0), 50),
+            ("TOPPADDING", (0, 0), (0, 0), 18),
+            ("BOTTOMPADDING", (0, 0), (0, 0), 18),
+
+            # Background color
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#DBDBDB")),
+
+            # Subtle bottom border
+            ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#8A8A8A")),
+        ]))
 
     return header_table
-
 
 def _get_report_styles():
     """Define consistent styles for all reports"""
