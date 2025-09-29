@@ -2122,9 +2122,6 @@ from reportlab.lib import colors
 def _build_report_header(logo_path, business_name, address, email, contact, styles):
     """Generate a modern header with correct spacing, background, and logo separator line."""
 
-    # Logo
-    logo = Image(logo_path, width=70, height=70)
-
     # Business Name (uppercase, bold)
     business_name_para = Paragraph(
         f'<font size="18" color="#000000"><b>{business_name.upper()}</b></font>',
@@ -2143,7 +2140,7 @@ def _build_report_header(logo_path, business_name, address, email, contact, styl
         styles["normal"]
     )
 
-    # Stack with explicit spacers
+    # Stack details
     details = [
         business_name_para,
         Spacer(1, 10),
@@ -2151,8 +2148,6 @@ def _build_report_header(logo_path, business_name, address, email, contact, styl
         Spacer(1, 1),
         contact_para,
     ]
-
-    # Wrap details in a table cell
     details_table = Table([[d] for d in details], colWidths=[400])
     details_table.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -2163,32 +2158,23 @@ def _build_report_header(logo_path, business_name, address, email, contact, styl
         ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    # Main header
-    header_content = [[logo, details_table]]
+    # ✅ Only include logo if available
+    if logo_path:
+        logo = Image(logo_path, width=70, height=70)
+        header_content = [[logo, details_table]]
+    else:
+        header_content = [[details_table]]
+
     header_table = Table(header_content)
     header_table.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("ALIGN", (1, 0), (1, 0), "CENTER"),
-
-        # Padding for logo + details
-        ("LEFTPADDING", (0, 0), (0, 0), 150),
-        ("RIGHTPADDING", (0, 0), (0, 0), 0),
-        ("TOPPADDING", (0, 0), (0, 0), 12),
-        ("BOTTOMPADDING", (0, 0), (0, 0), 12),
-
-        ("LEFTPADDING", (1, 0), (1, 0), 100),
-        ("RIGHTPADDING", (1, 0), (1, 0), 20),
-        ("TOPPADDING", (1, 0), (1, 0), 18),
-        ("BOTTOMPADDING", (1, 0), (1, 0), 18),
-
-        # Background color
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
         ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#DBDBDB")),
-
-        # Subtle bottom border
         ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#8A8A8A")),
     ]))
 
     return header_table
+
 
 def _get_report_styles():
     """Define consistent styles for all reports"""
