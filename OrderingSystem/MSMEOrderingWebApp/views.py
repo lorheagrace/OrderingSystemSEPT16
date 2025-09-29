@@ -2195,16 +2195,16 @@ def _build_report_header(logo_path, business_name, address, email, contact, styl
             ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#8A8A8A")),
         ]))
     else:
-        # Without logo: just center the details
+        # Without logo: center the details with same height as with-logo version
         header_content = [[details_table]]
-        header_table = Table(header_content, colWidths=[500])
+        header_table = Table(header_content)
         header_table.setStyle(TableStyle([
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
 
-            # Centered padding
-            ("LEFTPADDING", (0, 0), (0, 0), 50),
-            ("RIGHTPADDING", (0, 0), (0, 0), 50),
+            # Same padding as logo version to maintain consistent height
+            ("LEFTPADDING", (0, 0), (0, 0), 200),
+            ("RIGHTPADDING", (0, 0), (0, 0), 200),
             ("TOPPADDING", (0, 0), (0, 0), 18),
             ("BOTTOMPADDING", (0, 0), (0, 0), 18),
 
