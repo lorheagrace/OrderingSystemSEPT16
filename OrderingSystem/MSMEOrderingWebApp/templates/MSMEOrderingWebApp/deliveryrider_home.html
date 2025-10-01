@@ -502,9 +502,6 @@
                             </td>
                             <td>
                                 <div class="customer-info">
-                                    <div class="customer-avatar">
-                                        {{ group.first.first_name|slice:":1" }}{{ group.first.last_name|slice:":1" }}
-                                    </div>
                                     <div>
                                         <div class="fw-semibold">
                                             {{ group.first.first_name }} {{ group.first.last_name }}
@@ -654,19 +651,10 @@
                                 <label class="form-label">
                                     <i class="fas fa-info-circle me-2"></i>Other Details
                                 </label>
-                                <div class="order-summary-box">
-                                    <div class="mb-2">
-                                        <strong>Payment Method:</strong>
-                                        <span id="modalPayment">—</span>
-                                    </div>
-                                    <div class="mb-2">
-                                        <strong>Expected Arrival:</strong>
-                                        <span id="modalEta">—</span>
-                                    </div>
-                                    <div>
-                                        <strong>Assigned Rider:</strong>
-                                        <span id="modalRider">—</span>
-                                    </div>
+                                <div class="order-summary-box mb-3" style="height:auto;">
+                                    <div><strong>Payment Method:</strong> <span id="modalPayment"></span></div>
+                                    <div><strong>Expected Arrival:</strong> <span id="modalEta"></span></div>
+                                    <div><strong>Assigned Rider:</strong> <span id="modalRider"></span></div>
                                 </div>
 
                                 <label for="modalNotes" class="form-label mt-3">
@@ -678,13 +666,22 @@
 
                         <!-- Proof of Delivery -->
                         <div class="mb-4">
-                            <label for="proofDelivery" class="form-label">
+                            <label class="form-label">
                                 <i class="fas fa-camera me-2"></i>Proof of Delivery
                             </label>
-                            <div class="upload-area" onclick="document.getElementById('proofDelivery').click()">
-                                <div class="upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
+
+                            <!-- Preview container -->
+                            <div id="riderProofPreview" class="text-center mb-3">
+                                <img id="riderProofImg" 
+                                    src="" 
+                                    alt="Proof of Delivery" 
+                                    class="img-fluid rounded shadow d-block mx-auto"
+                                    style="max-height: 300px; display: none;">
+                            </div>
+
+                            <!-- Upload area (hidden if proof already exists) -->
+                            <div id="uploadContainer" class="upload-area" onclick="document.getElementById('proofDelivery').click()">
+                                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
                                 <p class="mb-0">Click to upload delivery photo</p>
                                 <small class="text-muted">JPG, PNG, or PDF formats accepted</small>
                             </div>
@@ -693,7 +690,7 @@
 
                         <!-- Action Button -->
                         <div class="text-center">
-                            <button type="submit" class="delivery-btn">
+                            <button type="submit" id="markDeliveredBtn" class="delivery-btn">
                                 <i class="fas fa-truck me-2"></i>Mark as Delivered
                             </button>
                         </div>
@@ -729,6 +726,39 @@
     // Populate modal with order details
     document.querySelectorAll('.view-details-btn').forEach(button => {
         button.addEventListener('click', function () {
+
+            // In the click handler for .view-details-btn
+            const proofUrl = this.getAttribute('data-proof');
+            const riderProofImg = document.getElementById('riderProofImg');
+            const riderProofPreview = document.getElementById('riderProofPreview');
+            const uploadContainer = document.getElementById('uploadContainer');
+
+            if (proofUrl) {
+                riderProofImg.src = proofUrl;
+                riderProofImg.style.display = 'block';
+                riderProofPreview.style.display = 'block';
+                uploadContainer.style.display = 'none'; // hide upload
+            } else {
+                riderProofImg.style.display = 'none';
+                riderProofPreview.style.display = 'none';
+                uploadContainer.style.display = 'block'; // show upload
+            }
+
+            const markDeliveredBtn = document.getElementById('markDeliveredBtn');
+
+            if (proofUrl) {
+                riderProofImg.src = proofUrl;
+                riderProofImg.style.display = 'block';
+                riderProofPreview.style.display = 'block';
+                uploadContainer.style.display = 'none'; // hide upload
+                markDeliveredBtn.style.display = 'none'; // ✅ hide button
+            } else {
+                riderProofImg.style.display = 'none';
+                riderProofPreview.style.display = 'none';
+                uploadContainer.style.display = 'block'; // show upload
+                markDeliveredBtn.style.display = 'inline-block'; // ✅ show button
+            }
+
             const orderId = this.getAttribute('data-order-id');
             const groupId = this.getAttribute('data-group-id'); // ✅ make sure you set this in the button
             const itemTotal = this.getAttribute('data-total') || "₱0.00";
