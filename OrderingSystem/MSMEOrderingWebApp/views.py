@@ -1920,7 +1920,7 @@ def dashboard(request):
     total_completed = count_unique_orders(completed_today_qs, use_updated=True)
 
     # Group ACCEPTED orders
-    ongoing_statuses = ["accepted", "Preparing", "Packed", "Out for Delivery", "Ready for Pickup", "Delivered"]
+    ongoing_statuses = ["accepted", "Preparing", "Packed", "Out for Delivery", "Ready for Pickup", "delivered"]
     accepted_orders_raw = Checkout.objects.filter(status__in=ongoing_statuses).order_by('created_at')
     grouped_accepted_orders = defaultdict(list)
     for order in accepted_orders_raw:
