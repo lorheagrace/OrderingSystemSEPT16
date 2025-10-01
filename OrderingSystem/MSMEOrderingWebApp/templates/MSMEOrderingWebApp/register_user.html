@@ -487,7 +487,37 @@
                 transform: translateY(0);
             }
         }
-        
+
+        /* Force visible checkmark on checkbox */
+        .agreement-box .form-check-input[type="checkbox"] {
+            appearance: none; /* remove default OS style */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--primary-color);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .agreement-box .form-check-input[type="checkbox"]:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .agreement-box .form-check-input[type="checkbox"]:checked::after {
+            content: "✔";
+            color: #fff;
+            font-size: 12px;
+            line-height: 1;
+        }
+
+
 </style>
 
 </head>
