@@ -478,10 +478,9 @@
         </div>
 
         <!-- Right side icons -->
-        <div class="d-flex align-items-center gap-3">
-            <!-- Profile -->
-            <a href="{% url 'staff_profile' %}" 
-            class="{% if request.resolver_match.url_name == 'staff_profile' %}active{% endif %}" 
+        <div class="navbar-nav d-flex flex-row align-items-center gap-2">
+            <a href="{% url 'staff_profile' %}"
+            class="{% if request.resolver_match.url_name == 'staff_profile' %}active{% endif %}"
             aria-label="Profile">
                 <i class="bi bi-person-circle fs-5"></i>
             </a>
