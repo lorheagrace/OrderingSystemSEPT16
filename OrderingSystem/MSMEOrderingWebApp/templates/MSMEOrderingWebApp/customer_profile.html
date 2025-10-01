@@ -577,6 +577,27 @@
             font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 12 %}{{ customization.body_font_size|default:10 }}{% else %}12{% endif %}px;
         }
     }
+
+    /* Center specific columns */
+    .table td.order-id,
+    .table td.total,
+    .table td.payment-method,
+    .table td.status,
+    .table td.date-ordered,
+    .table th.order-id,
+    .table th.total,
+    .table th.payment-method,
+    .table th.status,
+    .table th.date-ordered {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* Make payment method all caps */
+    .table td.payment-method {
+        text-transform: uppercase;
+    }
+
 </style>
 
 
@@ -746,7 +767,6 @@
         </div>
 
         <!-- Purchase History Section -->
-        <!-- Purchase History Section -->
         <div class="purchase-history">
             <h3 class="section-title">
                 <i class="fas fa-shopping-bag"></i>
@@ -758,20 +778,20 @@
                 <table class="table table-bordered table-hover">
                     <thead class="table-light">
                         <tr>
-                            <th>Date Ordered</th>
-                            <th>Order ID</th>
+                            <th class="date-ordered">Date Ordered</th>
+                            <th class="order-id">Order ID</th>
                             <th>Ordered Items</th>
-                            <th>Total (₱)</th>
-                            <th>Payment Method</th>
-                            <th>Status</th>
+                            <th class="total">Total (₱)</th>
+                            <th class="payment-method">Payment Method</th>
+                            <th class="status">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for order_code, items in grouped_orders %}
                         {% with first_item=items.0 %}
                         <tr>
-                            <td>{{ first_item.created_at|date:"F d, Y - h:i A" }}</td>
-                            <td>{{ order_code|default:"N/A" }}</td>
+                            <td class="date-ordered">{{ first_item.created_at|date:"F d, Y - h:i A" }}</td>
+                            <td class="order-id">{{ order_code|default:"N/A" }}</td>
                             <td>
                                 <ul class="mb-0 ps-3">
                                     {% for item in items %}
@@ -779,9 +799,9 @@
                                     {% endfor %}
                                 </ul>
                             </td>
-                            <td>₱{{ first_item.sub_total|floatformat:2 }}</td>
-                            <td>{{ first_item.payment_method }}</td>
-                            <td>
+                            <td class="total">₱{{ first_item.sub_total|floatformat:2 }}</td>
+                            <td class="payment-method">{{ first_item.payment_method }}</td>
+                            <td class="status">
                                 <span class="badge 
                                     {% if first_item.status == 'completed' %}
                                         bg-success
@@ -796,11 +816,10 @@
                                 </span>
                             </td>
                         </tr>
-
-                        </tr>
                         {% endwith %}
                         {% endfor %}
                     </tbody>
+
                 </table>
             </div>
             {% else %}
