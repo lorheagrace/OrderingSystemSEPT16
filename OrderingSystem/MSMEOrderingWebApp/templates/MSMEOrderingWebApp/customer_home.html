@@ -1432,7 +1432,7 @@
             </div>
         </div>
         <div class="col-lg-4">
-            <select id="categoryFilter" class="form-select category-select" onchange="filterProducts()">
+            <select id="categoryFilter" class="form-select" onchange="filterProducts()">
                 <option value="">All Categories</option>
                 {% for cat in categories %}
                     <option value="{{ cat.name }}">{{ cat.name }}</option>
