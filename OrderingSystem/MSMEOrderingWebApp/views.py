@@ -1621,6 +1621,13 @@ def login_view(request):
         'business': business
     })
 
+def login_required_session(view_func):
+    def wrapper(request, *args, **kwargs):
+        if 'user_id' not in request.session and 'owner_id' not in request.session and 'staff_id' not in request.session:
+            return redirect('login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+	
 def logout_view(request):
     request.session.flush()  # Clears all session data
     return redirect('login')
