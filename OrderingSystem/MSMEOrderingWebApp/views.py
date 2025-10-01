@@ -2139,47 +2139,47 @@ def _build_report_header(logo_path, business_name, address, email, contact, styl
         except:
             logo = None  # If there's any error creating the image, skip it
 
-    # Business Name (uppercase, bold)
+    # Business Name (uppercase, bold) - centered alignment
     business_name_para = Paragraph(
         f'<font size="18" color="#000000"><b>{business_name.upper()}</b></font>',
         styles["normal"]
     )
 
-    # Address
+    # Address - centered alignment
     address_para = Paragraph(
         f'<font size="10" color="#808080">{address}</font>',
         styles["normal"]
     )
 
-    # Contact info
+    # Contact info - centered alignment
     contact_para = Paragraph(
         f'<font size="10" color="#808080">{contact} | {email}</font>',
         styles["normal"]
     )
 
-    # Stack with explicit spacers
-    details = [
-        business_name_para,
-        Spacer(1, 10),
-        address_para,
-        Spacer(1, 1),
-        contact_para,
-    ]
-
-    # Wrap details in a table cell
-    details_table = Table([[d] for d in details], colWidths=[400])
-    details_table.setStyle(TableStyle([
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ("TOPPADDING", (0, 0), (-1, -1), 0),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
-    ]))
-
     # Main header - adjust based on whether logo exists
     if logo:
         # With logo: logo on left, details on right
+        # Stack with explicit spacers
+        details = [
+            business_name_para,
+            Spacer(1, 10),
+            address_para,
+            Spacer(1, 1),
+            contact_para,
+        ]
+
+        # Wrap details in a table cell
+        details_table = Table([[d] for d in details], colWidths=[400])
+        details_table.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 0),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+            ("TOPPADDING", (0, 0), (-1, -1), 0),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ]))
+
         header_content = [[logo, details_table]]
         header_table = Table(header_content)
         header_table.setStyle(TableStyle([
@@ -2204,28 +2204,41 @@ def _build_report_header(logo_path, business_name, address, email, contact, styl
             ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#8A8A8A")),
         ]))
     else:
-        # Without logo: just center the details
-        header_content = [[details_table]]
-        header_table = Table(header_content, colWidths=[500])
+        # Without logo: fully centered vertical stack
+        header_content = [
+            [business_name_para],
+            [Spacer(1, 8)],
+            [address_para],
+            [Spacer(1, 4)],
+            [contact_para]
+        ]
+        
+        header_table = Table(header_content)
         header_table.setStyle(TableStyle([
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-
-            # Centered padding
-            ("LEFTPADDING", (0, 0), (0, 0), 50),
-            ("RIGHTPADDING", (0, 0), (0, 0), 50),
-            ("TOPPADDING", (0, 0), (0, 0), 18),
-            ("BOTTOMPADDING", (0, 0), (0, 0), 18),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            
+            # Consistent padding all around
+            ("LEFTPADDING", (0, 0), (-1, -1), 50),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 50),
+            ("TOPPADDING", (0, 0), (0, 0), 20),
+            ("BOTTOMPADDING", (-1, -1), (-1, -1), 20),
+            
+            # Remove padding from spacer rows
+            ("TOPPADDING", (0, 1), (0, 1), 0),
+            ("BOTTOMPADDING", (0, 1), (0, 1), 0),
+            ("TOPPADDING", (0, 3), (0, 3), 0),
+            ("BOTTOMPADDING", (0, 3), (0, 3), 0),
 
             # Background color
             ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#DBDBDB")),
 
             # Subtle bottom border
-            ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#8A8A8A")),
+            ("LINEBELOW", (0, -1), (-1, -1), 0.5, colors.HexColor("#8A8A8A")),
         ]))
 
     return header_table
-
+	
 def _get_report_styles():
     """Define consistent styles for all reports"""
     styles = getSampleStyleSheet()
