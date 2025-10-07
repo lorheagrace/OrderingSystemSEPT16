@@ -1053,29 +1053,17 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// 🔔 Improved function with full mobile & desktop support
-function playNotificationSoundAndShowAlert(count) {
+// Function to play the notification sound
+function playNotificationSound() {
     const modalSound = document.getElementById('modalSound');
-
-    // Request system notification permission if not yet granted
-    if ("Notification" in window && Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
-
-    // Try playing the sound
-    modalSound.play().catch((err) => {
-        console.log("Autoplay blocked until user interacts:", err);
-    });
-
-    // Show a system notification (with native OS sound if allowed)
-    if ("Notification" in window && Notification.permission === "granted") {
-        new Notification("New Notification", {
-            body: `You have ${count} new notification${count > 1 ? 's' : ''}.`,
-            icon: "{% static 'images/logo.png' %}"
+    modalSound.play()
+        .then(() => {
+            console.log("Audio played successfully");
+        })
+        .catch((error) => {
+            console.error("Error playing audio: ", error);
         });
-    }
 }
-
 
 const badge = document.getElementById('notification-badge');
 const socket = new WebSocket("wss://" + window.location.host + "/ws/notifications/");
@@ -1083,16 +1071,15 @@ const socket = new WebSocket("wss://" + window.location.host + "/ws/notification
 socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
     if (data.type === "send_notification") {
-        const badge = document.getElementById('notification-badge');
+        // Only play the sound if the notification count is greater than 0
         if (data.count > 0) {
-            playNotificationSoundAndShowAlert(data.count);
-            badge.textContent = data.count;
-            badge.classList.remove('d-none');
+            playNotificationSound();
+            document.getElementById('notification-badge').textContent = data.count;
+            document.getElementById('notification-badge').classList.remove('d-none');
         } else {
-            badge.classList.add('d-none');
+            document.getElementById('notification-badge').classList.add('d-none');
         }
     }
-
 };
 
 socket.onclose = function(event) {
@@ -1153,23 +1140,13 @@ deliveryFeeSocketOwner.onmessage = function(event) {
         // Play the sound when a delivery fee request comes in
         const modalSound = document.getElementById('modalSound');
         
-         // Request permission for system notifications if not already granted
-        if ("Notification" in window && Notification.permission !== "granted") {
-            Notification.requestPermission();
-        }
-
-        // Attempt to play the notification sound (fallback for mobile)
-        modalSound.play().catch((err) => {
-            console.log("Autoplay blocked until user interaction:", err);
-        });
-
-        // Display a native system notification if permitted (works on desktop and Android)
-        if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("Delivery Fee Request", {
-                body: "A new delivery fee request has arrived. Please review it.",
-                icon: "{% static 'images/logo.png' %}"
+        modalSound.play()
+            .then(() => {
+                console.log("Audio played successfully");
+            })
+            .catch((error) => {
+                console.error("Error playing audio: ", error);
             });
-        }
         
         // Create request object with server timestamp and local tracking
         const requestData = {
@@ -1620,26 +1597,6 @@ window.addEventListener('focus', function() {
         requestTimerSync();
     }
 });
-
-// Unlock audio playback on first interaction (needed for mobile devices)
-document.addEventListener('click', () => {
-    const sound = document.getElementById('modalSound');
-    sound.play().then(() => {
-        sound.pause();
-        sound.currentTime = 0;
-    }).catch(() => {});
-}, { once: true });
-// 🟢 Unlock audio playback for mobile browsers
-document.addEventListener('click', () => {
-    const sound = document.getElementById('modalSound');
-    sound.play().then(() => {
-        sound.pause();
-        sound.currentTime = 0;
-    }).catch(() => {});
-}, { once: true });
-    
-
-    
 </script>
     
 </body>
