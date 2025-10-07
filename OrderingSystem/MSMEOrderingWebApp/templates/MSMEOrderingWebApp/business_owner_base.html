@@ -900,40 +900,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
 <script>
-    // 🔊 UNIVERSAL AUDIO UNLOCK for Safari, Chrome, Firefox, Edge, etc.
-(function enableAudioForAllBrowsers() {
-    const sound = document.getElementById('modalSound');
-    if (!sound) return;
-
-    // Function to unlock audio playback
-    const unlock = () => {
-        const playPromise = sound.play();
-        if (playPromise !== undefined) {
-            playPromise
-                .then(() => {
-                    sound.pause();
-                    sound.currentTime = 0;
-                    console.log("✅ Audio unlocked for all browsers");
-                })
-                .catch(err => {
-                    console.log("⚠️ Audio unlock attempt blocked:", err);
-                });
-        }
-
-        // Remove all listeners once unlocked
-        document.removeEventListener('click', unlock);
-        document.removeEventListener('touchstart', unlock);
-        document.removeEventListener('keydown', unlock);
-        window.removeEventListener('focus', unlock);
-    };
-
-    // Attach events that cover all major browser unlock triggers
-    document.addEventListener('click', unlock, { once: true });
-    document.addEventListener('touchstart', unlock, { once: true });
-    document.addEventListener('keydown', unlock, { once: true });
-    window.addEventListener('focus', unlock, { once: true });
-})();
-
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.querySelector('.sidebar-overlay');
@@ -1171,28 +1137,19 @@ deliveryFeeSocketOwner.onmessage = function(event) {
     const data = JSON.parse(event.data);
     console.log("[Owner JS] Received message:", data);
 
-        if (data.type === 'delivery_fee_request') {
-            
-            // Play the sound when a delivery fee request comes in
-            const modalSound = document.getElementById('modalSound');
-            
-            // Request permission for system notifications if not already granted
-        if ("Notification" in window && Notification.permission !== "granted") {
-            Notification.requestPermission();
-        }
-
-        // Attempt to play the notification sound (fallback for mobile)
-        modalSound.play().catch((err) => {
-            console.log("Autoplay blocked until user interaction:", err);
-        });
-
-        // Display a native system notification if permitted (works on desktop and Android)
-        if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("Delivery Fee Request", {
-                body: "A new delivery fee request has arrived. Please review it.",
-                icon: "{% static 'images/logo.png' %}"
+    if (data.type === 'delivery_fee_request') {
+        
+        // Play the sound when a delivery fee request comes in
+        const modalSound = document.getElementById('modalSound');
+        
+        modalSound.play()
+            .then(() => {
+                console.log("Audio played successfully");
+            })
+            .catch((error) => {
+                console.error("Error playing audio: ", error);
             });
-        }
+        
         // Create request object with server timestamp and local tracking
         const requestData = {
             ...data,
