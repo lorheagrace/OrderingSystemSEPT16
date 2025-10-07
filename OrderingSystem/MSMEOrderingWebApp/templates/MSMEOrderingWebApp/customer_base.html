@@ -726,7 +726,9 @@
                 {% if business and business.logo %}
                     <img src="{{ business.logo.url }}" alt="Logo" style="height: 40px; width: auto;">
                 {% else %}
-                    <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 40px; width: auto;">
+                    <div class="logo-circle sidebar-logo-circle">
+                        <span class="sidebarlogo-text">Logo</span>
+                    </div>
                 {% endif %}
             </button>
 
