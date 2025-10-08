@@ -4988,7 +4988,7 @@ def customer_notifications(request):
         email=email,
         status__in=[
             "accepted", "rejected",
-            "Preparing", "Packed", "Out for Delivery", "Completed"
+            "Preparing", "Packed", "Out for Delivery", "Completed", "delivered"
         ],
         is_seen_by_customer=False
     ).update(is_seen_by_customer=True)
@@ -4998,7 +4998,7 @@ def customer_notifications(request):
         email=email,
         status__in=[
             "accepted", "rejected", "Preparing", "Packed", 
-            "Ready for Pickup", "Out for Delivery", "Completed", "Void"
+            "Ready for Pickup", "Out for Delivery", "Completed", "Void", "delivered"
         ]
     ).order_by('-created_at')
 
@@ -5052,7 +5052,7 @@ def partial_customer_notifications(request):
         email=email,
         status__in=[
             "accepted", "rejected", "Preparing", "Packed",
-            "Ready for Pickup", "Out for Delivery", "Completed", "Void"
+            "Ready for Pickup", "Out for Delivery", "Completed", "Void", "delivered"
         ]
     ).order_by('-created_at')
 
