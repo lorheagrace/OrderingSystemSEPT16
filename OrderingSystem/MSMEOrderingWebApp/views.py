@@ -3802,7 +3802,7 @@ def pos_place_order(request):
                 {
                     'product_name': item.product_name,
                     'quantity': item.quantity,
-                    'price': float(item.price),
+                    'price': float(item.price * item.quantity),
                 }
                 for item in checkout_entries
             ]
