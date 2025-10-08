@@ -347,7 +347,7 @@ def update_order_status(request):
                     {
                         "product_name": o.product_name,
                         "quantity": o.quantity,
-                        "price": float(o.price * o.quantity),
+                        "price": float(o.price),
                     } for o in orders
                 ]
             }
