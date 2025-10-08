@@ -317,7 +317,7 @@ def update_order_status(request):
             order.save()
 
         # Send email to customer
-        send_order_status_email(customer_email, order_code, status, orders, void_reason=void_reason)
+        send_order_status_email(customer_email, order_code, status, orders, void_reason=None)
 
         channel_layer = get_channel_layer()
 
@@ -347,7 +347,7 @@ def update_order_status(request):
                     {
                         "product_name": o.product_name,
                         "quantity": o.quantity,
-                        "price": float(o.price)
+                        "price": float(o.price * o.quantity),
                     } for o in orders
                 ]
             }
