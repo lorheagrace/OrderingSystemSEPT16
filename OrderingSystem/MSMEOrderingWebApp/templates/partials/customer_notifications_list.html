@@ -439,6 +439,7 @@
                                 {% elif group.status == 'Ready for Pickup' %}text-primary
                                 {% elif group.status == 'Out for Delivery' %}text-primary
                                 {% elif group.status == 'Completed' %}text-success
+                                {% elif group.status == 'delivered' %}text-success
                                 {% endif %}
                             ">
                                 {% if group.status == 'accepted' %}
@@ -455,6 +456,8 @@
                                     <i class="fas fa-truck me-1"></i>
                                 {% elif group.status == 'Completed' %}
                                     <i class="fas fa-check-double me-1"></i>
+                                {% elif group.status == 'delivered' %}
+                                    <i class="fas fa-box-open me-1"></i>
                                 {% elif group.status == 'Void' %}
                                     <i class="fas fa-ban me-1"></i>
                                 {% endif %}
