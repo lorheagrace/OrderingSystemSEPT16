@@ -586,8 +586,9 @@
     .status-accepted { background: #d4edda; color: #155724; }
     .status-preparing { background: #fff3cd; color: #cfa600;}
     .status-packed { background: #fff3cd; color: #c25100;}
-    .status-ready { background: #cce5ff; color: #004085; }
+    .status-ready-for-pickup { background: #cce5ff; color: #004085; }
     .status-out-for-delivery { background: #cce5ff; color: #004085; }
+    .status-delivered { background: #d1f2eb; color: #0c5540; }
     .status-completed { background: #d1ecf1; color: #48c500; }
 
     .customer-section {
@@ -1614,7 +1615,8 @@ const statusColors = {
     'packed': '#f97316',             // Orange
     'ready for pickup': '#3b82f6',   // Blue
     'out for delivery': '#3b82f6',   // Blue
-    'completed': '#28a745'           // Gray
+    'delivered': '#10b981',          // Emerald Green
+    'completed': '#28a745'           // Green
 };
 
     let currentOrderCode = "";
