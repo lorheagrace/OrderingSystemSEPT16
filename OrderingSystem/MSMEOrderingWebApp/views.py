@@ -2293,7 +2293,7 @@ def _generate_sales_report(orders, period_label, styles):
         story.append(Paragraph(period_label, styles['subtitle']))
 
     # ✅ Only completed orders
-    completed_orders = orders.filter(status="completed").order_by("created_at")
+    completed_orders = orders.filter(status__iexact="completed").order_by("created_at")
 
     # ===== GROUP ORDERS =====
     grouped_orders = defaultdict(list)
