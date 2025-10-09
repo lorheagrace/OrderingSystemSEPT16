@@ -3686,7 +3686,7 @@ def pos_place_order(request):
             if not cart_items.exists():
                 return JsonResponse({'success': False, 'error': 'Cart is empty'})
 
-            subtotal = sum(item.price for item in cart_items)
+            subtotal = sum(item.price * item.quantity for item in cart_items)
             data = json.loads(request.body)
 
             payment_method = data.get('payment_method')
