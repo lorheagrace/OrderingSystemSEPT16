@@ -356,17 +356,12 @@ def update_order_status(request):
             if reference_order.order_type == "delivery" and reference_order.delivery_fee:
                 print_data["order"]["delivery_fee"] = float(reference_order.delivery_fee)
 
-            # ✅ Send print job
-            channel_layer = get_channel_layer()
+			# Send to printer group
             async_to_sync(channel_layer.group_send)(
-                'printers',
+                "printers",
                 {
-                    'type': 'send_print_job',
-                    'data': {
-                        'type': 'print',
-                        'order': order_data,
-                        'items': items_data
-                    }
+                    "type": "send_print_job",
+                    "data": print_data
                 }
             )
 
