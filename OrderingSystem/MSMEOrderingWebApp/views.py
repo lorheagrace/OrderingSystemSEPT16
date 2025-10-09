@@ -3761,7 +3761,7 @@ def pos_place_order(request):
                     image=item.image,
                     product_name=item.product_name,
                     quantity=item.quantity,
-                    price=item.price,
+                    price=item.price * item.quantity,
                     sub_total=subtotal,
                     order_type="walkin",  # general
                     specific_order_type=specific_order_type,  # ✅ save dropdown value
@@ -4179,7 +4179,7 @@ def cashier_dashboard(request):
     total_completed = count_unique_orders(completed_today_qs, use_updated=True)
 
     # Group ACCEPTED orders
-    ongoing_statuses = ["accepted", "Preparing", "Packed", "Out for Delivery", "Ready for Pickup", "Delivered"]
+    ongoing_statuses = ["accepted", "Preparing", "Packed", "Out for Delivery", "Ready for Pickup", "delivered"]
     accepted_orders_raw = Checkout.objects.filter(status__in=ongoing_statuses).order_by('created_at')
     grouped_accepted_orders = defaultdict(list)
     for order in accepted_orders_raw:
