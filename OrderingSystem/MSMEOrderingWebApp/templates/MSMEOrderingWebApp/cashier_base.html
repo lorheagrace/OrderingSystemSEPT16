@@ -83,6 +83,7 @@
         .navbar-brand {
             font-weight: 700;
             font-family: {{ customization.header_font_family|default:"Arial" }};
+            color: {{ customization.header_font_color|default:"#000000" }};
             display: flex;
             align-items: center;
             text-decoration: none;
@@ -155,26 +156,26 @@
         }
 
         .sidebar-header{
-            line-height: 20px;;
+            line-height: 20px;
             text-shadow: 2px 2px 5px black;
             font-family: "{{ customization.header_font_family|default:"Arial" }}";
             color: {{ customization.header_font_color|default:"#000000" }};
             font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
             font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
-
         }
         
         .sidebar-logo {
             display: flex;
             align-items: center;
             gap: 12px;
-            color: #ffffff;
             font-size: 1.25rem;
             padding: 15px;
             border-bottom: 2px solid;
             border-color: var(--primary-color);
             cursor: pointer;
-            text-shadow: 1px 1px 6px black;
+            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.377);
+            font-family: {{ customization.header_font_family|default:"Arial" }};
+            color: {{ customization.navigation_text_color|default:"#000000" }};
         }
 
         .logo-text {
@@ -235,16 +236,20 @@
 
         .sidebar-nav a {
             display: flex;
-            font-weight: 600;
-            font-family: {{ customization.header_font_family|default:"Arial" }};
+            font-weight: 700;
             align-items: center;
             gap: 12px;
             padding: 12px 20px;
-            color: {{ customization.navigation_text_color|default:"#000000" }};
             text-decoration: none;
             transition: all 0.3s;
-            text-shadow: 2px 2px 5px black;
+            text-shadow: 1px 1px 6px rgba(37, 37, 37, 0.377);
+            font-family: {{ customization.header_font_family|default:"Arial" }};
+            color: {{ customization.navigation_text_color|default:"#000000" }};
+        }
 
+        .sidebar-label{
+            font-family: {{ customization.header_font_family|default:"Arial" }};
+            color: {{ customization.navigation_text_color|default:"#000000" }};
         }
 
         .sidebar-nav a:hover,
@@ -271,7 +276,7 @@
 
         .logout-btn {
             display: flex;
-            font-weight: 600;
+            font-weight: 700;
             font-family: {{ customization.header_font_family|default:"Arial" }};
             align-items: center;
             gap: 12px;
@@ -279,8 +284,7 @@
             color: {{ customization.navigation_text_color|default:"#000000" }};
             text-decoration: none;
             transition: all 0.3s;
-            text-shadow: 2px 2px 5px black;
-
+            text-shadow: 1px 1px 6px rgba(37, 37, 37, 0.377);
         }
 
         .logout-btn:hover {
@@ -293,7 +297,6 @@
         .main-content {
             margin-left: var(--sidebar-width);
             margin-top: var(--navbar-height);
-            padding: 30px;
             min-height: calc(100vh - var(--navbar-height));
             transition: margin-left 0.3s ease;
         }
@@ -675,7 +678,50 @@
             background: rgba(0, 0, 0, 0.4);
             z-index: 9999; /* Just below the modal */
         }
-        
+
+        /* Responsive notification badge size */
+        #notification-badge {
+            font-size: 0.7em;
+            padding: 0.35em 0.5em;
+            min-width: 1.4em;
+            min-height: 1.4em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 992px) {
+            #notification-badge {
+                font-size: 0.8em;
+                min-width: 1.6em;
+                min-height: 1.6em;
+            }
+        }
+
+        @media (max-width: 576px) {
+            #notification-badge {
+                font-size: 0.9em;
+                min-width: 1.8em;
+                min-height: 1.8em;
+            }
+        }
+
+        /* Reuse main logo-circle styles, but adjust size for sidebar */
+        .sidebar-logo-circle {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebarlogo-text {
+            font-weight: bold;
+            font-size: 15px;
+            color: #333;
+        }
         
     </style>
 </head>
@@ -689,15 +735,16 @@
                 {% if business and business.logo %}
                     <img src="{{ business.logo.url }}" alt="Logo" style="height: 40px; width: auto;">
                 {% else %}
-                    <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 40px; width: auto;">
+                    <div class="logo-circle sidebar-logo-circle">
+                        <span class="sidebarlogo-text">Logo</span>
+                    </div>
                 {% endif %}
             </button>
-            <div class="navbar-brand"
-                style="font-size: 20px; color: {{ customization.header_font_color|default:"#000000" }};">
+            <div class="navbar-brand">
                 {% if title %}
                     {{ title }}
                 {% else %}
-                    Cashier Panel
+                    Business Name
                 {% endif %}
             </div>
         </div>
@@ -729,13 +776,15 @@
                 {% if business and business.logo %}
                     <img src="{{ business.logo.url }}" alt="Logo" class="logo-img" />
                 {% else %}
-                    <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo-img" />
+                    <div class="logo-circle sidebar-logo-circle">
+                        <span class="sidebarlogo-text">Logo</span>
+                    </div>
                 {% endif %}
                 <span class="logo-text">
                     {% if business and business.business_name %}
                         {{ business.business_name }}
                     {% else %}
-                        Cashier Panel
+                        Business Name
                     {% endif %}
                 </span>
             </div>
@@ -1125,8 +1174,8 @@
                 }));
 
                 modal.remove();
-                document.body.style.overflow = ''; // ✅ Restore scrolling
-                backdrop.remove(); // ✅ Remove backdrop
+                document.body.style.overflow = '';
+                backdrop.remove();
                 isModalOpen = false;
                 showNextModal();
             };
@@ -1140,8 +1189,8 @@
                 }));
 
                 modal.remove();
-                document.body.style.overflow = ''; // ✅ Restore scrolling
-                backdrop.remove(); // ✅ Remove backdrop
+                document.body.style.overflow = '';
+                backdrop.remove();
                 isModalOpen = false;
                 showNextModal();
             };
