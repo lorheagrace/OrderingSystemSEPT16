@@ -154,7 +154,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
 
     # Generate item lines dynamically from the passed 'orders' list
     item_lines = []
-    total_price = orders.first().sub_total if orders.exists() else 0
+    total_price = sum(order.price for order in orders)
     item_list = "\n".join([f"<tr><td style='padding: 10px; text-align: left;'>{order.product_name} (x{order.quantity})</td><td style='padding: 10px; text-align: right;'>₱{order.price:.2f}</td></tr>" for order in orders])
 
     # Message Content Based on Status
@@ -450,7 +450,7 @@ def send_email_notification(recipient_email, status, order_code, orders, void_re
 
     # Generate item lines dynamically from the passed 'orders' list
     item_lines = []
-    total_price = orders.first().sub_total if orders.exists() else 0
+    total_price = 0
     for order in orders:
         item_lines.append(f"<tr><td style='padding: 10px; text-align: left;'>{order.product_name} (x{order.quantity})</td><td style='padding: 10px; text-align: right;'>₱{order.price:.2f}</td></tr>")
         total_price += order.price * order.quantity  # Calculate total price
