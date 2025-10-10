@@ -2077,24 +2077,18 @@
                 formData.append("logo", file);
                 formData.append("csrfmiddlewaretoken", document.querySelector('[name=csrfmiddlewaretoken]').value);
 
-                // FIX: Use the proper URL and add CSRF header
-                fetch("{% url 'upload_logo' %}", {
+                fetch(window.location.origin + "/upload_logo/", {
                     method: "POST",
                     body: formData,
-                    headers: { 
-                        "X-Requested-With": "XMLHttpRequest",
-                        "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
-                    }
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
                 })
                 .then(res => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! status: ${res.status}`);
-                    }
+                    if (!res.ok) throw new Error('Network response was not ok');
                     return res.json();
                 })
                 .then(data => {
                     if (data.success) {
-                       logoPreview.src = data.logo_url;
+                        logoPreview.src = data.logo_url;
                         logoPreview.style.display = 'block';
                         uploadPlaceholder.style.display = 'none';
                         showToast('Logo uploaded successfully!', 'success');
@@ -2609,22 +2603,13 @@
 
                     const formData = new FormData();
                     formData.append("logo", file);
-                    formData.append("csrfmiddlewaretoken", document.querySelector('[name=csrfmiddlewaretoken]').value);
 
                     fetch("{% url 'upload_logo' %}", {
                         method: "POST",
                         body: formData,
-                        headers: { 
-                            "X-Requested-With": "XMLHttpRequest",
-                            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
-                        }
+                        headers: { "X-Requested-With": "XMLHttpRequest" }
                     })
-                    .then(res => {
-                        if (!res.ok) {
-                            throw new Error(`HTTP error! status: ${res.status}`);
-                        }
-                        return res.json();
-                    })
+                    .then(res => res.json())
                     .then(data => {
                         if (data.success) {
                             if (logoPreview && uploadPlaceholder) {
@@ -2632,23 +2617,23 @@
                                 logoPreview.style.display = 'block';
                                 logoPreview.style.cursor = 'pointer';
                                 uploadPlaceholder.style.display = 'none';
-                    
+                                
+                                // Make the new logo preview clickable
                                 logoPreview.addEventListener('click', function() {
                                     if (!logoInput.disabled) {
                                         logoInput.click();
                                     }
                                 });
                             }
-                
+                            
                             localStorage.setItem('logo_preview', data.logo_url);
                             showToast('Logo uploaded successfully!', 'success');
                         } else {
-                            throw new Error(data.error || 'Upload failed');
+                            showToast('Error uploading logo: ' + data.error, 'danger');
                         }
                     })
                     .catch(error => {
-                        console.error('Upload error:', error);
-                        showToast('Upload failed: ' + error.message, 'danger');
+                        showToast('Upload failed. Try again.', 'danger');
                     });
                 });
             }
