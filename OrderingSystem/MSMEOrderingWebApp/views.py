@@ -1004,7 +1004,7 @@ def customization_settings(request):
             'dynamic_description': customization.dynamic_description,
         }
 
-        return render(request, 'MSMEOrderingWebApp/settings.html', context)
+        return render(request, 'settings.html', context)
 
 def get_or_create_customization():
     # Fetch customization settings or create default if not found
@@ -1295,7 +1295,7 @@ def business_settings(request):
         if business:
             social_media_list = business.social_media.all()
 
-        return render(request, 'MSMEOrderingWebApp/settings.html', {
+        return render(request, 'settings.html', {
             'business': business,
             'owner': owner,  # Pass the owner object so the email can be accessed
             'days': days,
@@ -1467,7 +1467,7 @@ def force_change(request):
             messages.error(request, f"An error occurred: {str(e)}")
             return redirect('force_change')
     
-    return render(request, 'MSMEOrderingWebApp/forcechange.html', {
+    return render(request, 'forcechange.html', {
         'owner': owner
     })
 
@@ -1494,7 +1494,7 @@ def login_view(request):
             if owner.status != 'verified':
                 messages.error(request, "Please verify your account first.")
                 # Pass the POST data when redirecting to retain input values
-                return render(request, 'MSMEOrderingWebApp/login.html', {
+                return render(request, 'login.html', {
                     'email': email, 
                     'password': password,
                     'customization': customization,
@@ -1513,7 +1513,7 @@ def login_view(request):
 
             if user.status != 'verified':
                 messages.error(request, "Please verify your account first.")
-                return render(request, 'MSMEOrderingWebApp/login.html', {
+                return render(request, 'login.html', {
                     'email': email,
                     'password': password,
                     'customization': customization,
@@ -1522,7 +1522,7 @@ def login_view(request):
 
             if user.access != 'enabled':
                 messages.error(request, "Your account access is disabled.")
-                return render(request, 'MSMEOrderingWebApp/login.html', {
+                return render(request, 'login.html', {
                     'email': email,
                     'password': password,
                     'customization': customization,
@@ -1545,7 +1545,7 @@ def login_view(request):
 
             if staff.status != 'verified':
                 messages.error(request, "Please verify your account first.")
-                return render(request, 'MSMEOrderingWebApp/login.html', {
+                return render(request, 'login.html', {
                     'email': email,
                     'password': password,
                     'customization': customization,
@@ -1554,7 +1554,7 @@ def login_view(request):
 
             if staff.access != 'enabled':
                 messages.error(request, "Your account access is disabled.")
-                return render(request, 'MSMEOrderingWebApp/login.html', {
+                return render(request, 'login.html', {
                     'email': email,
                     'password': password,
                     'customization': customization,
@@ -1575,7 +1575,7 @@ def login_view(request):
 
             if staff.status != 'verified':
                 messages.error(request, "Please verify your account first.")
-                return render(request, 'MSMEOrderingWebApp/login.html', {
+                return render(request, 'login.html', {
                     'email': email,
                     'password': password,
                     'customization': customization,
@@ -1584,7 +1584,7 @@ def login_view(request):
 
             if staff.access != 'enabled':
                 messages.error(request, "Your account access is disabled.")
-                return render(request, 'MSMEOrderingWebApp/login.html', {
+                return render(request, 'login.html', {
                     'email': email,
                     'password': password,
                     'customization': customization,
@@ -1601,7 +1601,7 @@ def login_view(request):
 
         # If none matched
         messages.error(request, "Invalid credentials.")
-        return render(request, 'MSMEOrderingWebApp/login.html', {
+        return render(request, 'login.html', {
             'email': email,
             'password': password,
             'customization': customization,
@@ -1616,7 +1616,7 @@ def login_view(request):
         customization.login_background_image = request.FILES.get('login_background_image')
         customization.save()
 
-    return render(request, 'MSMEOrderingWebApp/login.html', {
+    return render(request, 'login.html', {
         'customization': customization,
         'business': business
     })
@@ -1629,7 +1629,7 @@ def verify_email(request):
     token = request.GET.get('token')
     if not token:
         print("No token provided")
-        return render(request, 'MSMEOrderingWebApp/verification_failed.html')
+        return render(request, 'verification_failed.html')
 
     # Try User first
     try:
@@ -1668,7 +1668,7 @@ def verify_email(request):
         return redirect('login')
     except StaffAccount.DoesNotExist:
         print("StaffAccount not found")
-        return render(request, 'MSMEOrderingWebApp/verification_failed.html')
+        return render(request, 'verification_failed.html')
 
 def register_user(request):
     customization = get_or_create_customization()
@@ -1698,7 +1698,7 @@ def register_user(request):
 
         if password != confirm_password:
             messages.error(request, "Passwords do not match.")
-            return render(request, 'MSMEOrderingWebApp/register_user.html', {
+            return render(request, 'register_user.html', {
                 "customization": customization,
                 "business": business,
                 **form_data
@@ -1706,7 +1706,7 @@ def register_user(request):
 
         if not length_regex.match(password) or not letter_number_regex.search(password) or not special_char_regex.search(password):
             messages.error(request, "Password must be at least 8 characters long, include both letters and numbers, and contain at least one special character.")
-            return render(request, 'MSMEOrderingWebApp/register_user.html', {
+            return render(request, 'register_user.html', {
                 "customization": customization,
                 "business": business,
                 **form_data
@@ -1714,7 +1714,7 @@ def register_user(request):
 
         if User.objects.filter(email=form_data["email"]).exists() or BusinessOwnerAccount.objects.filter(email=form_data["email"]).exists():
             messages.error(request, "Email already exists in the system.")
-            return render(request, 'MSMEOrderingWebApp/register_user.html', {
+            return render(request, 'register_user.html', {
                 "customization": customization,
                 "business": business,
                 **form_data
@@ -1722,7 +1722,7 @@ def register_user(request):
 
         if User.objects.filter(password=password).exists() or BusinessOwnerAccount.objects.filter(password=password).exists():
             messages.error(request, "This password is already in use. Please choose a different one.")
-            return render(request, 'MSMEOrderingWebApp/register_user.html', {
+            return render(request, 'register_user.html', {
                 "customization": customization,
                 "business": business,
                 **form_data
@@ -1854,7 +1854,7 @@ def register_user(request):
             email.send()
         except Exception as e:
             print(f"Error sending email: {e}")
-            return render(request, 'MSMEOrderingWebApp/register_user.html', {
+            return render(request, 'register_user.html', {
                 "error": "Failed to send verification email.",
                 "customization": customization,
                 "business": business
@@ -1864,7 +1864,7 @@ def register_user(request):
         messages.success(request, "Registration successful! Please check your email to verify your account, then proceed to log in.")
         return redirect('register_user')
 
-    return render(request, 'MSMEOrderingWebApp/register_user.html', {
+    return render(request, 'register_user.html', {
         'customization': customization,
         'business': business,
     })
@@ -2006,7 +2006,7 @@ def dashboard(request):
         "total_sales": total_sales,  # ✅ daily sales
     }
 
-    return render(request, 'MSMEOrderingWebApp/dashboard.html', context)
+    return render(request, 'dashboard.html', context)
 
 def sales_report_pdf(request):
     report_type = request.GET.get("report_type")
@@ -3287,7 +3287,7 @@ def inventory(request):
 
     def render_with_form_data():
         """Helper to render with previous inputs"""
-        return render(request, 'MSMEOrderingWebApp/inventory.html', {
+        return render(request, 'inventory.html', {
             'categories': categories,
             'products': products,
             'title': 'Inventory',
@@ -3384,7 +3384,7 @@ def inventory(request):
         'customization': customization,
         'business': business
     }
-    return render(request, 'MSMEOrderingWebApp/inventory.html', context)
+    return render(request, 'inventory.html', context)
 
 
 @login_required_session(allowed_roles=['owner'])
@@ -3508,7 +3508,7 @@ def pos(request):
         })
     customization = get_or_create_customization()
 
-    return render(request, 'MSMEOrderingWebApp/pos.html', {
+    return render(request, 'pos.html', {
         'products': unique_products,
         'categories': categories,
         'all_products': list(products.values('name', 'variation_name', 'price', 'stocks', 'track_stocks')),
@@ -3612,7 +3612,7 @@ def pos_cart_view(request):
     if business and business.specific_onsite_service:
         services = [s.strip() for s in business.specific_onsite_service.split(",") if s.strip()]
 
-    return render(request, 'MSMEOrderingWebApp/pos_cart.html', {
+    return render(request, 'pos_cart.html', {
         'cart_items': cart_items,
         'subtotal': subtotal,
         'customization': customization,
@@ -3892,7 +3892,7 @@ def delivery(request):
         'delivered_today_count': delivered_today_count,
     }
 
-    return render(request, 'MSMEOrderingWebApp/delivery.html', context)
+    return render(request, 'delivery.html', context)
 
 
 @login_required_session(allowed_roles=['owner'])
@@ -3911,7 +3911,7 @@ def reviews(request):
         'business': business
     }
 
-    return render(request, 'MSMEOrderingWebApp/reviews.html', context)
+    return render(request, 'reviews.html', context)
 
 @login_required_session(allowed_roles=['owner'])
 def users(request):
@@ -3965,7 +3965,7 @@ def users(request):
         'business': business,
     }
 
-    return render(request, 'MSMEOrderingWebApp/users.html', context)
+    return render(request, 'users.html', context)
 
 @login_required_session(allowed_roles=['owner'])
 @require_POST
@@ -4094,7 +4094,7 @@ def settings(request):
         'customization': customization,
         'title': 'Settings',
     }
-    return render(request, 'MSMEOrderingWebApp/settings.html', context)
+    return render(request, 'settings.html', context)
 
 @login_required_session(allowed_roles=['owner'])
 def business_dashboard(request):
@@ -4105,7 +4105,7 @@ def business_dashboard(request):
     business = BusinessDetails.objects.first()
 
     # Pass both customization and business to the template
-    return render(request, 'MSMEOrderingWebApp/business_owner_base.html', {
+    return render(request, 'business_owner_base.html', {
         'customization': customization,
         'business': business
     })
@@ -4116,7 +4116,7 @@ def customer_dashboard(request):
     customization = get_or_create_customization()
 
     # Render with customization context
-    return render(request, 'MSMEOrderingWebApp/customer_base.html', {
+    return render(request, 'customer_base.html', {
         'customization': customization,
     })
 
@@ -4124,7 +4124,7 @@ def customer_dashboard(request):
 def deliveryrider_dashboard(request):
     customization = get_or_create_customization()
 
-    return render(request, 'MSMEOrderingWebApp/deliveryrider_base.html', {
+    return render(request, 'deliveryrider_base.html', {
         'customization': customization,
     })
 
@@ -4265,7 +4265,7 @@ def cashier_dashboard(request):
         "total_sales": total_sales,  # ✅ daily sales
     }
 
-    return render(request, 'MSMEOrderingWebApp/cashier_dashboard.html', context)
+    return render(request, 'cashier_dashboard.html', context)
 
 @login_required_session(allowed_roles=['customer'])
 def cashier_pos(request):
@@ -4302,7 +4302,7 @@ def cashier_pos(request):
 
     customization = get_or_create_customization()
 
-    return render(request, 'MSMEOrderingWebApp/cashier_pos.html', {
+    return render(request, 'cashier_pos.html', {
         'products': unique_products,
         'categories': categories,
         'all_products': list(products.values('name', 'variation_name', 'price', 'stocks')),
@@ -4326,7 +4326,7 @@ def cashier_pos_cart_view(request):
     # Get business settings to pass to the cart
     business = BusinessDetails.objects.first()
     
-    return render(request, 'MSMEOrderingWebApp/cashier_poscart.html', {
+    return render(request, 'cashier_poscart.html', {
         'cart_items': cart_items,
         'subtotal': subtotal,
         'customization': customization,
@@ -4364,7 +4364,7 @@ def cashier_notifications(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
 
-    return render(request, 'MSMEOrderingWebApp/cashier_notification.html', {
+    return render(request, 'cashier_notification.html', {
         'grouped_orders': final_orders,
         'business': business,
         'customization': customization,
@@ -4430,7 +4430,7 @@ def deliveryrider_home(request):
         'delivered_today_count': delivered_today_count,
     }
 
-    return render(request, 'MSMEOrderingWebApp/deliveryrider_home.html', context)
+    return render(request, 'deliveryrider_home.html', context)
 
 @login_required_session(allowed_roles=['rider'])
 def mark_as_delivered(request):
@@ -4507,7 +4507,7 @@ def business_notifications(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
 
-    return render(request, 'MSMEOrderingWebApp/business_notification.html', {
+    return render(request, 'business_notification.html', {
         'grouped_orders': final_orders,
         'business': business,
         'customization': customization,
@@ -4563,7 +4563,7 @@ def customer_home(request):
     opening_time = business.opening_time.strftime("%H:%M:%S")
     closing_time = business.closing_time.strftime("%H:%M:%S")
 
-    return render(request, 'MSMEOrderingWebApp/customer_home.html', {
+    return render(request, 'customer_home.html', {
         'products': unique_products,
         'categories': categories,
         'all_products': list(products.values('name', 'variation_name', 'price', 'stocks', 'track_stocks', 'description')),
@@ -4596,11 +4596,11 @@ def staff_profile(request):
 
     # Decide which base template to extend depending on role
     if staff_data.role == 'cashier':
-        base_template = 'MSMEOrderingWebApp/cashier_base.html'
+        base_template = 'cashier_base.html'
     elif staff_data.role == 'rider':
-        base_template = 'MSMEOrderingWebApp/deliveryrider_base.html'
+        base_template = 'deliveryrider_base.html'
     else:
-        base_template = 'MSMEOrderingWebApp/base.html'  # fallback
+        base_template = 'base.html'  # fallback
 
     # Pass customization & business info
     business = BusinessDetails.objects.first()
@@ -4613,7 +4613,7 @@ def staff_profile(request):
         'base_template': base_template
     }
 
-    return render(request, 'MSMEOrderingWebApp/staff_profile.html', context)
+    return render(request, 'staff_profile.html', context)
 
 @login_required_session(allowed_roles=['owner'])
 def update_customization(request):
@@ -4685,7 +4685,7 @@ def customer_reviews(request):
     opening_time = business.opening_time.strftime("%H:%M:%S") if business and business.opening_time else "00:00:00"
     closing_time = business.closing_time.strftime("%H:%M:%S") if business and business.closing_time else "23:59:59"
 
-    return render(request, 'MSMEOrderingWebApp/customer_reviews.html', {
+    return render(request, 'customer_reviews.html', {
         'reviews': reviews,
         'customization': customization,
         'business': business,
@@ -4723,7 +4723,7 @@ def customer_cart(request):
         subtotal = sum(item.price for item in cart_items)
         customization = get_or_create_customization()
         
-        return render(request, 'MSMEOrderingWebApp/customer_cart.html', {
+        return render(request, 'customer_cart.html', {
             'cart_items': cart_items,
             'subtotal': subtotal,
             'customization': customization,
@@ -4957,7 +4957,7 @@ def customer_checkout(request):
         messages.success(request, "Order placed. Check your notifications to see the progress of your order.")
         return redirect('customer_home')
 
-    return render(request, 'MSMEOrderingWebApp/customer_checkout.html', {
+    return render(request, 'customer_checkout.html', {
         'user': user,
         'cart_items': cart_data,
         'subtotal': subtotal,
@@ -5025,7 +5025,7 @@ def customer_notifications(request):
     opening_time = business.opening_time.strftime("%H:%M:%S") if business and business.opening_time else "00:00:00"
     closing_time = business.closing_time.strftime("%H:%M:%S") if business and business.closing_time else "23:59:59"
 
-    return render(request, 'MSMEOrderingWebApp/customer_notification.html', {
+    return render(request, 'customer_notification.html', {
         'notifications': grouped_notifications,
         'business': business,
         'customization': customization,
@@ -5170,7 +5170,7 @@ def customer_profile(request):
     opening_time = business.opening_time.strftime("%H:%M:%S") if business and business.opening_time else "00:00:00"
     closing_time = business.closing_time.strftime("%H:%M:%S") if business and business.closing_time else "23:59:59"
 
-    return render(request, 'MSMEOrderingWebApp/customer_profile.html', {
+    return render(request, 'customer_profile.html', {
         'user_data': user,
         'customization': customization,
         'business': business,
@@ -5237,7 +5237,7 @@ def online_payment_details(request):
         'title': 'Set Up Payment Details',
         'business': business    
     }
-    return render(request, 'MSMEOrderingWebApp/onlinepayment_details.html', context)
+    return render(request, 'onlinepayment_details.html', context)
 
 
 @login_required_session(allowed_roles=['owner'])
@@ -5252,7 +5252,7 @@ def customer_viewonlinepayment(request):
     payment_methods = OnlinePaymentDetails.objects.all().order_by('-id')
     business = BusinessDetails.objects.first()
 
-    return render(request, 'MSMEOrderingWebApp/customer_viewonlinepayment.html', {
+    return render(request, 'customer_viewonlinepayment.html', {
         'customization': customization,
         'payment_methods': payment_methods,
         'business': business,
@@ -5264,7 +5264,7 @@ def business_viewonlinepayment(request):
     payment_methods = OnlinePaymentDetails.objects.all().order_by('-id')
     business = BusinessDetails.objects.first()
 
-    return render(request, 'MSMEOrderingWebApp/business_viewonlinepayment.html', {
+    return render(request, 'business_viewonlinepayment.html', {
         'customization': customization,
         'payment_methods': payment_methods,
         'business': business,
@@ -5276,7 +5276,7 @@ def cashier_viewonlinepayment(request):
     payment_methods = OnlinePaymentDetails.objects.all().order_by('-id')
     business = BusinessDetails.objects.first()
 
-    return render(request, 'MSMEOrderingWebApp/cashier_viewonlinepayment.html', {
+    return render(request, 'cashier_viewonlinepayment.html', {
         'customization': customization,
         'payment_methods': payment_methods,
         'business': business,
@@ -5311,7 +5311,7 @@ def business_changepassword(request):
         owner.save()
         return JsonResponse({'success': True, 'message': "Password changed successfully."})
 
-    return render(request, 'MSMEOrderingWebApp/business_changepassword.html')
+    return render(request, 'business_changepassword.html')
 
 
 
