@@ -1306,36 +1306,20 @@ def business_settings(request):
         })
 
 @login_required_session(allowed_roles=['owner'])
+@csrf_exempt
 def upload_logo(request):
-    if request.method == "POST" and request.FILES.get('logo'):
+    if request.method == "POST" and 'logo' in request.FILES:
         try:
-            # Get the business associated with the logged-in owner
-            owner = request.session.get('user_id')
-            business = BusinessDetails.objects.get(owner_id=owner)
-            
-            # Save the logo
+            business, created = BusinessDetails.objects.get_or_create(id=1)
             business.logo = request.FILES['logo']
-            business.save(update_fields=['logo'])
-            
+            business.save(update_fields=['logo'])  # only update logo
             return JsonResponse({
                 'success': True,
                 'logo_url': business.logo.url
             })
-        except BusinessDetails.DoesNotExist:
-            return JsonResponse({
-                'success': False, 
-                'error': 'Business not found'
-            }, status=404)
         except Exception as e:
-            return JsonResponse({
-                'success': False, 
-                'error': str(e)
-            }, status=500)
-    
-    return JsonResponse({
-        'success': False, 
-        'error': 'Invalid request or no file provided'
-    }, status=400)
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 @login_required_session(allowed_roles=['owner'])
 def change_owner_password(request):
