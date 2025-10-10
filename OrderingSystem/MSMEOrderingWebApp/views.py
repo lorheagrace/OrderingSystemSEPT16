@@ -673,7 +673,7 @@ def update_order_status_progress(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def partial_pending_orders(request):
     customization = get_or_create_customization()
     pending_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
@@ -775,7 +775,7 @@ def reject_order(request, order_code):
 
 
 #CUSTOMIZE FUNCTION WAG GALAWIN #
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 @csrf_exempt
 def customization_settings(request):
     if request.method == 'POST':
@@ -1091,7 +1091,7 @@ def get_or_create_customization():
 
 
 @csrf_exempt  # CSRF exemption (ensure it's safe in your application)
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def reset_customization(request):
     if request.method == 'POST':
         try:
@@ -1187,7 +1187,7 @@ def reset_customization(request):
 
 #CUSTOMIZE FUNCTION WAG GALAWIN #
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def business_settings(request):
     customization = get_or_create_customization()
 
@@ -1305,7 +1305,7 @@ def business_settings(request):
             'social_media_list': social_media_list,  # ✅ Pass to template
         })
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 @csrf_exempt
 def upload_logo(request):
     if request.method == "POST" and 'logo' in request.FILES:
@@ -1321,7 +1321,7 @@ def upload_logo(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def change_owner_password(request):
     if request.method == 'POST':
         current_password = request.POST.get('current_password')
@@ -1620,13 +1620,6 @@ def login_view(request):
         'customization': customization,
         'business': business
     })
-
-def login_required_session(view_func):
-    def wrapper(request, *args, **kwargs):
-        if 'user_id' not in request.session and 'owner_id' not in request.session and 'staff_id' not in request.session:
-            return redirect('login')
-        return view_func(request, *args, **kwargs)
-    return wrapper
 	
 def logout_view(request):
     request.session.flush()  # Clears all session data
@@ -1876,7 +1869,7 @@ def register_user(request):
         'business': business,
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def dashboard(request):
     customization = get_or_create_customization()
     business = BusinessDetails.objects.first()
@@ -3285,7 +3278,7 @@ def _get_table_style():
 
 
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def inventory(request):
     business = BusinessDetails.objects.first()
     categories = ProductCategory.objects.all()
@@ -3394,7 +3387,7 @@ def inventory(request):
     return render(request, 'MSMEOrderingWebApp/inventory.html', context)
 
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def edit_product_price(request):
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
@@ -3443,7 +3436,7 @@ def edit_product_price(request):
 
     return redirect('inventory')
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def delete_product(request, product_id):
     product = get_object_or_404(Products, id=product_id)
 
@@ -3464,7 +3457,7 @@ def delete_product(request, product_id):
     messages.success(request, "Product archived and deleted successfully.")
     return redirect('inventory')
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def toggle_availability(request, product_id):
     product = get_object_or_404(Products, id=product_id)
     if request.method == 'POST':
@@ -3480,7 +3473,7 @@ from django.db.models import Sum
 from decimal import Decimal
 
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def pos(request):
     business = BusinessDetails.objects.first()
     products = Products.objects.select_related('category').filter(available=True)
@@ -3526,7 +3519,7 @@ def pos(request):
         'cart_url': 'pos_cart',
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 @csrf_exempt
 def pos_add_to_cart(request):
     if request.method == "POST":
@@ -3566,7 +3559,7 @@ def pos_add_to_cart(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 @csrf_exempt
 def pos_add_to_cart_variation(request):
     if request.method == "POST":
@@ -3601,7 +3594,7 @@ def pos_add_to_cart_variation(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def pos_cart_view(request):
     cart_items = Cart.objects.filter(email="walkin@store.com")
     for item in cart_items:
@@ -3629,7 +3622,7 @@ def pos_cart_view(request):
 		"payment_url": "business_viewonlinepayment",
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 @csrf_exempt
 def remove_cart_item(request, item_id):
     if request.method == 'POST':
@@ -3642,7 +3635,7 @@ def remove_cart_item(request, item_id):
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 @csrf_exempt  
 def clear_cart_items(request):
     if request.method == 'POST':
@@ -3655,7 +3648,7 @@ def clear_cart_items(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 @csrf_exempt
 def update_pos_cart_quantity(request):
     if request.method == 'POST':
@@ -3677,7 +3670,7 @@ def update_pos_cart_quantity(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-@login_required_session	
+@login_required_session(allowed_roles=['owner'])
 @csrf_exempt
 def pos_place_order(request):
     if request.method == 'POST':
@@ -3835,7 +3828,7 @@ from collections import defaultdict
 from django.utils.timezone import now
 from django.utils.safestring import mark_safe
 
-@login_required_session
+@login_required_session(allowed_roles=['owner', 'rider'])
 def delivery(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
@@ -3902,7 +3895,7 @@ def delivery(request):
     return render(request, 'MSMEOrderingWebApp/delivery.html', context)
 
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def reviews(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
@@ -3920,7 +3913,7 @@ def reviews(request):
 
     return render(request, 'MSMEOrderingWebApp/reviews.html', context)
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def users(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
@@ -3974,7 +3967,7 @@ def users(request):
 
     return render(request, 'MSMEOrderingWebApp/users.html', context)
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 @require_POST
 def disable_user(request, role, user_id):
     try:
@@ -3994,7 +3987,7 @@ def disable_user(request, role, user_id):
         messages.error(request, 'User or Staff not found.')
     return redirect('users')
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 @require_POST
 def enable_user(request, role, user_id):
     try:
@@ -4014,7 +4007,7 @@ def enable_user(request, role, user_id):
         messages.error(request, 'User or Staff not found.')
     return redirect('users')
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def create_staff_account(request):
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
@@ -4091,7 +4084,7 @@ def create_staff_account(request):
 
     return redirect('users')
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def settings(request):
     # Get or create customization
     customization = get_or_create_customization()
@@ -4103,7 +4096,7 @@ def settings(request):
     }
     return render(request, 'MSMEOrderingWebApp/settings.html', context)
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def business_dashboard(request):
     # Get or create customization
     customization = get_or_create_customization()
@@ -4117,7 +4110,7 @@ def business_dashboard(request):
         'business': business
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def customer_dashboard(request):
     # Get or create customization settings
     customization = get_or_create_customization()
@@ -4127,7 +4120,7 @@ def customer_dashboard(request):
         'customization': customization,
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['rider'])
 def deliveryrider_dashboard(request):
     customization = get_or_create_customization()
 
@@ -4135,7 +4128,7 @@ def deliveryrider_dashboard(request):
         'customization': customization,
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['cashier'])
 def cashier_dashboard(request):
     customization = get_or_create_customization()
     business = BusinessDetails.objects.first()
@@ -4274,7 +4267,7 @@ def cashier_dashboard(request):
 
     return render(request, 'MSMEOrderingWebApp/cashier_dashboard.html', context)
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def cashier_pos(request):
     business = BusinessDetails.objects.first()
     products = Products.objects.select_related('category').filter(available=True)
@@ -4320,7 +4313,7 @@ def cashier_pos(request):
         'cart_url': 'cashier_poscart',
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def cashier_pos_cart_view(request):
     cart_items = Cart.objects.filter(email="walkin@store.com")
     for item in cart_items:
@@ -4342,7 +4335,7 @@ def cashier_pos_cart_view(request):
 		"payment_url": "cashier_viewonlinepayment",
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def cashier_notifications(request):
 
     raw_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
@@ -4379,7 +4372,7 @@ def cashier_notifications(request):
     })
 
 
-@login_required_session
+@login_required_session(allowed_roles=['rider'])
 def deliveryrider_home(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
@@ -4439,7 +4432,7 @@ def deliveryrider_home(request):
 
     return render(request, 'MSMEOrderingWebApp/deliveryrider_home.html', context)
 
-@login_required_session
+@login_required_session(allowed_roles=['rider'])
 def mark_as_delivered(request):
     order_code = request.POST.get('order_code')
     group_id = request.POST.get('group_id')  # ✅ require group_id
@@ -4464,7 +4457,7 @@ def mark_as_delivered(request):
     messages.success(request, f"Order #{order_code} marked as delivered.")
     return redirect('deliveryrider_home')
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def business_notifications(request):
     # Mark unseen pending orders as seen
     Checkout.objects.filter(status="pending", is_seen_by_owner=False).update(is_seen_by_owner=True)
@@ -4521,7 +4514,7 @@ def business_notifications(request):
         'title': 'Notifications'
     })
 	
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def customer_home(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
@@ -4586,7 +4579,7 @@ def customer_home(request):
         'closing_time': closing_time,
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['cashier', 'rider'])
 def staff_profile(request):
     # Ensure the user is logged in as staff
     staff_id = request.session.get('staff_id')
@@ -4622,7 +4615,7 @@ def staff_profile(request):
 
     return render(request, 'MSMEOrderingWebApp/staff_profile.html', context)
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def update_customization(request):
     customization = get_object_or_404(Customization, pk=1)
     if request.method == 'POST':
@@ -4644,7 +4637,7 @@ def update_customization(request):
 
 from .models import CustomerReview, ReviewPhoto, User
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def customer_reviews(request):
     business = BusinessDetails.objects.first()
     customization = get_or_create_customization()
@@ -4702,7 +4695,7 @@ def customer_reviews(request):
     })
 
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def customer_cart(request):
     business = BusinessDetails.objects.first()
     if 'user_id' in request.session and request.session.get('user_type') == 'customer':
@@ -4740,14 +4733,14 @@ def customer_cart(request):
     else:
         return redirect('login')
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def delete_cart_item(request, cart_id):
     if request.method == 'POST':
         cart_item = get_object_or_404(Cart, id=cart_id)
         cart_item.delete()
     return redirect('customer_cart')
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 @csrf_exempt
 def update_cart(request, cart_id):
     if request.method == 'POST':
@@ -4824,7 +4817,7 @@ def generate_order_code(order_type):
     return f"{prefix}{str(next_number).zfill(3)}"
 
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 @csrf_exempt
 def customer_checkout(request):
     if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
@@ -4977,7 +4970,7 @@ def customer_checkout(request):
     })
 
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def customer_notifications(request):
     email = request.session.get('email')
     business = BusinessDetails.objects.first()
@@ -5041,7 +5034,7 @@ def customer_notifications(request):
         'closing_time': closing_time,
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def partial_customer_notifications(request):
     customization = get_or_create_customization()
     email = request.session.get('email')
@@ -5128,7 +5121,7 @@ def notify_customer(email, message):
 
     
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def customer_profile(request):
     user_id = request.session.get('user_id')
     user = User.objects.get(id=user_id)
@@ -5188,7 +5181,7 @@ def customer_profile(request):
         'closing_time': closing_time,
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def online_payment_details(request):
     customization = get_or_create_customization()
     business = BusinessDetails.objects.first()
@@ -5247,13 +5240,13 @@ def online_payment_details(request):
     return render(request, 'MSMEOrderingWebApp/onlinepayment_details.html', context)
 
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def delete_online_payment(request, id):
     obj = get_object_or_404(OnlinePaymentDetails, id=id)
     obj.delete()
     return redirect('online_payment_details')
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def customer_viewonlinepayment(request):
     customization = get_or_create_customization()
     payment_methods = OnlinePaymentDetails.objects.all().order_by('-id')
@@ -5265,7 +5258,7 @@ def customer_viewonlinepayment(request):
         'business': business,
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def business_viewonlinepayment(request):
     customization = get_or_create_customization()
     payment_methods = OnlinePaymentDetails.objects.all().order_by('-id')
@@ -5277,7 +5270,7 @@ def business_viewonlinepayment(request):
         'business': business,
     })
 
-@login_required_session
+@login_required_session(allowed_roles=['cashier'])
 def cashier_viewonlinepayment(request):
     customization = get_or_create_customization()
     payment_methods = OnlinePaymentDetails.objects.all().order_by('-id')
@@ -5289,7 +5282,7 @@ def cashier_viewonlinepayment(request):
         'business': business,
     })
 	
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def business_changepassword(request):
     owner_id = request.session.get('owner_id')
     owner = get_object_or_404(BusinessOwnerAccount, id=owner_id)
@@ -5322,7 +5315,7 @@ def business_changepassword(request):
 
 
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def customer_changepassword(request):
     user_id = request.session.get('user_id')
     user = User.objects.get(id=user_id)
@@ -5361,7 +5354,7 @@ def customer_changepassword(request):
     # If not AJAX or not POST
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
 
-@login_required_session
+@login_required_session(allowed_roles=['customer'])
 def add_to_cart(request):
     print("add_to_cart called")
     if request.method == 'POST':
@@ -5594,7 +5587,7 @@ from django.http import JsonResponse
 from .models import CustomerReview
 from django.utils import timezone
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def update_review_response(request, review_id):
     if request.method == 'POST':
         try:
@@ -5607,7 +5600,7 @@ def update_review_response(request, review_id):
             return JsonResponse({'status': 'error', 'message': 'Review not found.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def hide_review(request, review_id):
     if request.method == 'POST':
         try:
@@ -5619,7 +5612,7 @@ def hide_review(request, review_id):
             return JsonResponse({'status': 'error', 'message': 'Review not found.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid method'})
 
-@login_required_session
+@login_required_session(allowed_roles=['owner'])
 def show_review(request, review_id):
     if request.method == 'POST':
         try:
