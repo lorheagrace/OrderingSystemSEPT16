@@ -2174,8 +2174,8 @@
 {% with opening=opening_time closing=closing_time start_day=business.start_day end_day=business.end_day force_closed=business.force_closed %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const openingTime = "{{ opening }}";   // e.g. "08:00:00"
-    const closingTime = "{{ closing }}";   // e.g. "17:00:00"
+    const openingTime = "{{ opening }}";   // e.g. "23:00:00"
+    const closingTime = "{{ closing }}";   // e.g. "06:00:00"
     const startDay = "{{ start_day }}";    // e.g. "Monday"
     const endDay = "{{ end_day }}";        // e.g. "Friday"
     let forceClosed = {{ force_closed|yesno:"true,false" }}; // from backend
@@ -2208,19 +2208,23 @@ document.addEventListener("DOMContentLoaded", () => {
     
         // Handle special case: closing exactly at midnight (00:00:00)
         if (closingTime === "00:00:00") {
-            // midnight means "end of the current day"
             close = new Date(open);
             close.setHours(23, 59, 59, 999);
+            return now >= open && now <= close;
         }
-        else if (close <= open) {
-            // Overnight support
-            close.setDate(close.getDate() + 1);
-            if (now < open) {
-                open.setDate(open.getDate() - 1);
-            }
+        
+        // Check if this is an overnight operation (closing time is "earlier" than opening)
+        const isOvernight = close <= open;
+        
+        if (isOvernight) {
+            // For overnight hours, we're open if:
+            // - Current time is after opening time (still same day), OR
+            // - Current time is before closing time (early morning of next day)
+            return now >= open || now <= close;
+        } else {
+            // Normal same-day operation
+            return now >= open && now <= close;
         }
-    
-        return now >= open && now <= close;
     }
 
     function applyClosedState() {
@@ -2293,12 +2297,12 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(() => {});
     }, 3000);
 
-    // --- Schedule recheck only when not forced closed ---
+    // --- Recheck status every 60 seconds ---
     setInterval(() => {
         if (!forceClosed) {
             checkShopStatus();
         }
-    }, 1000); // every 60s instead of 1s (enough for schedule drift)
+    }, 1000); 
 
 });
 </script>
