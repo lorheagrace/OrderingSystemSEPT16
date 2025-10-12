@@ -16,15 +16,18 @@ def login_required_session(allowed_roles=None):
         @wraps(view_func)
         @never_cache
         def wrapper(request, *args, **kwargs):
+            # Check if user is logged in by checking for user_id or owner_id (same as old decorator)
+            user_id = request.session.get('user_id')
+            owner_id = request.session.get('owner_id')
             user_type = request.session.get('user_type')
 
-            # Not logged in
-            if not user_type:
+            # Not logged in (match the old logic)
+            if not user_id and not owner_id:
                 return redirect('login')
 
-            # Logged in but not allowed
+            # Logged in but role restriction applies
             if allowed_roles and user_type not in allowed_roles:
-                # Optional: redirect to their respective home/dashboard
+                # Redirect to their respective home/dashboard
                 if user_type == 'owner':
                     return redirect('dashboard')
                 elif user_type == 'cashier':
