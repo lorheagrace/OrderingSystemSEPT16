@@ -1472,30 +1472,32 @@ def force_change(request):
     })
 
 def login_view(request):
+    # 🧩 Prevent infinite redirect loops if already logged in
+    if request.session.get('user_type'):
+        return redirect('route_home')
+
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-         # Get customization and business details, as they are needed throughout
+        # Get customization and business details
         customization = get_or_create_customization()
         business = BusinessDetails.objects.first()
 
-        # 1. Try BusinessOwnerAccount login
+        # 1️⃣ Try BusinessOwnerAccount login
         try:
             owner = BusinessOwnerAccount.objects.get(email=email, password=password)
 
             request.session['owner_id'] = owner.id
             request.session['user_type'] = 'owner'
-            
 
             if owner.first_login:
                 return redirect('force_change')
 
             if owner.status != 'verified':
                 messages.error(request, "Please verify your account first.")
-                # Pass the POST data when redirecting to retain input values
                 return render(request, 'MSMEOrderingWebApp/login.html', {
-                    'email': email, 
+                    'email': email,
                     'password': password,
                     'customization': customization,
                     'business': business
@@ -1505,9 +1507,11 @@ def login_view(request):
                 return redirect('settings')
             else:
                 return redirect('dashboard')
+
         except BusinessOwnerAccount.DoesNotExist:
             pass
 
+        # 2️⃣ Try User (Customer) login
         try:
             user = User.objects.get(email=email, password=password)
 
@@ -1526,7 +1530,7 @@ def login_view(request):
                     'email': email,
                     'password': password,
                     'customization': customization,
-                    'business': business,
+                    'business': business
                 })
 
             request.session['user_id'] = user.id
@@ -1538,8 +1542,7 @@ def login_view(request):
         except User.DoesNotExist:
             pass
 
-
-        # 3. Try StaffAccount login (for Delivery Rider only)
+        # 3️⃣ Try StaffAccount (Rider)
         try:
             staff = StaffAccount.objects.get(email=email, password=password, role='rider')
 
@@ -1566,10 +1569,11 @@ def login_view(request):
             request.session['email'] = staff.email
 
             return redirect('deliveryrider_home')
+
         except StaffAccount.DoesNotExist:
             pass
 
-        # StaffAccount login for Cashier
+        # 4️⃣ Try StaffAccount (Cashier)
         try:
             staff = StaffAccount.objects.get(email=email, password=password, role='cashier')
 
@@ -1596,10 +1600,11 @@ def login_view(request):
             request.session['email'] = staff.email
 
             return redirect('cashier_dashboard')
+
         except StaffAccount.DoesNotExist:
             pass
 
-        # If none matched
+        # ❌ If none matched
         messages.error(request, "Invalid credentials.")
         return render(request, 'MSMEOrderingWebApp/login.html', {
             'email': email,
@@ -1608,7 +1613,7 @@ def login_view(request):
             'business': business
         })
 
-    # GET request: Render login page
+    # GET request — render login page
     customization = get_or_create_customization()
     business = BusinessDetails.objects.first()
 
@@ -1622,10 +1627,31 @@ def login_view(request):
     })
 
 def login_required_session(view_func):
+    @wraps(view_func)
     def wrapper(request, *args, **kwargs):
-        if 'user_id' not in request.session and 'owner_id' not in request.session and 'staff_id' not in request.session:
+        user_type = request.session.get('user_type')
+
+        # 🔒 If no valid session found, redirect to login
+        if not user_type:
+            request.session.flush()  # clear any partial or broken session
             return redirect('login')
+
+        # ✅ Handle mismatched sessions (e.g., missing ID)
+        if user_type == 'owner' and not request.session.get('owner_id'):
+            request.session.flush()
+            return redirect('login')
+
+        if user_type == 'customer' and not request.session.get('user_id'):
+            request.session.flush()
+            return redirect('login')
+
+        if user_type in ['rider', 'cashier'] and not request.session.get('staff_id'):
+            request.session.flush()
+            return redirect('login')
+
+        # ✅ Everything OK — continue
         return view_func(request, *args, **kwargs)
+
     return wrapper
 	
 def logout_view(request):
