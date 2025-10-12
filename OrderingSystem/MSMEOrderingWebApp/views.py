@@ -1620,10 +1620,7 @@ def login_view(request):
         'customization': customization,
         'business': business
     })
-	
-from django.views.decorators.cache import never_cache	
 
-@never_cache
 def logout_view(request):
     request.session.flush()  # Clears all session data
     return redirect('login')
