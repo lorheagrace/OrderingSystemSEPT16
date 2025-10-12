@@ -15,6 +15,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --------------------------------------------------
 # Security
 # --------------------------------------------------
+
+# Trust Render's proxy headers (prevents redirect loops)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Enforce HTTPS only once (Render already handles HTTPS redirection)
+SECURE_SSL_REDIRECT = False
+
+# Optional but recommended for security
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+
 SECRET_KEY = os.environ.get("SECRET_KEY", "insecure-fallback-key")
 
 DEBUG = os.environ.get("DEBUG", "False").lower() in ["true", "1"]
