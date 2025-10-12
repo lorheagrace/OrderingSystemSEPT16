@@ -421,6 +421,64 @@
         .text-orange {
             color: orange !important;
         }
+
+        /* Empty state responsiveness */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: none;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .empty-illustration {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .empty-title {
+            margin-bottom: 0.5rem;
+            font-family: "{{ customization.header_font_family|default:'Arial' }}";
+            font-size: clamp(1.5rem, 5vw, 2.2rem); /* adjusts with screen width */
+            color: {{ customization.header_font_color|default:'#000000' }};
+            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
+            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+        }
+
+        .empty-subtitle {
+            font-weight: 600;
+            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+            font-size: clamp(0.8rem, 3.5vw, 1rem); /* scales smaller on phones */
+            line-height: 1.4;
+            color: #333;
+            opacity: 0.9;
+            padding: 0 1rem;
+        }
+
+        /* Responsive padding & alignment */
+        @media (max-width: 480px) {
+            .empty-state {
+                padding: 2.5rem 1rem;
+                border-width: 1px;
+            }
+
+            .empty-illustration {
+                font-size: 2.5rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .empty-title {
+                font-size: clamp(1.2rem, 6vw, 1.8rem);
+            }
+
+            .empty-subtitle {
+                font-size: clamp(0.75rem, 4vw, 0.9rem);
+            }
+        }
+
     </style>
     
 
