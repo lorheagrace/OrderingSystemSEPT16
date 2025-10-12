@@ -7,18 +7,19 @@ def login_required_session(allowed_roles=None):
         @wraps(view_func)
         @never_cache
         def wrapper(request, *args, **kwargs):
-            # Prevent redirect loops on login/logout pages
             current_view = request.resolver_match.url_name if request.resolver_match else None
+
+            # Prevent loops on login/logout
             if current_view in ['login', 'logout']:
                 return view_func(request, *args, **kwargs)
 
             user_type = request.session.get('user_type')
 
-            # Not logged in → go to login
+            # Not logged in → go to login page
             if not user_type:
                 return redirect('login')
 
-            # Logged in but not allowed
+            # Role restriction
             if allowed_roles and user_type not in allowed_roles:
                 redirect_map = {
                     'owner': 'dashboard',
@@ -28,7 +29,6 @@ def login_required_session(allowed_roles=None):
                 }
                 return redirect(redirect_map.get(user_type, 'login'))
 
-            # Allowed
             return view_func(request, *args, **kwargs)
         return wrapper
     return decorator
