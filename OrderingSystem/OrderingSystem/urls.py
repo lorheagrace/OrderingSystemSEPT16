@@ -12,7 +12,6 @@ urlpatterns = [
     path('', include('MSMEOrderingWebApp.urls')),
     path('', views.login_view, name='login'),
     path('admin/', admin.site.urls),
-    path('MSMEOrderingWebApp/', include('MSMEOrderingWebApp.urls')),
     path('verify-email/', views.verify_email, name='verify_email'),
     path('Logout/', views.logout_view, name='logout'),
     path('add-to-cart/', views.add_to_cart, name='add_to_cart'),
