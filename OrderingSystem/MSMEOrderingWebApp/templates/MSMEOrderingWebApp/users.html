@@ -571,6 +571,63 @@
             vertical-align: middle;
         }
 
+        /* ===== Responsive Centering for Search and Filter Tabs ===== */
+        @media (max-width: 768px) {
+
+            /* Stack search and filter vertically */
+            .search-section .d-flex {
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 10px !important;
+                text-align: center;
+            }
+
+            /* Center and widen search bar */
+            .search-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                text-align: center;
+            }
+
+            .search-input {
+                width: 100% !important;
+                font-size: 14px;
+                padding: 0.6rem 1rem 0.6rem 2.5rem;
+                border-radius: 10px;
+            }
+
+            .search-icon {
+                left: 1rem !important;
+                font-size: 14px;
+            }
+
+            /* Center filter badges */
+            .filter-badges {
+                justify-content: center !important;
+                flex-wrap: wrap;
+                gap: 8px;
+                text-align: center;
+            }
+
+            .filter-badge {
+                font-size: 13px;
+                padding: 0.4rem 0.9rem;
+                flex: 0 1 auto;
+            }
+        }
+
+        /* For tablets slightly wider than phones */
+        @media (min-width: 769px) and (max-width: 992px) {
+            .search-container {
+                width: 70%;
+                margin: 0 auto;
+            }
+
+            .filter-badges {
+                justify-content: center;
+            }
+        }
+
     </style>
 </head>
 <body>
