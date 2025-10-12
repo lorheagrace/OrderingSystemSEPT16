@@ -36,6 +36,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from .utils import get_or_create_customization
 from django.utils.timezone import make_aware, localtime, get_current_timezone
+from functools import wraps
 from django.shortcuts import redirect
 from django.urls import resolve, reverse
 from escpos.printer import Usb
