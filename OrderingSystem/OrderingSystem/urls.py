@@ -10,6 +10,7 @@ from django.urls import re_path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('MSMEOrderingWebApp.urls')),
+    path('MSMEOrderingWebApp/', include('MSMEOrderingWebApp.urls')),
     path('', views.login_view, name='login'),
     path('admin/', admin.site.urls),
     path('verify-email/', views.verify_email, name='verify_email'),
