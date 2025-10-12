@@ -7,30 +7,28 @@ def login_required_session(allowed_roles=None):
         @wraps(view_func)
         @never_cache
         def wrapper(request, *args, **kwargs):
-            # Allow access to login/logout without checks
-            if request.resolver_match and request.resolver_match.url_name in ['login', 'logout']:
+            # Prevent redirect loops on login/logout pages
+            current_view = request.resolver_match.url_name if request.resolver_match else None
+            if current_view in ['login', 'logout']:
                 return view_func(request, *args, **kwargs)
 
             user_type = request.session.get('user_type')
 
-            # Not logged in
+            # Not logged in → go to login
             if not user_type:
                 return redirect('login')
 
             # Logged in but not allowed
             if allowed_roles and user_type not in allowed_roles:
-                if user_type == 'owner':
-                    return redirect('dashboard')
-                elif user_type == 'cashier':
-                    return redirect('cashier_dashboard')
-                elif user_type == 'rider':
-                    return redirect('deliveryrider_home')
-                elif user_type == 'customer':
-                    return redirect('customer_home')
-                else:
-                    return redirect('login')
+                redirect_map = {
+                    'owner': 'dashboard',
+                    'cashier': 'cashier_dashboard',
+                    'rider': 'deliveryrider_home',
+                    'customer': 'customer_home'
+                }
+                return redirect(redirect_map.get(user_type, 'login'))
 
-            # Allowed → proceed
+            # Allowed
             return view_func(request, *args, **kwargs)
         return wrapper
     return decorator
