@@ -177,8 +177,21 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'tupclaboratory@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'wrxx wlxh dlkn gony')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'tupclaboratory@gmail.com')
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
-APPEND_SLASH = True 
+# Detect Render environment
+IS_RENDER = os.environ.get('RENDER', False)
+
+if IS_RENDER:
+    # CRITICAL FOR RENDER
+    SECURE_SSL_REDIRECT = False  # Render handles SSL
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    ALLOWED_HOSTS = ['orderingsystemsept16.onrender.com']
+    DEBUG = False
+else:
+    # Local development
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.210.182.134']
+    DEBUG = True
+
+# These should be False for now
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
