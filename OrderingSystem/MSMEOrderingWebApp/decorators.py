@@ -3,19 +3,14 @@ from django.views.decorators.cache import never_cache
 from functools import wraps
 
 def login_required_session(allowed_roles=None):
-    """
-    Decorator to ensure the user is logged in and has the proper role.
-
-    allowed_roles: list of user_type values allowed to access the view.
-                   Examples:
-                     ['owner']
-                     ['customer']
-                     ['cashier', 'rider']
-    """
     def decorator(view_func):
         @wraps(view_func)
         @never_cache
         def wrapper(request, *args, **kwargs):
+            # Allow access to login/logout without checks
+            if request.resolver_match and request.resolver_match.url_name in ['login', 'logout']:
+                return view_func(request, *args, **kwargs)
+
             user_type = request.session.get('user_type')
 
             # Not logged in
@@ -24,7 +19,6 @@ def login_required_session(allowed_roles=None):
 
             # Logged in but not allowed
             if allowed_roles and user_type not in allowed_roles:
-                # Optional: redirect to their respective home/dashboard
                 if user_type == 'owner':
                     return redirect('dashboard')
                 elif user_type == 'cashier':
