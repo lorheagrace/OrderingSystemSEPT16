@@ -673,7 +673,7 @@ def update_order_status_progress(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-@login_required_session(allowed_roles=['owner'])
+@login_required_session(allowed_roles=['owner', 'cashier'])
 def partial_pending_orders(request):
     customization = get_or_create_customization()
     pending_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
@@ -3473,7 +3473,7 @@ from django.db.models import Sum
 from decimal import Decimal
 
 
-@login_required_session(allowed_roles=['owner'])
+@login_required_session(allowed_roles=['owner', 'cashier'])
 def pos(request):
     business = BusinessDetails.objects.first()
     products = Products.objects.select_related('category').filter(available=True)
