@@ -124,10 +124,14 @@ class DeliveryFeeOwnerConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         print(f"[Owner] Parsed data: {data}")
 
-        if data.get("action") == "send_fee":
+        action = data.get("action")
+
+        if action == "send_fee":
             customer_email = data["customer_email"]
             fee = data["delivery_fee"]
+            request_id = data.get("request_id")
             customer_group = f"customer_{self.sanitize_email(customer_email)}"
+
             print(f"[Owner] Forwarding fee '{fee}' to customer group '{customer_group}'")
             await self.channel_layer.group_send(
                 customer_group,
@@ -137,10 +141,22 @@ class DeliveryFeeOwnerConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-        elif data.get("action") == "reject_fee":
+            # ✅ NEW: Notify all owners to close the modal
+            await self.channel_layer.group_send(
+                "owners",
+                {
+                    "type": "delivery_fee_resolved",
+                    "request_id": request_id,
+                    "status": "sent",
+                }
+            )
+
+        elif action == "reject_fee":
             customer_email = data["customer_email"]
             reason = data.get("reason", "Delivery request rejected")
+            request_id = data.get("request_id")
             customer_group = f"customer_{self.sanitize_email(customer_email)}"
+
             print(f"[Owner] Rejecting fee request for {customer_email} with reason: {reason}")
             await self.channel_layer.group_send(
                 customer_group,
@@ -150,74 +166,37 @@ class DeliveryFeeOwnerConsumer(AsyncWebsocketConsumer):
                 }
             )
 
+            # ✅ NEW: Notify all owners to close the modal
+            await self.channel_layer.group_send(
+                "owners",
+                {
+                    "type": "delivery_fee_resolved",
+                    "request_id": request_id,
+                    "status": "rejected",
+                }
+            )
+
     async def delivery_fee_request(self, event):
         print(f"[Owner] Sending fee request event: {event}")
         await self.send(text_data=json.dumps({
             "type": "delivery_fee_request",
             "customer_email": event["customer_email"],
             "order_details": event["order_details"],
+            "request_id": event.get("request_id"),  # ensure request_id is passed
+        }))
+
+    # ✅ NEW: Broadcast event handler for closing modals
+    async def delivery_fee_resolved(self, event):
+        print(f"[Owner] Delivery fee resolved, closing modal for request: {event.get('request_id')}")
+        await self.send(text_data=json.dumps({
+            "type": "delivery_fee_resolved",
+            "request_id": event.get("request_id"),
+            "status": event.get("status"),
         }))
 
     async def delivery_fee_rejected(self, event):
         # No-op handler to avoid ValueError if a stray message comes here
         print(f"[Owner] Ignoring delivery_fee_rejected: {event}")
-
-    def sanitize_email(self, email):
-        return email.replace('@', '_at_').replace('.', '_dot_')
-
-
-class DeliveryFeeCustomerConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        print("[Customer] Connecting")
-        query_params = parse_qs(self.scope['query_string'].decode())
-        self.customer_email = query_params.get('email', [None])[0]
-
-        if not self.customer_email:
-            print("[Customer] No email found, closing connection")
-            await self.close()
-            return
-
-        self.group_name = f"customer_{self.sanitize_email(self.customer_email)}"
-        print(f"[Customer] Adding to group: {self.group_name}")
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
-        await self.accept()
-        print("[Customer] Connected")
-
-    async def disconnect(self, close_code):
-        print(f"[Customer] Disconnecting {self.channel_name}")
-        if hasattr(self, 'group_name') and self.group_name:
-            await self.channel_layer.group_discard(self.group_name, self.channel_name)
-            print(f"[Customer] Removed from group: {self.group_name}")
-
-    async def receive(self, text_data):
-        print(f"[Customer] Received raw text: {text_data}")
-        data = json.loads(text_data)
-        print(f"[Customer] Parsed data: {data}")
-
-        if data.get("action") == "request_fee":
-            print("[Customer] Forwarding fee request to 'owners' group")
-            await self.channel_layer.group_send(
-                "owners",
-                {
-                    "type": "delivery_fee_request",
-                    "customer_email": data["customer_email"],
-                    "order_details": data["order_details"],
-                }
-            )
-
-    async def delivery_fee_response(self, event):
-        print(f"[Customer] Sending fee response event: {event}")
-        await self.send(text_data=json.dumps({
-            "type": "delivery_fee_response",
-            "delivery_fee": event["delivery_fee"],
-        }))
-
-    async def delivery_fee_rejected(self, event):
-        print(f"[Customer] Delivery fee rejected: {event}")
-        await self.send(text_data=json.dumps({
-            "type": "delivery_fee_rejected",
-            "reason": event["reason"],
-        }))
 
     def sanitize_email(self, email):
         return email.replace('@', '_at_').replace('.', '_dot_')
