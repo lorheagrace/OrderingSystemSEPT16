@@ -1197,17 +1197,18 @@ deliveryFeeSocketOwner.onmessage = function(event) {
         updateTimerFromServer(data);
     }
     else if (data.type === 'delivery_fee_resolved') {
-        console.log("[Owner JS] Closing modal due to broadcast:", data);
-        
-        // Only close if the modal corresponds to the same request
-        if (currentRequestId === data.request_id) {
+        console.log("[Owner JS] Received delivery_fee_resolved:", data);
+    
+        // If this matches the currently open modal, close it
+        if (currentRequestId && data.request_id && currentRequestId === data.request_id) {
             closeCurrentModal();
         }
     
-        // Also remove any queued matching requests
-        const queueIndex = deliveryFeeQueue.findIndex(req => req.requestId === data.request_id);
-        if (queueIndex !== -1) {
-            deliveryFeeQueue.splice(queueIndex, 1);
+        // Remove matching queued items (if any) so they won't show later
+        for (let i = deliveryFeeQueue.length - 1; i >= 0; i--) {
+            if (deliveryFeeQueue[i].requestId === data.request_id) {
+                deliveryFeeQueue.splice(i, 1);
+            }
         }
     }
 };
