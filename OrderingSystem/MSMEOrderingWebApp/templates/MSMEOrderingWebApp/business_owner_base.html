@@ -1196,6 +1196,20 @@ deliveryFeeSocketOwner.onmessage = function(event) {
         // Update timer display with server time
         updateTimerFromServer(data);
     }
+    else if (data.type === 'delivery_fee_resolved') {
+        console.log("[Owner JS] Closing modal due to broadcast:", data);
+        
+        // Only close if the modal corresponds to the same request
+        if (currentRequestId === data.request_id) {
+            closeCurrentModal();
+        }
+    
+        // Also remove any queued matching requests
+        const queueIndex = deliveryFeeQueue.findIndex(req => req.requestId === data.request_id);
+        if (queueIndex !== -1) {
+            deliveryFeeQueue.splice(queueIndex, 1);
+        }
+    }
 };
 
 function startGlobalQueueTimer() {
