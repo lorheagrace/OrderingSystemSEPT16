@@ -2518,16 +2518,16 @@ import matplotlib.pyplot as plt
 ongoing_statuses = ["accepted", "preparing", "packed", "out for delivery", "ready for pickup", "delivered"]
 completed_statuses = ["completed", "delivered", "picked up"]
 
-def generate_order_status_bar_chart(completed, rejected, ongoing):
-    """Generate a bar chart for order status with improved design and no title"""
-    labels = ['Completed', 'Rejected', 'Ongoing']
-    data = [completed, rejected, ongoing]
+def generate_order_status_bar_chart(completed, rejected, ongoing, voided=0):
+    """Generate a bar chart for order status with improved design and 'Voided' added"""
+    labels = ['Completed', 'Voided', 'Rejected', 'Ongoing']
+    data = [completed, voided, rejected, ongoing]
     
     # Define colors for the bars
-    colors = ['#28a745', '#dc3545', '#fd7e14']  # More refined color palette
+    colors = ['#28a745', '#6c757d', '#dc3545', '#fd7e14']  # Added gray for 'Voided'
     
     # Create the bar chart
-    fig, ax = plt.subplots(figsize=(8, 6))  # Adjust size for better visual appeal
+    fig, ax = plt.subplots(figsize=(8, 6))
     bars = ax.bar(labels, data, color=colors, edgecolor='black', linewidth=1.5)
     
     # Add grid lines for better readability
@@ -2542,18 +2542,17 @@ def generate_order_status_bar_chart(completed, rejected, ongoing):
         height = bar.get_height()
         ax.annotate(f'{height}', 
                     xy=(bar.get_x() + bar.get_width() / 2, height), 
-                    xytext=(0, 3),  # 3 points vertical offset
+                    xytext=(0, 3),
                     textcoords="offset points", 
                     ha='center', va='bottom', fontsize=10, fontweight='bold', color='black')
     
-    # Make the chart layout cleaner and more fitting
     plt.tight_layout()
     
     # Save the chart to a BytesIO object and return it as an image
     img_stream = BytesIO()
-    plt.savefig(img_stream, format='png', dpi=300)  # High DPI for better resolution
-    img_stream.seek(0)  # Go to the start of the stream
-    plt.close(fig)  # Close the plot to free memory
+    plt.savefig(img_stream, format='png', dpi=300)
+    img_stream.seek(0)
+    plt.close(fig)
     return img_stream
 
 def generate_order_types_bar_chart(order_types):
@@ -2630,7 +2629,7 @@ def _generate_orders_report(orders, period_label, styles):
         grouped_orders[group_key].append(order)
     
     total_orders = len(grouped_orders)
-    completed = rejected = ongoing = pending = 0
+    completed = rejected = ongoing = pending = voided = 0
     payment_methods = defaultdict(int)
     order_types = defaultdict(int)
     order_details = []
@@ -2649,6 +2648,8 @@ def _generate_orders_report(orders, period_label, styles):
             pending += 1
         elif status_lower in ongoing_statuses:
             ongoing += 1
+        elif status_lower == "void":
+            voided += 1
         
         # Payment + order type
         payment_methods[first_order.payment_method] += 1
@@ -2672,18 +2673,20 @@ def _generate_orders_report(orders, period_label, styles):
     status_data = [
         ["Status", "Orders", "Percentage"],
         ["Completed", str(completed), f"{(completed/total_orders*100 if total_orders else 0):.1f}%"],
+        ["Voided", str(voided), f"{(voided/total_orders*100 if total_orders else 0):.1f}%"],
         ["Rejected", str(rejected), f"{(rejected/total_orders*100 if total_orders else 0):.1f}%"],
         ["Ongoing", str(ongoing), f"{(ongoing/total_orders*100 if total_orders else 0):.1f}%"],
-        ["Pending", str(pending), f"{(pending/total_orders*100 if total_orders else 0):.1f}%"],  # ✅ NEW
+        ["Pending", str(pending), f"{(pending/total_orders*100 if total_orders else 0):.1f}%"],
         ["Total Orders", str(total_orders), "100%" if total_orders else "0%"],
     ]
+
 
     status_table = Table(status_data, colWidths=[120, 80, 100])
     status_table.setStyle(_get_table_style())
     story.append(status_table)
     story.append(Spacer(1, 15))
 
-    order_status_chart = generate_order_status_bar_chart(completed, rejected, ongoing)
+    order_status_chart = generate_order_status_bar_chart(completed, rejected, ongoing, voided)
     story.append(Image(order_status_chart, width=400, height=200))
     story.append(Spacer(1, 5))
     
@@ -2931,7 +2934,7 @@ def _generate_orders_report(orders, period_label, styles):
     story.append(Spacer(1, 20))
 
     return story
-
+	
 def _generate_inventory_report(period_label, styles):
     story = []
     story.append(Paragraph("INVENTORY REPORT", styles['title']))
