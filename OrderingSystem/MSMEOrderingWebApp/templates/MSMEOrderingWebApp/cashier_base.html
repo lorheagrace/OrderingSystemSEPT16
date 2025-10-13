@@ -1028,13 +1028,38 @@
         const protocol = window.location.protocol === "https:" ? "wss" : "ws";
         const deliveryFeeSocketOwner = new WebSocket(`${protocol}://${window.location.host}/ws/delivery-fee/owners/`);
 
-        // Queue to hold requests
+        // Queue to hold requests (FIFO - First In, First Out)
         const deliveryFeeQueue = [];
         let isModalOpen = false;
+        let currentModalTimer = null;
+        let currentRequestId = null;
 
-        deliveryFeeSocketOwner.onopen = () => console.log("[Owner JS] WebSocket connected");
+        // Timer sync interval (check server time every 5 seconds)
+        let timerSyncInterval = null;
+
+        // Global timer for tracking all queued requests
+        let globalQueueTimer = null;
+
+        deliveryFeeSocketOwner.onopen = () => {
+            console.log("[Owner JS] WebSocket connected");
+            // Request initial timer sync when connection opens
+            requestTimerSync();
+        };
+
         deliveryFeeSocketOwner.onerror = (e) => console.error("[Owner JS] WebSocket error:", e);
-        deliveryFeeSocketOwner.onclose = (e) => console.log("[Owner JS] WebSocket closed:", e);
+        deliveryFeeSocketOwner.onclose = (e) => {
+            console.log("[Owner JS] WebSocket closed:", e);
+            // Clear timer sync when connection closes
+            if (timerSyncInterval) {
+                clearInterval(timerSyncInterval);
+                timerSyncInterval = null;
+            }
+            // Clear global queue timer
+            if (globalQueueTimer) {
+                clearInterval(globalQueueTimer);
+                globalQueueTimer = null;
+            }
+        };
 
         deliveryFeeSocketOwner.onmessage = function(event) {
             const data = JSON.parse(event.data);
@@ -1052,25 +1077,267 @@
                     .catch((error) => {
                         console.error("Error playing audio: ", error);
                     });
-                // Add request to queue and try to show modal
-                deliveryFeeQueue.push(data);
+                
+                // Create request object with server timestamp and local tracking
+                const requestData = {
+                    ...data,
+                    requestId: data.request_id || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    serverCreatedAt: data.created_at || Date.now(),
+                    expiresAt: data.expires_at || (Date.now() + 120000), // 2 minutes from now if not provided
+                    localCreatedAt: Date.now(), // Track when we received it locally
+                    timeRemaining: 120 // Default 2 minutes in seconds
+                };
+                
+                // Add request to queue (FIFO) and try to show modal
+                deliveryFeeQueue.push(requestData);
+                
+                // Start global queue timer if not already running
+                startGlobalQueueTimer();
+                
                 showNextModal();
+                
+                // Start timer sync if not already running
+                if (!timerSyncInterval) {
+                    startTimerSync();
+                }
+            } 
+            else if (data.type === 'delivery_fee_timeout') {
+                console.log("[Owner JS] Request timed out from server:", data.request_id);
+                
+                // Remove from queue if still there
+                const queueIndex = deliveryFeeQueue.findIndex(req => req.requestId === data.request_id);
+                if (queueIndex !== -1) {
+                    deliveryFeeQueue.splice(queueIndex, 1);
+                }
+                
+                // If this was the currently displayed modal, close it
+                if (currentRequestId === data.request_id) {
+                    closeCurrentModal();
+                }
+                
+                // Stop global timer if no more queued requests
+                if (deliveryFeeQueue.length === 0 && !isModalOpen) {
+                    stopGlobalQueueTimer();
+                }
+            }
+            else if (data.type === 'timer_sync') {
+                // Update timer display with server time
+                updateTimerFromServer(data);
             }
         };
 
+        function startGlobalQueueTimer() {
+            // Clear existing timer if any
+            if (globalQueueTimer) {
+                clearInterval(globalQueueTimer);
+            }
+            
+            // Start timer to update all queued requests every second
+            globalQueueTimer = setInterval(() => {
+                const currentTime = Date.now();
+                
+                // Update time remaining for all queued requests
+                for (let i = deliveryFeeQueue.length - 1; i >= 0; i--) {
+                    const request = deliveryFeeQueue[i];
+                    
+                    // Calculate elapsed time since request was created locally
+                    const elapsedSeconds = Math.floor((currentTime - request.localCreatedAt) / 1000);
+                    const newTimeRemaining = Math.max(0, 120 - elapsedSeconds); // Always start from 120 seconds
+                    
+                    // Update the request's time remaining
+                    request.currentTimeRemaining = newTimeRemaining;
+                    
+                    // If time expired, remove from queue and notify customer
+                    if (newTimeRemaining <= 0) {
+                        console.log("[Owner JS] Queued request expired locally:", request.requestId);
+                        
+                        // Send timeout notification to customer using reject_fee action
+                        deliveryFeeSocketOwner.send(JSON.stringify({
+                            action: "reject_fee",
+                            customer_email: request.customer_email,
+                            request_id: request.requestId,
+                            reason: "Request timed out please try again"
+                        }));
+                        
+                        deliveryFeeQueue.splice(i, 1);
+                    }
+                }
+                
+                // Stop timer if no more requests
+                if (deliveryFeeQueue.length === 0 && !isModalOpen) {
+                    stopGlobalQueueTimer();
+                }
+                
+            }, 1000);
+        }
+
+        function stopGlobalQueueTimer() {
+            if (globalQueueTimer) {
+                clearInterval(globalQueueTimer);
+                globalQueueTimer = null;
+            }
+        }
+
+        function requestTimerSync() {
+            if (deliveryFeeSocketOwner.readyState === WebSocket.OPEN) {
+                deliveryFeeSocketOwner.send(JSON.stringify({
+                    action: "request_timer_sync"
+                }));
+            }
+        }
+
+        function startTimerSync() {
+            // Clear existing interval if any
+            if (timerSyncInterval) {
+                clearInterval(timerSyncInterval);
+            }
+            
+            // Only start sync if we have active modal or queued requests
+            if (isModalOpen || deliveryFeeQueue.length > 0) {
+                // Sync every 5 seconds
+                timerSyncInterval = setInterval(() => {
+                    // Only sync if we have requests to track
+                    if (isModalOpen || deliveryFeeQueue.length > 0) {
+                        requestTimerSync();
+                    } else {
+                        // No more requests to track, stop syncing
+                        clearInterval(timerSyncInterval);
+                        timerSyncInterval = null;
+                        console.log("[Owner JS] No active requests, stopping timer sync");
+                    }
+                }, 5000);
+            }
+        }
+
+        function updateTimerFromServer(syncData) {
+            const activeServerRequests = syncData.active_requests || [];
+            const serverRequestIds = new Set(activeServerRequests.map(req => req.request_id));
+            
+            // Update currently displayed modal timer
+            if (currentRequestId && isModalOpen) {
+                const activeRequest = activeServerRequests.find(req => req.request_id === currentRequestId);
+                if (!activeRequest) {
+                    // Request no longer active on server, close modal
+                    console.log("[Owner JS] Active request timed out on server:", currentRequestId);
+                    closeCurrentModal();
+                    return;
+                } else {
+                    const timeLeft = Math.max(0, activeRequest.time_remaining);
+                    const timerDisplay = document.getElementById(`timer_deliveryFeeModal_${currentRequestId}`);
+                    
+                    if (timerDisplay) {
+                        timerDisplay.textContent = formatTime(timeLeft);
+                        
+                        // Change color based on time remaining
+                        if (timeLeft <= 30) {
+                            timerDisplay.style.color = '#ff4444';
+                        } else if (timeLeft <= 60) {
+                            timerDisplay.style.color = '#ff8800';
+                        } else {
+                            timerDisplay.style.color = '#333';
+                        }
+                    }
+                }
+            }
+            
+            // Update queued requests with server time
+            for (let i = deliveryFeeQueue.length - 1; i >= 0; i--) {
+                const queuedRequest = deliveryFeeQueue[i];
+                const serverRequest = activeServerRequests.find(req => req.request_id === queuedRequest.requestId);
+                
+                if (!serverRequest || serverRequest.time_remaining <= 0) {
+                    // Request timed out on server, remove from queue
+                    console.log("[Owner JS] Queued request timed out on server:", queuedRequest.requestId);
+                    deliveryFeeQueue.splice(i, 1);
+                } else {
+                    // Update the queued request's timing info with server data
+                    queuedRequest.serverTimeRemaining = serverRequest.time_remaining;
+                    queuedRequest.lastSyncTime = Date.now();
+                    queuedRequest.currentTimeRemaining = serverRequest.time_remaining;
+                    
+                    // Reset local tracking based on server time - adjust localCreatedAt to match server timing
+                    const elapsedFromServer = 120 - serverRequest.time_remaining;
+                    queuedRequest.localCreatedAt = Date.now() - (elapsedFromServer * 1000);
+                }
+            }
+            
+            // If no more requests and no active modal, stop timers
+            if (deliveryFeeQueue.length === 0 && !isModalOpen) {
+                if (timerSyncInterval) {
+                    clearInterval(timerSyncInterval);
+                    timerSyncInterval = null;
+                }
+                stopGlobalQueueTimer();
+                console.log("[Owner JS] No more active requests, stopping all timers");
+            }
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function closeCurrentModal() {
+            if (currentModalTimer) {
+                clearInterval(currentModalTimer);
+                currentModalTimer = null;
+            }
+            
+            const activeModal = document.querySelector('.delivery-fee-modal');
+            const backdrop = document.getElementById('modalBackdrop');
+            
+            if (activeModal) {
+                activeModal.remove();
+            }
+            if (backdrop) {
+                backdrop.remove();
+            }
+            
+            document.body.style.overflow = '';
+            isModalOpen = false;
+            currentRequestId = null;
+            
+            // Stop timer sync if no more requests
+            if (deliveryFeeQueue.length === 0) {
+                if (timerSyncInterval) {
+                    clearInterval(timerSyncInterval);
+                    timerSyncInterval = null;
+                }
+                stopGlobalQueueTimer();
+            }
+            
+            // Process next modal in queue
+            showNextModal();
+        }
+
         function showNextModal() {
             if (isModalOpen) return;  // modal already showing, wait
-
             if (deliveryFeeQueue.length === 0) return; // no requests waiting
 
             isModalOpen = true;
 
-            const data = deliveryFeeQueue.shift();
+            // Get the first request from queue (FIFO)
+            const requestData = deliveryFeeQueue.shift();
+            currentRequestId = requestData.requestId;
+            
+            // Check if this request is still valid
+            const currentTimeRemaining = requestData.currentTimeRemaining !== undefined ? requestData.currentTimeRemaining : requestData.timeRemaining;
+            if (currentTimeRemaining <= 0) {
+                console.log("[Owner JS] Skipping expired queued request:", requestData.requestId);
+                isModalOpen = false;
+                currentRequestId = null;
+                showNextModal(); // Try next request
+                return;
+            }
+            
+            console.log("[Owner JS] Showing modal for request:", requestData.requestId, "with time remaining:", currentTimeRemaining);
+            
             const container = document.getElementById('modalContainer');
-            const { customer_email, order_details } = data;
+            const { customer_email, order_details, requestId } = requestData;
             const { customer_name, email, address, items, total } = order_details;
 
-            const modalId = `deliveryFeeModal_${Date.now()}`;
+            const modalId = `deliveryFeeModal_${requestId}`;
 
             // Create backdrop
             const backdrop = document.createElement('div');
@@ -1086,9 +1353,17 @@
             const modalHtml = `
             <div class="delivery-fee-modal" id="${modalId}">
                 <div class="delivery-modal-content">
-                    <div class="delivery-modal-header">
+                    <div class="delivery-modal-header" style="flex-direction: column; text-align: left;">
                         <h4>Delivery Fee Request</h4>
+                        <div class="timer-container">
+                            <span class="timer-label">Time remaining:</span>
+                            <span class="timer-display" id="timer_${modalId}">
+                                Loading...
+                            </span>
+                            <span class="timer-icon"></span>
+                        </div>
                     </div>
+
                     
                     <div class="delivery-modal-section">
                         <p class="delivery-modal-label">Customer</p>
@@ -1145,6 +1420,50 @@
             // Disable page scroll while modal open
             document.body.style.overflow = 'hidden';
 
+            // Request immediate timer sync for this modal
+            requestTimerSync();
+
+            // Initialize timer display with current time remaining from queue
+            const timerDisplay = document.getElementById(`timer_${modalId}`);
+            let localTimeLeft = currentTimeRemaining;
+            
+            // Update initial display
+            if (timerDisplay && localTimeLeft > 0) {
+                timerDisplay.textContent = formatTime(localTimeLeft);
+                if (localTimeLeft <= 30) {
+                    timerDisplay.style.color = '#ff4444';
+                } else if (localTimeLeft <= 60) {
+                    timerDisplay.style.color = '#ff8800';
+                }
+            }
+            
+            // Start local countdown timer for the displayed modal
+            currentModalTimer = setInterval(() => {
+                localTimeLeft--;
+                if (timerDisplay && localTimeLeft > 0) {
+                    timerDisplay.textContent = formatTime(localTimeLeft);
+                    
+                    // Change color when less than 30 seconds left
+                    if (localTimeLeft <= 30) {
+                        timerDisplay.style.color = '#ff4444';
+                    } else if (localTimeLeft <= 60) {
+                        timerDisplay.style.color = '#ff8800';
+                    }
+                } else if (localTimeLeft <= 0) {
+                    // Time expired, send timeout notification to customer using reject_fee and close modal
+                    console.log("[Owner JS] Modal timer expired locally:", requestId);
+                    
+                    deliveryFeeSocketOwner.send(JSON.stringify({
+                        action: "reject_fee",
+                        customer_email: customer_email,
+                        request_id: requestId,
+                        reason: "Request timed out please try again"
+                    }));
+                    
+                    closeCurrentModal();
+                }
+            }, 1000);
+
             // Copy address button
             modal.querySelector('.delivery-copyAddressBtn').onclick = () => {
                 const addressText = modal.querySelector('.modalAddress').textContent.trim();
@@ -1161,23 +1480,23 @@
             modal.querySelector('.submitDeliveryFeeBtn').onclick = () => {
                 const feeInput = modal.querySelector(`#deliveryFeeInput_${modalId}`);
                 const fee = feeInput.value.trim();
-                if (fee === '') {
-                    alert('Please enter a delivery fee');
+                
+                // Allow 0 as a valid input
+                if (fee === '' || isNaN(fee) || parseFloat(fee) < 0) {
+                    alert('Please enter a valid delivery fee (0 or greater)');
                     return;
                 }
 
                 console.log("[Owner JS] Sending fee:", fee);
+                
                 deliveryFeeSocketOwner.send(JSON.stringify({
                     action: "send_fee",
                     customer_email: customer_email,
+                    request_id: requestId,
                     delivery_fee: fee,
                 }));
 
-                modal.remove();
-                document.body.style.overflow = '';
-                backdrop.remove();
-                isModalOpen = false;
-                showNextModal();
+                closeCurrentModal();
             };
 
             // Reject button
@@ -1185,17 +1504,29 @@
                 deliveryFeeSocketOwner.send(JSON.stringify({
                     action: "reject_fee",
                     customer_email: customer_email,
+                    request_id: requestId,
                     reason: "Delivery fee request is rejected, location is out of coverage area"
                 }));
 
-                modal.remove();
-                document.body.style.overflow = '';
-                backdrop.remove();
-                isModalOpen = false;
-                showNextModal();
+                closeCurrentModal();
             };
         }
 
+        // Handle page visibility changes to sync timers when page becomes visible
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && (isModalOpen || deliveryFeeQueue.length > 0)) {
+                // Page became visible, request immediate timer sync
+                requestTimerSync();
+            }
+        });
+
+        // Handle window focus to sync timers when window gets focus
+        window.addEventListener('focus', function() {
+            if (isModalOpen || deliveryFeeQueue.length > 0) {
+                // Window got focus, request immediate timer sync
+                requestTimerSync();
+            }
+        });
     </script>
     
 </body>
