@@ -3473,7 +3473,7 @@ from django.db.models import Sum
 from decimal import Decimal
 
 
-@login_required_session(allowed_roles=['owner', 'cashier'])
+@login_required_session(allowed_roles=['owner'])
 def pos(request):
     business = BusinessDetails.objects.first()
     products = Products.objects.select_related('category').filter(available=True)
@@ -4267,7 +4267,7 @@ def cashier_dashboard(request):
 
     return render(request, 'MSMEOrderingWebApp/cashier_dashboard.html', context)
 
-@login_required_session(allowed_roles=['customer'])
+@login_required_session(allowed_roles=['cashier'])
 def cashier_pos(request):
     business = BusinessDetails.objects.first()
     products = Products.objects.select_related('category').filter(available=True)
@@ -4313,7 +4313,7 @@ def cashier_pos(request):
         'cart_url': 'cashier_poscart',
     })
 
-@login_required_session(allowed_roles=['customer'])
+@login_required_session(allowed_roles=['cashier'])
 def cashier_pos_cart_view(request):
     cart_items = Cart.objects.filter(email="walkin@store.com")
     for item in cart_items:
@@ -4335,7 +4335,7 @@ def cashier_pos_cart_view(request):
 		"payment_url": "cashier_viewonlinepayment",
     })
 
-@login_required_session(allowed_roles=['customer'])
+@login_required_session(allowed_roles=['cashier'])
 def cashier_notifications(request):
 
     raw_orders = Checkout.objects.filter(status="pending").order_by('-created_at')
