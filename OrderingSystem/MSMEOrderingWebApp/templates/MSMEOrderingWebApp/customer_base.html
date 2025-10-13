@@ -512,7 +512,7 @@
        /* About Us Modal */
         .aboutus-modal .modal-dialog {
             width: 90%;
-            max-width: 500px; /* for large screens */
+            max-width: 750px; /* for large screens */
             margin: 1.75rem auto;
         }
 
@@ -620,6 +620,7 @@
             font-size: clamp(11px, 1.3vw, 14px);
             line-height: 1;
             text-align: left;
+            font-weight: 600;
             color: {{ customization.body_font_color|default:"#000000" }};
             font-family: '{{ customization.body_font_family|default:"Arial" }}';
         }
@@ -685,7 +686,7 @@
 
         .aboutus-modal .social-item a {
             text-decoration: none;
-            color: var(--secondary-color);
+            color: var(--primary-color);
             font-weight: 600;
             font-size: clamp(12px, 1.5vw, 16px);
         }
@@ -834,88 +835,85 @@
 
     <!-- About Us Modal -->
     <div class="modal fade aboutus-modal" id="aboutUsModal" tabindex="-1" aria-labelledby="aboutUsLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="aboutUsLabel">About Us</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="aboutUsLabel">About Us</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
 
-                <!-- Main Content Row -->
-                <div class="main-content-row d-flex align-items-start gap-4">
-                
-                <!-- Business Logo -->
-                <div class="logo-section text-center flex-shrink-0">
-                    {% if business.logo %}
-                    <img src="{{ business.logo.url }}" alt="{{ business.business_name }}" class="img-fluid rounded" style="max-height:120px;">
-                    {% endif %}
-                </div>
-
-                <!-- Business Info -->
-                <div class="business-info-section">
-                    <!-- Business Name -->
-                    <h4 class="business-name">{{ business.business_name }}</h4>
-                    
-                    <!-- Description -->
-                    {% if business.business_description %}
-                    <p class="description">{{ business.business_description }}</p>
-                    {% endif %}
-                    
-                    <!-- Mission -->
-                    {% if business.business_mission %}
-                    <div class="mt-2">
-                        <h6>Our Mission</h6>
-                        <p>{{ business.business_mission }}</p>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Vision -->
-                    {% if business.business_vision %}
-                    <div class="mt-2">
-                        <h6>Our Vision</h6>
-                        <p>{{ business.business_vision }}</p>
-                    </div>
-                    {% endif %}
-                </div>
-                </div>
-                
-                <!-- Contact Info -->
-                <div class="contact-section mt-4">
-                <div class="contact-item">
-                    <i class="bi bi-telephone"></i>
-                    <span>{{ business.contact_number }}</span>
-                </div>
-                <div class="contact-item">
-                    <i class="bi bi-envelope"></i>
-                    <span>{{ business.email_address }}</span>
-                </div>
-                <div class="contact-item">
-                    <i class="bi bi-geo-alt"></i>
-                    <span>{{ business.store_address }}</span>
-                </div>
-                </div>
-                
-                <!-- Social Media -->
-                {% if business.social_media.all %}
-                <div class="social-section mt-3">
-                    <h6 class="social-title text-center mb-2">Follow us on:</h6>
-                    <div class="social-links">
-                    {% for sm in business.social_media.all %}
-                        <div class="social-item">
-                        <i class="bi bi-{{ sm.platform|lower }}"></i> 
-                        <a href="{{ sm.username_or_link }}" target="_blank">{{ sm.platform }}</a>
-                        </div>
-                    {% endfor %}
-                    </div>
-                </div>
+            <!-- Logo + Title Row -->
+            <div class="d-flex align-items-center mb-3">
+            <!-- Business Logo -->
+            <div class="flex-shrink-0 me-3">
+                {% if business.logo %}
+                <img src="{{ business.logo.url }}" alt="{{ business.business_name }}" class="img-fluid rounded" style="max-height:100px; width:auto;">
                 {% endif %}
-                
+            </div>
+
+            <!-- Business Title -->
+            <div>
+                <h4 class="mb-1">{{ business.business_name }}</h4>
             </div>
             </div>
+
+            <!-- Business Details -->
+            <div class="business-details">
+            {% if business.business_description %}
+            <p class="description mb-3">{{ business.business_description }}</p>
+            {% endif %}
+
+            {% if business.business_mission %}
+            <div class="mb-3">
+                <h6>Our Mission</h6>
+                <p>{{ business.business_mission }}</p>
+            </div>
+            {% endif %}
+
+            {% if business.business_vision %}
+            <div class="mb-3">
+                <h6>Our Vision</h6>
+                <p>{{ business.business_vision }}</p>
+            </div>
+            {% endif %}
+            </div>
+
+            <!-- Contact Info -->
+            <div class="contact-section mt-4">
+            <div class="contact-item">
+                <i class="bi bi-telephone"></i>
+                <span>{{ business.contact_number }}</span>
+            </div>
+            <div class="contact-item">
+                <i class="bi bi-envelope"></i>
+                <span>{{ business.email_address }}</span>
+            </div>
+            <div class="contact-item">
+                <i class="bi bi-geo-alt"></i>
+                <span>{{ business.store_address }}</span>
+            </div>
+            </div>
+
+            <!-- Social Media -->
+            {% if business.social_media.all %}
+            <div class="social-section mt-3">
+            <h6 class="social-title text-center mb-2">Follow us on:</h6>
+            <div class="social-links d-flex justify-content-center flex-wrap gap-2">
+                {% for sm in business.social_media.all %}
+                <div class="social-item">
+                <i class="bi bi-{{ sm.platform|lower }}"></i>
+                <a href="{{ sm.username_or_link }}" target="_blank">{{ sm.platform }}</a>
+                </div>
+                {% endfor %}
+            </div>
+            </div>
+            {% endif %}
+
+        </div>
         </div>
     </div>
-
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1048,100 +1046,100 @@
     </script>
     {% if business %}
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const openingTime = "{{ opening_time }}";
-        const closingTime = "{{ closing_time }}";
-        const startDay = "{{ business.start_day }}";  // e.g., "Monday"
-        const endDay = "{{ business.end_day }}";      // e.g., "Friday"
+        document.addEventListener("DOMContentLoaded", () => {
+            const openingTime = "{{ opening_time }}";
+            const closingTime = "{{ closing_time }}";
+            const startDay = "{{ business.start_day }}";  // e.g., "Monday"
+            const endDay = "{{ business.end_day }}";      // e.g., "Friday"
+            
+            let forceClosed = {{ business.force_closed|yesno:"true,false" }}; // from backend
         
-        let forceClosed = {{ business.force_closed|yesno:"true,false" }}; // from backend
-    
-        const weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    
-        function parseTime(t) {
-            const [h, m, s] = t.split(":").map(Number);
-            const now = new Date();
-            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, s, 0);
-        }
-    
-        function isWithinOperatingDays() {
-            const now = new Date();
-            const todayIndex = now.getDay();
-            const startIndex = weekdays.indexOf(startDay);
-            const endIndex = weekdays.indexOf(endDay);
-    
-            if (startIndex <= endIndex) {
-                return todayIndex >= startIndex && todayIndex <= endIndex;
-            } else {
-                return todayIndex >= startIndex || todayIndex <= endIndex;
-            }
-        }
-    
-        function isWithinOperatingHours() {
-            const now = new Date();
-            let open = parseTime(openingTime);
-            let close = parseTime(closingTime);
+            const weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
         
-            // Handle special case: closing exactly at midnight (00:00:00)
-            if (closingTime === "00:00:00") {
-                // midnight means "end of the current day"
-                close = new Date(open);
-                close.setHours(23, 59, 59, 999);
+            function parseTime(t) {
+                const [h, m, s] = t.split(":").map(Number);
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, s, 0);
             }
-            else if (close <= open) {
-                // Overnight support
-                close.setDate(close.getDate() + 1);
-                if (now < open) {
-                    open.setDate(open.getDate() - 1);
+        
+            function isWithinOperatingDays() {
+                const now = new Date();
+                const todayIndex = now.getDay();
+                const startIndex = weekdays.indexOf(startDay);
+                const endIndex = weekdays.indexOf(endDay);
+        
+                if (startIndex <= endIndex) {
+                    return todayIndex >= startIndex && todayIndex <= endIndex;
+                } else {
+                    return todayIndex >= startIndex || todayIndex <= endIndex;
                 }
             }
         
-            return now >= open && now <= close;
-        }
-    
-        function isShopClosed() {
-            // 🚨 Forced closed overrides schedule
-            if (forceClosed === true) return true;
-    
-            return !(isWithinOperatingDays() && isWithinOperatingHours());
-        }
-    
-        function updateCartLink() {
-            const cartLink = document.querySelector('a[aria-label="Cart"]');
-            if (!cartLink) return;
-    
-            if (isShopClosed()) {
-                cartLink.onclick = e => e.preventDefault();
-                cartLink.title = "Shop is currently closed";
-                cartLink.classList.add("disabled");
-            } else {
-                cartLink.onclick = null;
-                cartLink.title = "";
-                cartLink.classList.remove("disabled");
-            }
-        }
-    
-        // Initial check
-        updateCartLink();
-    
-        // Recheck every second
-        setInterval(updateCartLink, 1000);
-    
-        // --- Poll backend every 3s to refresh forceClosed ---
-        setInterval(() => {
-            fetch("{% url 'toggle_shop_status' %}", { method: "GET" })
-            .then(res => res.json())
-            .then(data => {
-                const newForceClosed = data.force_closed;
-                if (forceClosed !== newForceClosed) {
-                    forceClosed = newForceClosed;
-                    updateCartLink();  // immediately reapply new state
+            function isWithinOperatingHours() {
+                const now = new Date();
+                let open = parseTime(openingTime);
+                let close = parseTime(closingTime);
+            
+                // Handle special case: closing exactly at midnight (00:00:00)
+                if (closingTime === "00:00:00") {
+                    // midnight means "end of the current day"
+                    close = new Date(open);
+                    close.setHours(23, 59, 59, 999);
                 }
-            })
-            .catch(() => {});
-        }, 3000);
-    
-    });
+                else if (close <= open) {
+                    // Overnight support
+                    close.setDate(close.getDate() + 1);
+                    if (now < open) {
+                        open.setDate(open.getDate() - 1);
+                    }
+                }
+            
+                return now >= open && now <= close;
+            }
+        
+            function isShopClosed() {
+                // 🚨 Forced closed overrides schedule
+                if (forceClosed === true) return true;
+        
+                return !(isWithinOperatingDays() && isWithinOperatingHours());
+            }
+        
+            function updateCartLink() {
+                const cartLink = document.querySelector('a[aria-label="Cart"]');
+                if (!cartLink) return;
+        
+                if (isShopClosed()) {
+                    cartLink.onclick = e => e.preventDefault();
+                    cartLink.title = "Shop is currently closed";
+                    cartLink.classList.add("disabled");
+                } else {
+                    cartLink.onclick = null;
+                    cartLink.title = "";
+                    cartLink.classList.remove("disabled");
+                }
+            }
+        
+            // Initial check
+            updateCartLink();
+        
+            // Recheck every second
+            setInterval(updateCartLink, 1000);
+        
+            // --- Poll backend every 3s to refresh forceClosed ---
+            setInterval(() => {
+                fetch("{% url 'toggle_shop_status' %}", { method: "GET" })
+                .then(res => res.json())
+                .then(data => {
+                    const newForceClosed = data.force_closed;
+                    if (forceClosed !== newForceClosed) {
+                        forceClosed = newForceClosed;
+                        updateCartLink();  // immediately reapply new state
+                    }
+                })
+                .catch(() => {});
+            }, 3000);
+        
+        });
     </script>
     {% endif %}    
 </body>
