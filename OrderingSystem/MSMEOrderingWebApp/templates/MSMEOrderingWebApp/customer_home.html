@@ -76,7 +76,7 @@
     }
 
     .slide.welcome-slide {
-        background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--secondary-color)); /* Gradient with Accent Color */
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); /* Gradient with Accent Color */
         margin-top: 0;
     }
 
@@ -250,6 +250,10 @@
         border-top: 2px solid;
         border-color: var(--primary-color);
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+        position: sticky;
+        top: 70px;
+        z-index: 1000; /* keeps it above other content */
     }
 
     .search-input-group {
@@ -260,8 +264,7 @@
 
     .search-input-group .form-control {
         font-weight: 500;
-        padding: 15px 25px;
-        background: white;
+        padding: 10px 25px;
         border-right: transparent;
         box-shadow: none;
         color: {{ customization.body_font_color|default:"#000000" }};
@@ -272,6 +275,20 @@
         border-color:var(--primary-color);
         border-radius: {{ customization.input_rounded_corner|default:1 }}px;
     }
+
+    .form-select {
+        font-weight: 600;
+        padding: 15px 25px;
+        background: white;
+        box-shadow: none;
+        color: {{ customization.body_font_color|default:"#000000" }};
+        font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+        border-width: {{ customization.input_border_width|default:1 }}px; 
+        border-style: {{ customization.input_border_style|default:'solid' }};
+        border-color:var(--primary-color);
+        border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+    }    
 
     .search-input-group .form-control:focus {
         box-shadow: none;
@@ -615,6 +632,7 @@
         font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 25 %}{{ customization.header_font_size|default:20 }}{% else %}25{% endif %}px;
     }
 
+
     .modal-dropdown {
         width: 100%;
         font-weight: 600;
@@ -628,10 +646,23 @@
         color: {{ customization.body_font_color|default:"#000000" }};
         font-family: '{{ customization.body_font_family|default:"Arial" }}';
         font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
-        border-width: {{ customization.input_border_width|default:1 }}px; 
+        border-width: {{ customization.input_border_width|default:1 }}px;
         border-style: {{ customization.input_border_style|default:'solid' }};
         border-color: {{ customization.primary_color|default:'#000000' }};
         border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+        padding-right: 2.5rem; /* space for logo */
+        cursor: pointer;
+    }
+
+    /* Dropdown logo/icon */
+    .dropdown-logo {
+        position: absolute;
+        right: 1rem;
+        top: 70%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        font-size: 1rem;
+        color: {{ customization.primary_color|default:'#000000' }};
     }
 
     /* Optional: focus and hover effect */
@@ -1431,15 +1462,17 @@
                 </button>
             </div>
         </div>
-        <div class="col-lg-4">
-            <select id="categoryFilter" class="form-select" onchange="filterProducts()">
+        <div class="col-lg-4 d-flex align-items-center position-relative">
+            <select id="categoryFilter" class="form-select pe-5" onchange="filterProducts()">
                 <option value="">All Categories</option>
                 {% for cat in categories %}
-                    <option value="{{ cat.name }}">{{ cat.name }}</option>
+                <option value="{{ cat.name }}">{{ cat.name }}</option>
                 {% endfor %}
             </select>
+            <i class="bi bi-caret-down-fill position-absolute" style="right: 25px; pointer-events: none;"></i>
         </div>
     </div>
+
     <div class="row mt-3">
         <div class="col-12 d-flex justify-content-between align-items-center">
             <div class="product-count">
@@ -1454,6 +1487,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Success Message -->
 <div class="cart-success scale-in" id="cartSuccess">
@@ -1603,11 +1637,15 @@
         <!-- Variation + Quantity Row -->
         <div class="d-flex flex-wrap align-items-end justify-content-between p-3">
             <!-- Variation -->
-            <div class="flex-fill">
+            <div class="flex-fill position-relative" style="max-width: 250px;">
                 <label for="modalVariation" class="form-label fw-semibold mb-2 text-muted">VARIATION</label>
+                
                 <select class="modal-dropdown" id="modalVariation" required>
-                <option value="">Choose a variation...</option>
+                    <option value="">Choose a variation...</option>
                 </select>
+
+                <!-- Dropdown Logo/Icon -->
+                <i class="bi bi-caret-down-fill dropdown-logo"></i>
             </div>
 
             <!-- Quantity -->
