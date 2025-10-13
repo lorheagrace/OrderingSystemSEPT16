@@ -511,8 +511,14 @@
                                 </div>
                             </td>
                             <td>
-                                <div>{{ group.first.address }}</div>
-                                <small class="address-text">{{ group.first.city }}, {{ group.first.province }}</small>
+                                <div>
+                                    {% if group.first.address %}{{ group.first.address }}{% endif %}
+                                    {% if group.first.subdivision %}, {{ group.first.subdivision }}{% endif %}
+                                    {% if group.first.barangay %}, {{ group.first.barangay }}{% endif %}
+                                    {% if group.first.city %}, {{ group.first.city }}{% endif %}
+                                    {% if group.first.province %}, {{ group.first.province }}{% endif %}
+                                    {% if group.first.zip_code %}, {{ group.first.zip_code }}{% endif %}
+                                </div>
                             </td>
                             <td>
                                 <span class="status-badge status-{{ group.first.status|lower }}">
