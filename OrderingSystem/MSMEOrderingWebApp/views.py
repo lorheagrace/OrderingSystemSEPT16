@@ -3519,7 +3519,7 @@ def pos(request):
         'cart_url': 'pos_cart',
     })
 
-@login_required_session(allowed_roles=['owner'])
+@login_required_session(allowed_roles=['owner', 'cashier'])
 @csrf_exempt
 def pos_add_to_cart(request):
     if request.method == "POST":
@@ -3559,7 +3559,7 @@ def pos_add_to_cart(request):
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-@login_required_session(allowed_roles=['owner'])
+@login_required_session(allowed_roles=['owner', 'cashier'])
 @csrf_exempt
 def pos_add_to_cart_variation(request):
     if request.method == "POST":
@@ -3622,7 +3622,7 @@ def pos_cart_view(request):
 		"payment_url": "business_viewonlinepayment",
     })
 
-@login_required_session(allowed_roles=['owner'])
+@login_required_session(allowed_roles=['owner', 'cashier'])
 @csrf_exempt
 def remove_cart_item(request, item_id):
     if request.method == 'POST':
@@ -3635,7 +3635,7 @@ def remove_cart_item(request, item_id):
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
 
-@login_required_session(allowed_roles=['owner'])
+@login_required_session(allowed_roles=['owner', 'cashier'])
 @csrf_exempt  
 def clear_cart_items(request):
     if request.method == 'POST':
@@ -3648,7 +3648,7 @@ def clear_cart_items(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-@login_required_session(allowed_roles=['owner'])
+@login_required_session(allowed_roles=['owner', 'cashier'])
 @csrf_exempt
 def update_pos_cart_quantity(request):
     if request.method == 'POST':
@@ -3670,7 +3670,7 @@ def update_pos_cart_quantity(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
-@login_required_session(allowed_roles=['owner'])
+@login_required_session(allowed_roles=['owner', 'cashier'])
 @csrf_exempt
 def pos_place_order(request):
     if request.method == 'POST':
