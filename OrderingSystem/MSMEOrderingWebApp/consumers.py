@@ -200,3 +200,60 @@ class DeliveryFeeOwnerConsumer(AsyncWebsocketConsumer):
 
     def sanitize_email(self, email):
         return email.replace('@', '_at_').replace('.', '_dot_')
+
+
+class DeliveryFeeCustomerConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        print("[Customer] Connecting")
+        query_params = parse_qs(self.scope['query_string'].decode())
+        self.customer_email = query_params.get('email', [None])[0]
+
+        if not self.customer_email:
+            print("[Customer] No email found, closing connection")
+            await self.close()
+            return
+
+        self.group_name = f"customer_{self.sanitize_email(self.customer_email)}"
+        print(f"[Customer] Adding to group: {self.group_name}")
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+        print("[Customer] Connected")
+
+    async def disconnect(self, close_code):
+        print(f"[Customer] Disconnecting {self.channel_name}")
+        if hasattr(self, 'group_name') and self.group_name:
+            await self.channel_layer.group_discard(self.group_name, self.channel_name)
+            print(f"[Customer] Removed from group: {self.group_name}")
+
+    async def receive(self, text_data):
+        print(f"[Customer] Received raw text: {text_data}")
+        data = json.loads(text_data)
+        print(f"[Customer] Parsed data: {data}")
+
+        if data.get("action") == "request_fee":
+            print("[Customer] Forwarding fee request to 'owners' group")
+            await self.channel_layer.group_send(
+                "owners",
+                {
+                    "type": "delivery_fee_request",
+                    "customer_email": data["customer_email"],
+                    "order_details": data["order_details"],
+                }
+            )
+
+    async def delivery_fee_response(self, event):
+        print(f"[Customer] Sending fee response event: {event}")
+        await self.send(text_data=json.dumps({
+            "type": "delivery_fee_response",
+            "delivery_fee": event["delivery_fee"],
+        }))
+
+    async def delivery_fee_rejected(self, event):
+        print(f"[Customer] Delivery fee rejected: {event}")
+        await self.send(text_data=json.dumps({
+            "type": "delivery_fee_rejected",
+            "reason": event["reason"],
+        }))
+
+    def sanitize_email(self, email):
+        return email.replace('@', '_at_').replace('.', '_dot_')
