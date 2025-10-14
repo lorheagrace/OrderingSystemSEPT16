@@ -1531,20 +1531,41 @@
                         <div class="social-media-section mt-3">
                             <label class="form-label">Social Media Links</label>
                             <div id="socialMediaContainer">
-                                {% for sm in social_media_list %}
-                                <div class="row g-2 mb-2 social-media-row">
-                                    <div class="col-md-4">
-                                        <input type="text" name="social_platform[]" value="{{ sm.platform }}" class="form-control" placeholder="Platform" disabled>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="text" name="social_username[]" value="{{ sm.username_or_link }}" class="form-control" placeholder="Link" disabled>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-center">
-                                        <button type="button" class="btn btn-danger btn-sm remove-social" disabled>&times;</button>
-                                    </div>
+                            {% for sm in social_media_list %}
+                            <div class="row g-2 align-items-center mb-2 social-media-row">
+                                <div class="col-12 col-md-5 col-sm-5">
+                                    <input 
+                                        type="text" 
+                                        name="social_platform[]" 
+                                        value="{{ sm.platform }}" 
+                                        class="form-control" 
+                                        placeholder="Platform" 
+                                        disabled
+                                    >
                                 </div>
-                                {% endfor %}
+                                <div class="col-12 col-md-5 col-sm-5">
+                                    <input 
+                                        type="text" 
+                                        name="social_username[]" 
+                                        value="{{ sm.username_or_link }}" 
+                                        class="form-control" 
+                                        placeholder="Link" 
+                                        disabled
+                                    >
+                                </div>
+                                <div class="col-12 col-md-2 col-sm-2 d-flex justify-content-md-center justify-content-start mt-2 mt-md-0">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-danger btn-sm remove-social w-100 w-md-auto" 
+                                        disabled
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
                             </div>
+                            {% endfor %}
+                        </div>
+
                             <button type="button" class="btn btn-secondary btn-sm mt-2" id="addSocialMedia" disabled>
                                 <i class="fas fa-plus"></i> Add Social Media
                             </button>
