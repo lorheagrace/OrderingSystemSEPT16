@@ -1203,7 +1203,7 @@
                     
                     <div class="orders-container">
                         {% for group in accepted_orders_grouped %}
-                        <div class="order-card" data-order-type="{{ group.first.order_type }}" data-order-code="{{ group.order_code }}" data-order-date="{{ group.first.created_at|date:'Y-m-d' }}">
+                        <div class="order-card" data-order-type="{{ group.first.order_type }}" data-order-code="{{ group.order_code }}">
                             <div class="card-accent"></div>
                             
                             <div class="card-header">
