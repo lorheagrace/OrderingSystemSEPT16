@@ -69,7 +69,8 @@
         }
     
         .pos-header {
-            background-color: white;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -196,7 +197,8 @@
         }
     
         .cart-item {
-            background: white;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
             border: 1px solid none;
             border-radius: 12px;
             padding: 20px;
@@ -283,11 +285,9 @@
             align-items: center;
             border-radius: 8px;
             overflow: hidden;
-            background: white;
         }
     
         .qty-btn {
-            background: white;
             border: none;
             padding: 8px 12px;
             cursor: pointer;
@@ -315,7 +315,6 @@
             width: 50px;
             text-align: center;
             font-weight: 600;
-            background: white;
             outline: none;
             color: var(--primary-color);
             font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:14 }}{% else %}16{% endif %}px;
@@ -359,7 +358,8 @@
         }
     
         .options-card {
-            background: white;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
             border-left: 2px solid var(--primary-color);
             border-right: 2px solid var(--primary-color);
             border-radius: 16px;
@@ -369,7 +369,8 @@
         }
     
         .summary-card {
-            background: white;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--accent-color);
             border-radius: 5px;
             padding: 20px;
@@ -410,7 +411,8 @@
             border: 2px solid;
             border-color: var(--primary-color);
             border-radius: 12px;
-            background: white;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
