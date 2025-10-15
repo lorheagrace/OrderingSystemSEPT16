@@ -69,8 +69,9 @@
     }
 
     .reviews-header {
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(20px);
       font-family: {{ customization.header_font_family|default:"Arial" }};
-      background-color: rgba(255, 255, 255, 0.63);
       border-radius: var(--border-radius);
       padding: 25px;
       margin-bottom: 25px;
@@ -181,7 +182,8 @@
       padding: 20px;
       border-top: 2px solid var(--primary-color);
       border-bottom: 2px solid var(--primary-color);
-      background: white;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     
@@ -194,7 +196,8 @@
       display: flex;
       align-items-start;
       gap: 15px;
-      margin-bottom: 15px;
+      font-weight: 600;
+      margin-bottom: 5px;
       font-family: {{ customization.header_font_family|default:"Montserrat" }};
       color: {{ customization.header_font_color|default:"#000000" }};
     }
@@ -223,14 +226,13 @@
     }
     
     .review-text {
-      font-weight: 550;
+      font-weight: 600;
       line-height: 1.6;
-      margin: 15px 0;
+      margin: 10px 0;
       font-family: {{ customization.body_font_family|default:"Montserrat" }};
       color: {{ customization.body_font_color|default:"#000000" }};
       font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:12 }}{% else %}16{% endif %}px;
     }
-    
 
     .owner-response {
       background: #f8f9fa;
@@ -275,42 +277,6 @@
       margin-right: 5px;
       font-size: 30px;
     }
-  
-
-    .owner-response {
-      background:white;
-      border: 1px solid var(--primary-color);
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 15px;
-    }
-    
-    .owner-response-header {
-      font-family: {{ customization.header_font_family|default:"Montserrat" }};
-      color: var(--primary-color);
-      font-weight: 600;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .owner-response-date {
-      font-weight: 600;
-      color: #6c757d;
-      font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
-      font-family: {{ customization.body_font_family|default:"Montserrat" }};
-    }
-    
-    .owner-response-text {
-      font-weight: 500;
-      line-height: 1.6;
-      margin: 15px 0;
-      font-family: {{ customization.body_font_family|default:"Montserrat" }};
-      color: {{ customization.body_font_color|default:"#000000" }};
-      font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:12 }}{% else %}16{% endif %}px;
-    }
-  
     
     .reviews-header {
       display: flex;
@@ -458,13 +424,17 @@
     }
  
     .search-sort-container {
+      position: sticky;
+      top: 65px; /* adjust depending on your header height */
+      z-index: 100; /* keeps it above other elements */
       font-family: {{ customization.header_font_family|default:"Montserrat" }};
-      background: white;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(20px);
       padding: 25px 30px;
       border-radius: 16px;
+      border: 2px solid var(--primary-color);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       margin-bottom: 20px;
-      position: relative;
     }
 
     .search-sort-container .input-group {
@@ -530,10 +500,11 @@
 
     
     .rating-summary {
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(20px);
       font-weight: 700;
       font-family: {{ customization.header_font_family|default:"Montserrat" }};
       color: {{ customization.header_font_color|default:"#000000" }};
-      background: white;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.7);
@@ -695,7 +666,28 @@
     </button>
   </div>
 
-  <!-- Search and Sort Controls -->
+
+  <!-- Rating Summary -->
+  {% if reviews %}
+  <div class="rating-summary">
+    <div class="row justify-content-center">
+      <div class="col-xl-4 col-lg-6 col-md-6 text-center">
+        <h3 class="mb-1" id="avgRating">4.5</h3>
+        <div class="star-display justify-content-center mb-2" id="avgStars">
+          <!-- Stars will be populated by JavaScript -->
+        </div>
+        <small class="text-muted">Average Rating</small>
+      </div>
+      <div class="col-md-8">
+        <div id="ratingBars">
+          <!-- Rating bars will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+    <!-- Search and Sort Controls -->
   <div class="search-sort-container">
     <div class="row g-3">
       <div class="col-md-6">
@@ -724,26 +716,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Rating Summary -->
-  {% if reviews %}
-  <div class="rating-summary">
-    <div class="row justify-content-center">
-      <div class="col-xl-4 col-lg-6 col-md-6 text-center">
-        <h3 class="mb-1" id="avgRating">4.5</h3>
-        <div class="star-display justify-content-center mb-2" id="avgStars">
-          <!-- Stars will be populated by JavaScript -->
-        </div>
-        <small class="text-muted">Average Rating</small>
-      </div>
-      <div class="col-md-8">
-        <div id="ratingBars">
-          <!-- Rating bars will be populated by JavaScript -->
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endif %}
 
   <!-- Review Modal -->
   <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
@@ -806,104 +778,130 @@
   </div>
 
   <!-- Reviews Display -->
+   <!-- Reviews Display -->
+<div class="reviews-section">    
   {% if reviews %}
     <div id="reviewsContainer">
       {% for review in reviews %}
-      <div class="review-card" data-rating="{{ review.rating|default:0 }}" data-date="{{ review.submitted_at|date:'c' }}">
-        <div class="review-header">
-        {% if review.anonymous %}
-          <div class="default-avatar">A</div>
-        {% else %}
-          {% if review.user and review.user.image %}
-            <img src="{{ review.user.image.url }}" alt="{{ review.user.first_name }} {{ review.user.last_name }}" class="profile-img">
-          {% else %}
-            {% if review.user %}
-              <div class="default-avatar">{{ review.user.first_name|first|upper }}</div>
-            {% else %}
-              <div class="default-avatar">{{ review.name|first|upper }}</div>
-            {% endif %}
-          {% endif %}
-        {% endif %}
-
-          <div class="review-info flex-grow-1">
-            <h6>
+        <div class="review-card {% if review.is_hidden %}hidden-review{% endif %}" 
+            data-id="{{ review.id }}" 
+            data-rating="{{ review.rating|default:0 }}" 
+            data-date="{{ review.submitted_at|date:'Y-m-d' }}"
+            data-customer="{{ review.name|lower }}"
+            data-content="{{ review.review|lower }}">
+          
+          <div class="d-flex align-items-start">
+            <!-- Profile Image / Avatar -->
+            <div class="flex-shrink-0 me-3">
               {% if review.anonymous %}
-                Anonymous User
+                <div class="default-avatar">A</div>
               {% else %}
-                {% if review.user %}
-                  {{ review.user.first_name }} {{ review.user.last_name }}
+                {% if review.user and review.user.image %}
+                  <img src="{{ review.user.image.url }}" 
+                      alt="{{ review.user.first_name }} {{ review.user.last_name }}" 
+                      class="profile-img" 
+                      style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
                 {% else %}
-                  {{ review.name }}
+                  {% if review.user %}
+                    <div class="default-avatar">{{ review.user.first_name|first|upper }}</div>
+                  {% else %}
+                    <div class="default-avatar" style="width:40px; height:40px; border-radius:50%; background-color:#ccc; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px;">
+                      {{ review.name|first|upper }}
+                    </div>
+                  {% endif %}
                 {% endif %}
               {% endif %}
-            </h6>
-            <div class="star-display">
-              {% for i in "12345" %}
-                {% if forloop.counter <= review.rating %}
-                  <i class="fas fa-star"></i>
-                {% else %}
-                  <i class="far fa-star"></i>
-                {% endif %}
-              {% endfor %}
             </div>
-            <div class="review-date">{{ review.submitted_at|timesince }} ago</div>
-          </div>
-        </div>
-        
-        <div class="review-text">
-          {{ review.review }}
-        </div>
 
-        {% if review.photos.all %}
-          <div class="review-photos">
-            {% for photo in review.photos.all %}
-              <a href="#" onclick="showPhotoModal({{ review.photos.all|length }}, {{ forloop.counter0 }}, [{% for p in review.photos.all %}'{{ p.image.url }}'{% if not forloop.last %}, {% endif %}{% endfor %}]); return false;">
-                <img src="{{ photo.image.url }}" alt="Photo Review">
-              </a>
-            {% endfor %}
-          </div>
-        {% endif %}
-
-        {% if review.owner_response %}
-        <div class="owner-response p-3 mt-3 rounded border bg-light">
-            <div class="d-flex align-items-center mb-2 owner-response-header">
-                <div class="owner-response-icon me-2">
-                    {% if business and business.logo %}
-                        <img src="{{ business.logo.url }}" alt="Logo" 
-                            class="logo-img" 
-                            style="height: 30px; width: 30px; object-fit: cover; border-radius: 50%;" />
+            <!-- Review Content -->
+            <div class="flex-grow-1">
+              <div class="review-info">
+                <div class="review-header">
+                  {% if review.anonymous %}
+                    Anonymous User
+                  {% else %}
+                    {% if review.user %}
+                      {{ review.user.first_name }} {{ review.user.last_name }}
                     {% else %}
-                        <img src="{% static 'images/logo.png' %}" alt="Logo" 
-                            class="logo-img" 
-                            style="height: 30px; width: 30px; object-fit: cover; border-radius: 50%;" />
+                      {{ review.name }}
                     {% endif %}
+                  {% endif %}
                 </div>
-                <h6 class="mb-0 fw-bold">
-                    {% if business and business.business_name %}
-                        {{ business.business_name }}
-                    {% else %}
-                        Owner Response
-                    {% endif %}
-                </h6>
-            </div>
-            <p class="mb-1 owner-response-text">{{ review.owner_response }}</p>
-            <small class="text-muted owner-response-date">
-                {{ review.response_date|timesince }} ago
-            </small>
-        </div>
 
-        {% endif %}
-      </div>
+                <!-- Rating Stars -->
+                <div class="star-display mb-2">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= review.rating %}
+                      <i class="fas fa-star"></i>
+                    {% else %}
+                      <i class="fas fa-star empty"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <span class="review-date">{{ review.submitted_at|timesince }} ago</span>
+              </div>
+
+              <!-- Review Text -->
+              <p class="review-text">{{ review.review }}</p>
+
+              <!-- Review Photos -->
+              {% if review.photos.all %}
+                <div class="review-photos">
+                  {% for photo in review.photos.all %}
+                    <a href="#" onclick="showPhotoModal({{ review.photos.all|length }}, {{ forloop.counter0 }}, [{% for p in review.photos.all %}'{{ p.image.url }}'{% if not forloop.last %}, {% endif %}{% endfor %}]); return false;">
+                      <img src="{{ photo.image.url }}" alt="Photo Review">
+                    </a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <!-- Order Items -->
+              {% if review.order_items %}
+                <div class="order-items-badge">
+                  <i class="fas fa-shopping-bag me-1"></i>
+                  Items: {{ review.order_items }}
+                </div>
+              {% endif %}
+
+              <!-- Owner Response -->
+              {% if review.owner_response %}
+                <div class="owner-response">
+                  <div class="owner-response-header">
+                    <div class="owner-response-icon">
+                        {% if business and business.logo %}
+                            <img src="{{ business.logo.url }}" alt="Logo" class="logo-img" style="height: 30px; width: 30px; object-fit: cover; border-radius: 50%;" />
+                        {% else %}
+                            <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo-img" style="height: 30px; width: 30px; object-fit: cover; border-radius: 50%;" />
+                        {% endif %}
+                    </div>
+                    <h6>
+                        {% if business and business.business_name %}
+                            {{ business.business_name }}
+                        {% else %}
+                            Owner Response
+                        {% endif %}
+                    </h6>
+                  </div>
+                  <p class="mb-2">{{ review.owner_response }}</p>
+                  <small class="text-muted">{{ review.response_date|timesince }} ago</small>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
       {% endfor %}
     </div>
   {% else %}
-    <div class="no-reviews">
-      <i class="fas fa-comment-dots"></i>
-      <h4>No reviews yet</h4>
-      <p>Be the first to share your experience!</p>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-comments"></i>
+      </div>
+      <h4 class="text-muted mb-3">No reviews yet</h4>
     </div>
   {% endif %}
 </div>
+
+
 <div id="photoModal" class="photo-modal">
   <span onclick="closePhotoModal()" class="close-btn">&times;</span>
   <button id="prevPhotoBtn" onclick="prevPhoto()" class="prev-btn">&#8592;</button>
@@ -1140,3 +1138,4 @@
 </script>
 
 {% endblock %}
+ 
