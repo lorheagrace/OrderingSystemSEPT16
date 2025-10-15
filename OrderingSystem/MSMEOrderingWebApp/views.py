@@ -1898,6 +1898,7 @@ def dashboard(request):
         Checkout.objects.filter(status__in=["rejected", "Void"])
     )
 
+
     # ✅ Completed orders updated today (for stats and sales)
     today = localdate()
     tz = get_current_timezone()
@@ -1911,30 +1912,24 @@ def dashboard(request):
 
     total_completed = count_unique_orders(completed_today_qs, use_updated=True)
 
-    # ✅ FIXED: Group ACCEPTED orders by order_code AND created_at date
+    # Group ACCEPTED orders
     ongoing_statuses = ["accepted", "Preparing", "Packed", "Out for Delivery", "Ready for Pickup", "delivered"]
     accepted_orders_raw = Checkout.objects.filter(status__in=ongoing_statuses).order_by('created_at')
-    
     grouped_accepted_orders = defaultdict(list)
     for order in accepted_orders_raw:
-        # ✅ Use created_at date for grouping (not just order_code)
         order_date = order.created_at.date() if order.created_at else None
         composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
         grouped_accepted_orders[composite_key].append(order)
 
     accepted_orders_grouped = []
     for composite_key, items in grouped_accepted_orders.items():
-        # ✅ Extract clean order code from composite key
         clean_order_code = composite_key.split('_')[0]
         accepted_orders_grouped.append({
             'order_code': clean_order_code,
             'items': items,
             'first': items[0],
             'total_price': sum(item.price for item in items),
-            'composite_key': composite_key,  # ✅ Keep composite key for uniqueness
         })
-    
-    # ✅ Sort by created_at (oldest first)
     accepted_orders_grouped.sort(key=lambda x: x['first'].created_at or make_aware(datetime.min, tz))
 
     # Group UNSUCCESSFUL orders (Rejected + Void)
@@ -2002,13 +1997,13 @@ def dashboard(request):
         'total_inventory': total_inventory,
         'accepted_orders_grouped': accepted_orders_grouped,
         'unsuccessful_orders_grouped': unsuccessful_orders_grouped,
-        'completed_orders_grouped': completed_orders_grouped,
+        'completed_orders_grouped': completed_orders_grouped,  # ✅ all completed orders
         'total_pending': total_pending,
         'total_preparing': total_preparing,
         'total_declined': total_declined,
-        'total_completed': total_completed,
+        'total_completed': total_completed,  # ✅ daily completed count
         "riders": riders,
-        "total_sales": total_sales,
+        "total_sales": total_sales,  # ✅ daily sales
     }
 
     return render(request, 'MSMEOrderingWebApp/dashboard.html', context)
