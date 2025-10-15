@@ -73,7 +73,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr); /* For large to small screens (3 cards per row) */
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         @media (min-width: 1200px) { /* For extra-large screens */
@@ -83,7 +83,8 @@
         }
 
         .stat-card {
-            background: white;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
             border-radius: 12px;
             padding: 1.5rem;
             transition: all 0.3s ease;
@@ -139,13 +140,6 @@
             color: {{ customization.header_font_color|default:"#6b7280" }};
         }
 
-        .delivery-table-container {
-            background: white;
-            border-radius: 15px;
-            padding: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
 
         .table {
             width: 100%;
