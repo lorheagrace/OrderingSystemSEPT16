@@ -1915,22 +1915,34 @@ def dashboard(request):
     # Group ACCEPTED orders
     ongoing_statuses = ["accepted", "Preparing", "Packed", "Out for Delivery", "Ready for Pickup", "delivered"]
     accepted_orders_raw = Checkout.objects.filter(status__in=ongoing_statuses).order_by('created_at')
+
+    # Group orders by BOTH order_code and created_at date
     grouped_accepted_orders = defaultdict(list)
     for order in accepted_orders_raw:
-        order_date = order.created_at.date() if order.created_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        if order.created_at:
+            order_date = order.created_at.date()  # use only the date part
+            composite_key = f"{order.order_code}_{order_date}"  # unique per order_code per date
+        else:
+            composite_key = order.order_code
         grouped_accepted_orders[composite_key].append(order)
 
     accepted_orders_grouped = []
     for composite_key, items in grouped_accepted_orders.items():
-        clean_order_code = composite_key.split('_')[0]
+        first_item = items[0]
         accepted_orders_grouped.append({
-            'order_code': clean_order_code,
+            'order_code': first_item.order_code,
+            'created_at': first_item.created_at,  # ✅ store created_at for sorting/display
             'items': items,
-            'first': items[0],
+            'first': first_item,
             'total_price': sum(item.price for item in items),
         })
-    accepted_orders_grouped.sort(key=lambda x: x['first'].created_at or make_aware(datetime.min, tz))
+
+    # Sort by created_at (newest first)
+    accepted_orders_grouped.sort(
+        key=lambda x: x['created_at'] or make_aware(datetime.min, tz),
+        reverse=True
+    )
+
 
     # Group UNSUCCESSFUL orders (Rejected + Void)
     unsuccessful_orders_raw = Checkout.objects.filter(
