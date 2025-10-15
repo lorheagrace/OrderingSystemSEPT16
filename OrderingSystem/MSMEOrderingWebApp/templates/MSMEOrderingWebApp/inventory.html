@@ -81,15 +81,14 @@
         }
 
         .form-section {
-            padding: 10px;
-            background: var(--card-bg);
+            padding: 5px;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
             padding: 2.5rem;
             border-radius: 15px;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             box-shadow: var(--shadow-xl);
             position: relative;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .form-section::before {
@@ -459,13 +458,17 @@
 
         /* Checkbox Groups */
         .sc-card {
-            background: white;
+           background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            margin-bottom: 5px;
             border-radius: 16px;
-            padding: 1rem;
+            padding: 20px;
             border-bottom: 3px solid var(--primary-color);
             border-top: 3px solid var(--primary-color);
-            position: relative;
-            overflow: hidden;
+            position: sticky; /* makes it stay in place while scrolling */
+            top: 72px; /* adjust distance from top */
+            z-index: 100; /* ensures it stays above other elements */
+            overflow: auto;
 
         }
         /* Enhanced Category Tabs */
@@ -474,7 +477,6 @@
             gap: 5px;
             margin-bottom: 2rem;
             padding: 0.5rem;
-            background: var(--card-bg);
             border-radius: 1.5rem;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-light);
@@ -584,6 +586,12 @@
             
             .category-tabs {
                 justify-content: center;
+            }
+
+            .tab-btn {
+                padding: 4px 10px;
+                gap: 3px;
+                font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 10 %}{{ customization.body_font_size|default:8 }}{% else %}10{% endif %}px;
             }
             
             .product-actions {
@@ -984,7 +992,6 @@
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <h4>Upload Image</h4>
                                 <p>Drag & drop or click to browse</p>
-                                <small>PNG, JPG up to 2MB</small>
                                 </div>
                                 <canvas id="image_canvas" width="200" height="200"></canvas>
                             </label>
@@ -1117,7 +1124,7 @@
             </div>
 
             <!-- Card Containing Search Functionality and Category Tabs -->
-            <div class="sc-card p-4 shadow-sm mb-3" style="border-radius: 1rem;">
+            <div class="sc-card">
                 <!-- Search Bar -->
                 <div class="mb-2">
                     <input type="text" id="searchInput" class="form-control" placeholder="Search products..." onkeyup="searchProducts()">
