@@ -87,7 +87,8 @@
 
         .settings-card {
             padding: 0;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
             border-radius: 24px;
             box-shadow: var(--shadow-xl);
             /* overflow: hidden; */
@@ -101,7 +102,8 @@
         }
 
         .card-header {
-            background: white;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(30px);
             padding: 25px;
             border-radius: 24px;
             border-bottom: 1px solid var(--primary-color);
@@ -181,7 +183,7 @@
             justify-content: center;
             cursor: default;
             transition: all 0.3s ease;
-            background: transparent;
+            background: white;
             overflow: hidden;
         }
 
@@ -294,7 +296,7 @@
 
         /* Checkbox Groups */
         .service-section {
-            background: white;
+            backdrop-filter: blur(20px);
             border-radius: 16px;
             padding: 1.5rem;
             border-bottom: 2px solid var(--primary-color);
@@ -551,14 +553,16 @@
         /* customization css start */
 
         .customize-card {
-            background: rgb(255, 255, 255);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
             border-radius: 24px;
             /*overflow: hidden;*/
         }
 
         .custom-card {
+            background: rgba(255, 255, 255, 0);
             padding: 1rem;
-            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
             border-radius: 24px;
             /*overflow: hidden;*/
             border-bottom: 5px solid var(--primary-color);
@@ -574,7 +578,8 @@
         }
 
         .card2-header {
-            background: white;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(30px);
             padding: 15px;
             border-radius: 24px 24px 0 0;
             border-bottom: 1px solid var(--primary-color);
@@ -599,7 +604,7 @@
 
         .card1-header {
             color: var(--primary-color);
-            background: white;
+            backdrop-filter: blur(20px);
             padding: 10px;
             margin-bottom: 15px;
             border-bottom: 2px solid  var(--primary-color);
@@ -2852,3 +2857,4 @@
 </script>
     
 {% endblock %}
+    
