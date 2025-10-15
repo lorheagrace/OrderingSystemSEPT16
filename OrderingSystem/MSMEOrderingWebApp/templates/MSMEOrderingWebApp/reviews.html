@@ -68,7 +68,11 @@
   }
   
   .search-container {
-    background: white;
+    position: sticky;
+    top: 72px; /* adjust depending on your layout/header height */
+    z-index: 100; /* keeps it above other elements */
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(20px);
     border-radius: 15px;
     padding: 20px;
     gap: 2px;
@@ -97,7 +101,8 @@
   }
 
   .rating-summary {
-    background: white;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(20px);
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 2px 10px var(--primary-color);
@@ -136,7 +141,7 @@
   }
 
   .star-display .fa-star.empty {
-    color: #ddd;
+    color: #b4b0b0ff;
   }
 
   .rating-bar {
@@ -147,7 +152,8 @@
 
   .rating-bar-label {
     min-width: 60px;
-    color: #686868;
+    color: #3d3d3dff;
+    font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
     font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 15 %}{{ customization.body_font_size|default:12 }}{% else %}15{% endif %}px;
 
   }
@@ -176,10 +182,11 @@
   }
   
   .review-card {
-    background: white;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--primary-color);
     border-radius: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     padding: 20px;
     transition: box-shadow 0.3s ease;
   }
@@ -241,9 +248,8 @@
   
   .time-badge {
     font-weight: 500;
-    background: #f8f9fa;
     font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
-    color:  #999999;
+    color:  #6b6b6bff;
     font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
   }
   
