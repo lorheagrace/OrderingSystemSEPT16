@@ -1890,7 +1890,7 @@ def dashboard(request):
 
     total_preparing = count_unique_orders(
         Checkout.objects.filter(
-            status__in=["accepted", "Preparing", "Packed", "Ready for Pickup", "Ready for Delivery"]
+            status__in=["accepted", "Preparing", "Packed", "Out for Delivery", "Ready for Pickup", "delivered"]
         )
     )
 
