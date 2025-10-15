@@ -55,11 +55,11 @@
 
 .notifications-header {
     font-family: {{ customization.header_font_family|default:"Arial" }};
-    background: white;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(20px);
     border-radius: var(--border-radius);
     padding: 2rem;
     margin-bottom: 25px;
-    color: white;
     box-shadow: var(--shadow-lg);
 }
 
