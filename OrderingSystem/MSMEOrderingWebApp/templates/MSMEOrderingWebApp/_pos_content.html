@@ -727,6 +727,29 @@
         transition: left 0.5s;
     }
    
+    /* ✅ Center category tabs when screen is narrow */
+    @media (max-width: 992px) {
+        #categoryButtons {
+            justify-content: center !important;
+            text-align: center;
+            gap: 6px;
+        }
+
+        #categoryButtons .btn {
+            flex: 0 1 auto;
+            text-align: center;
+        }
+    }
+
+    /* ✅ Make "View Cart" button responsive */
+    @media (max-width: 768px) {
+        .cart-button {
+            width: 100%;
+            justify-content: center;
+            font-size: 14px;
+            padding: 10px;
+        }
+    }
 
 </style>
 
