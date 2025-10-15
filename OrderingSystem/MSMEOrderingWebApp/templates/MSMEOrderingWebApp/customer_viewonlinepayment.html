@@ -80,13 +80,19 @@
 
     /* Header layout for large screens */
     .header-row {
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
         display: flex;
         justify-content: space-between;
-        align-items: center;
         margin-bottom: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        border: 3px solid var(--primary-color);
     }
 
     .header-title {
+        align-self: start;
         font-family: {{ customization.header_font_family|default:"Montserrat" }};
         color: {{ customization.header_font_color|default:"#000000" }};
         font-size: 2.5rem;
@@ -100,7 +106,8 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: transparent;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
         color: var(--primary-color);
         padding: 0.75rem 1.5rem;
         border: 2px solid var(--primary-color);
@@ -337,7 +344,8 @@
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
-        background: white;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
         border-radius: 20px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
@@ -350,12 +358,13 @@
 
     .empty-text {
         font-size: 1.2rem;
-        color: #6b7280;
+        color: #585858ff;
         font-weight: 500;
     }
 
     .reminder-section {
-        background-color: white;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
         border: 2px solid var(--accent-color);
         padding: 2rem;
         border-radius: 20px;
