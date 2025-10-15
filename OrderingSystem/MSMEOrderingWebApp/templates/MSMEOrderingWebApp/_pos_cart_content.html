@@ -588,30 +588,39 @@
     
         .empty-cart {
             text-align: center;
-            padding: 80px 20px;
-            color: #6b7280;
+            padding: 100px 20px;
+            color: #1f2937;
+            background-color: #ffffff; /* White background for readability */
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            min-height: 350px; /* matches your form card height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto; /* centers horizontally */
         }
-    
+
         .empty-cart i {
             font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.6;
+            margin-bottom: 15px;
             color: var(--primary-color);
         }
-    
+
         .empty-cart h4 {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: #1f2937;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
-    
+
         .empty-cart p {
             font-size: 1rem;
-            color: #6b7280;
-            margin-bottom: 0;
+            color: #4b5563;
+            margin: 0;
         }
-    
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .pos-content {
@@ -1465,4 +1474,3 @@
 </script>
 
 {% endblock %}
-
