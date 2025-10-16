@@ -4154,7 +4154,7 @@ def cashier_dashboard(request):
             order_date = order.updated_at.date() if use_updated and order.updated_at else (
                 order.created_at.date() if order.created_at else None
             )
-            composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+            composite_key = f"{order.order_code}_{order.group_id}_{order_date}" if order_date else f"{order.order_code}_{order.group_id}"
             unique_orders.add(composite_key)
         return len(unique_orders)
 
@@ -4191,7 +4191,7 @@ def cashier_dashboard(request):
     grouped_accepted_orders = defaultdict(list)
     for order in accepted_orders_raw:
         order_date = order.created_at.date() if order.created_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        composite_key = f"{order.order_code}_{order.group_id}"
         grouped_accepted_orders[composite_key].append(order)
 
     accepted_orders_grouped = []
@@ -4213,7 +4213,7 @@ def cashier_dashboard(request):
     grouped_unsuccessful_orders = defaultdict(list)
     for order in unsuccessful_orders_raw:
         order_date = order.created_at.date() if order.created_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        composite_key = f"{order.order_code}_{order.group_id}"
         grouped_unsuccessful_orders[composite_key].append(order)
 
     unsuccessful_orders_grouped = []
@@ -4236,7 +4236,7 @@ def cashier_dashboard(request):
     grouped_completed_orders = defaultdict(list)
     for order in completed_all_qs:
         order_date = order.updated_at.date() if order.updated_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        composite_key = f"{order.order_code}_{order.group_id}"
         grouped_completed_orders[composite_key].append(order)
 
     completed_orders_grouped = []
