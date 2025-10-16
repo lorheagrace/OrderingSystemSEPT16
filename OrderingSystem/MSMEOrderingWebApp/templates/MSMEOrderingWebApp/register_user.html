@@ -517,6 +517,22 @@
             line-height: 1;
         }
 
+        .verify-note {
+            background-color: rgba(37, 99, 235, 0.08); /* soft blue tone */
+            border-left: 4px solid var(--primary-color);
+            color: {{ customization.body_font_color|default:"#000000" }};
+            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16
+            {% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+            line-height: 1.5;
+        }
+
+        .verify-note i {
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+
 
 </style>
 
@@ -632,6 +648,13 @@
             <button type="submit" id="registerBtn" disabled>
                 Register
             </button>
+
+            <div class="verify-note p-2 rounded mb-3 mt-3 d-flex align-items-center">
+                <i class="fas fa-envelope me-2"></i>
+                <span>
+                    After completing your registration, please check your email for the activation link.
+                </span>
+            </div>
 
 
             <a href="{% url 'login' %}">Already have an account? <span class="sign-in-text">Sign In</span></a>
