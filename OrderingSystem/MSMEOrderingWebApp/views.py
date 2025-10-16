@@ -1940,7 +1940,7 @@ def dashboard(request):
     grouped_unsuccessful_orders = defaultdict(list)
     for order in unsuccessful_orders_raw:
         order_date = order.created_at.date() if order.created_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        composite_key = f"{order.order_code}_{order.group_id}"
         grouped_unsuccessful_orders[composite_key].append(order)
 
     unsuccessful_orders_grouped = []
@@ -1963,7 +1963,7 @@ def dashboard(request):
     grouped_completed_orders = defaultdict(list)
     for order in completed_all_qs:
         order_date = order.updated_at.date() if order.updated_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        composite_key = f"{order.order_code}_{order.group_id}"
         grouped_completed_orders[composite_key].append(order)
 
     completed_orders_grouped = []
