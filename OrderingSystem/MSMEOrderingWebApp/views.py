@@ -2291,12 +2291,12 @@ def _generate_sales_report(orders, period_label, styles):
     # ===== GROUP ORDERS =====
     grouped_orders = defaultdict(list)
     for order in completed_orders:
-        key = (order.order_code, order.created_at.strftime("%Y-%m-%d %H:%M"))
+        key = (order.order_code, str(order.group_id))  # ✅ use group_id to distinguish same code orders
         grouped_orders[key].append(order)
 
     # ===== METRICS =====
     total_revenue = sum(float(order.price) for order in completed_orders)
-    total_orders = len(grouped_orders)  # ✅ unique orders
+    total_orders = len(grouped_orders)  # ✅ each group_id is a unique order
     total_items = sum(order.quantity for order in completed_orders)
     avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
 
@@ -2319,16 +2319,15 @@ def _generate_sales_report(orders, period_label, styles):
     story.append(Paragraph("This is a table of all completed orders within the selected period.", styles['summary']))
     story.append(Spacer(1, 10))
 
-    # ✅ Always initialize sales_data before loop
     sales_data = [["Customer", "Date & Time", "Order Code", "Ordered Items", "Order Value"]]
 
-    for (order_code, order_datetime), items in sorted(grouped_orders.items(), key=lambda x: x[0][1]):
+    for (order_code, group_id), items in sorted(grouped_orders.items(), key=lambda x: x[1][0].created_at):
         first_order = items[0]
         customer_name = f"{first_order.first_name} {first_order.last_name}"
+        order_datetime = first_order.created_at.strftime("%Y-%m-%d %H:%M") if first_order.created_at else ""
 
         # Bullet list for items
         ordered_items = "<br/>".join([f"• {o.product_name} (x{o.quantity})" for o in items])
-
         total_value = sum(float(o.price) for o in items)
 
         sales_data.append([
@@ -2339,7 +2338,6 @@ def _generate_sales_report(orders, period_label, styles):
             f"Php {total_value:,.2f}",
         ])
 
-    # ✅ Now sales_data is guaranteed to exist
     sales_table = Table(sales_data, colWidths=[120, 100, 80, 200, 80])
     sales_table.setStyle(_get_table_style())
     story.append(sales_table)
@@ -2359,7 +2357,6 @@ def _generate_sales_report(orders, period_label, styles):
         story.append(Image(pay_chart, width=250, height=250))
         story.append(Spacer(1, 10))
 
-        # ✅ Totals below chart
         pay_data = [["Payment Method", "Total Sales"]]
         for method, total in payment_summary.items():
             pay_data.append([method.title(), f"Php {total:,.2f}"])
@@ -2368,18 +2365,19 @@ def _generate_sales_report(orders, period_label, styles):
         story.append(pay_table)
         story.append(Spacer(1, 20))
 
-    # Narrative analysis
-    sorted_methods = sorted(payment_summary.items(), key=lambda x: x[1], reverse=True)
-    top_method, top_value = sorted_methods[0]
-    total_payment_sales = sum(payment_summary.values())
-    top_pct = (top_value / total_payment_sales * 100) if total_payment_sales > 0 else 0
+    if payment_summary:
+        sorted_methods = sorted(payment_summary.items(), key=lambda x: x[1], reverse=True)
+        top_method, top_value = sorted_methods[0]
+        total_payment_sales = sum(payment_summary.values())
+        top_pct = (top_value / total_payment_sales * 100) if total_payment_sales > 0 else 0
 
-    analysis_text = f"The leading payment method is <b>{top_method.title()}</b>, accounting for Php {top_value:,.2f} ({top_pct:.1f}%) of total revenue."
-    if len(sorted_methods) > 1:
-        second_method, second_value = sorted_methods[1]
-        second_pct = (second_value / total_payment_sales * 100) if total_payment_sales > 0 else 0
-        analysis_text += f" The second most used is <b>{second_method.title()}</b> at Php {second_value:,.2f} ({second_pct:.1f}%)."
-    story.append(Paragraph(analysis_text, styles['summary']))
+        analysis_text = f"The leading payment method is <b>{top_method.title()}</b>, accounting for Php {top_value:,.2f} ({top_pct:.1f}%) of total revenue."
+        if len(sorted_methods) > 1:
+            second_method, second_value = sorted_methods[1]
+            second_pct = (second_value / total_payment_sales * 100) if total_payment_sales > 0 else 0
+            analysis_text += f" The second most used is <b>{second_method.title()}</b> at Php {second_value:,.2f} ({second_pct:.1f}%)."
+        story.append(Paragraph(analysis_text, styles['summary']))
+        story.append(Spacer(1, 20))
 
     # --- Sales by Order Type (Bar Chart + Totals) ---
     order_type_summary = defaultdict(float)
@@ -2393,7 +2391,6 @@ def _generate_sales_report(orders, period_label, styles):
         story.append(Image(type_chart, width=350, height=200))
         story.append(Spacer(1, 10))
 
-        # ✅ Totals below chart
         type_data = [["Order Type", "Total Sales"]]
         for otype, total in order_type_summary.items():
             type_data.append([otype.title(), f"Php {total:,.2f}"])
@@ -2402,18 +2399,18 @@ def _generate_sales_report(orders, period_label, styles):
         story.append(type_table)
         story.append(Spacer(1, 20))
 
-    sorted_types = sorted(order_type_summary.items(), key=lambda x: x[1], reverse=True)
-    top_type, top_value = sorted_types[0]
-    total_type_sales = sum(order_type_summary.values())
-    top_pct = (top_value / total_type_sales * 100) if total_type_sales > 0 else 0
+        sorted_types = sorted(order_type_summary.items(), key=lambda x: x[1], reverse=True)
+        top_type, top_value = sorted_types[0]
+        total_type_sales = sum(order_type_summary.values())
+        top_pct = (top_value / total_type_sales * 100) if total_type_sales > 0 else 0
 
-    analysis_text = f"The majority of sales come from <b>{top_type.title()}</b> orders, generating Php {top_value:,.2f} ({top_pct:.1f}%)."
-    if len(sorted_types) > 1:
-        second_type, second_value = sorted_types[1]
-        second_pct = (second_value / total_type_sales * 100) if total_type_sales > 0 else 0
-        analysis_text += f" In comparison, <b>{second_type.title()}</b> orders contributed Php {second_value:,.2f} ({second_pct:.1f}%)."
-    story.append(Paragraph(analysis_text, styles['summary']))
-
+        analysis_text = f"The majority of sales come from <b>{top_type.title()}</b> orders, generating Php {top_value:,.2f} ({top_pct:.1f}%)."
+        if len(sorted_types) > 1:
+            second_type, second_value = sorted_types[1]
+            second_pct = (second_value / total_type_sales * 100) if total_type_sales > 0 else 0
+            analysis_text += f" In comparison, <b>{second_type.title()}</b> orders contributed Php {second_value:,.2f} ({second_pct:.1f}%)."
+        story.append(Paragraph(analysis_text, styles['summary']))
+        story.append(Spacer(1, 20))
 
     # ===== PRODUCT PERFORMANCE BREAKDOWN =====
     story.append(Paragraph("PRODUCT PERFORMANCE BREAKDOWN", styles['heading']))
@@ -2424,7 +2421,7 @@ def _generate_sales_report(orders, period_label, styles):
         if variation and variation.lower() != "default":
             key = f"{order.product_name} - {variation}"
         else:
-            key = order.product_name  # ✅ no "- Default" if variation is missing or 'Default'
+            key = order.product_name
 
         product_sales[key]["quantity"] += order.quantity
         product_sales[key]["revenue"] += float(order.price)
@@ -2450,11 +2447,8 @@ def _generate_sales_report(orders, period_label, styles):
         prod_table = Table(prod_data, colWidths=[40, 200, 80, 80, 80])
         prod_table.setStyle(_get_table_style())
         story.append(prod_table)
+        story.append(Spacer(1, 20))
 
-    story.append(Spacer(1, 20))
-
-    # ===== PRODUCT PERFORMANCE ANALYSIS =====
-    if product_sales:
         ranked = sorted(product_sales.items(), key=lambda x: x[1]["revenue"], reverse=True)
         best_product, best_data = ranked[0]
         total_sales = sum(p["revenue"] for p in product_sales.values())
@@ -2471,14 +2465,13 @@ def _generate_sales_report(orders, period_label, styles):
                 f" The next best-seller is <b>{second_product}</b>, with {second_data['quantity']} units sold "
                 f"and Php {second_data['revenue']:,.2f} ({second_pct:.1f}%)."
             )
-
         story.append(Paragraph(analysis_text, styles['summary']))
         story.append(Spacer(1, 20))
 
     # ===== TOP CUSTOMERS =====
     story.append(Paragraph("TOP CUSTOMERS BY REVENUE", styles['heading']))
     customer_sales = defaultdict(lambda: {"orders": 0, "revenue": 0})
-    for (order_code, order_datetime), items in grouped_orders.items():
+    for (order_code, group_id), items in grouped_orders.items():
         first_order = items[0]
         key = f"{first_order.first_name} {first_order.last_name}"
         customer_sales[key]["orders"] += 1
@@ -2499,6 +2492,7 @@ def _generate_sales_report(orders, period_label, styles):
 
     story.append(Spacer(1, 20))
     return story
+
 
 
 import matplotlib.pyplot as plt
