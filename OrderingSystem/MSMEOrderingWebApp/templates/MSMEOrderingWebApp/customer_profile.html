@@ -62,14 +62,17 @@
     {% endif %}
 
 
+    .container {
+        padding: 3px;
+    }
     .profile-container {
         background: transparent;
-        min-height: 100vh;
-        padding: 0;
+        padding: 2px;
     }
 
     .profile-card {
-        background: white;
+        background: rgba(255,255,255,0.7);
+        backdrop-filter: blur(20px);
         border-radius: 20px;
         overflow: hidden;
         animation: slideUp 0.6s ease-out;
@@ -201,7 +204,7 @@
     }
 
     .info-card {
-        background: var(--bg-light);
+        backdrop-filter: blur(5px);
         border-radius: 15px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
@@ -325,7 +328,8 @@
     }
 
     .purchase-history {
-        background: white;
+        background: rgba(255,255,255,0.7);
+        backdrop-filter: blur(20px);
         border-radius: 15px;
         padding: 2rem;
         border-top: 4px solid var(--primary-color);
@@ -352,6 +356,10 @@
 
     @media (max-width: 768px) {
         .profile-container {
+            padding: 0;
+        }
+
+        .profile-card {
             padding: 0;
         }
         .profile-title {
@@ -469,7 +477,6 @@
         }
     }
     .table-responsive {
-        background: white;
         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         overflow: hidden;
         margin-top: 1.5rem;
@@ -479,11 +486,10 @@
         width: 100%;
         border-collapse: collapse;
         margin: 0;
+        backdrop-filter: blur(20px);
     }
 
-    .table-light {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    }
+
 
     .table th {
         padding: 10px;
@@ -506,7 +512,6 @@
     }
 
     .table-hover tbody tr:hover {
-        background-color: #f8fafc;
         transition: background-color 0.2s ease;
     }
 
@@ -776,7 +781,7 @@
             {% if grouped_orders %}
             <div class="table-responsive mt-3">
                 <table class="table table-bordered table-hover">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th class="date-ordered">Date Ordered</th>
                             <th class="order-id">Order ID</th>
