@@ -3690,24 +3690,24 @@ def pos_place_order(request):
             ).exists():
                 return JsonResponse({'success': False, 'error': 'Duplicate order code for current business day'})
 
+            # ✅ Shared group ID for all items in the same POS transaction
+            group_id = uuid.uuid4()
+
             # ✅ Get specific order type
             specific_order_type = data.get('order_type', None)
 
             checkout_entries = []
-            grouped_sales = {}  # ✅ Track grouped quantities by base product name
+            grouped_sales = {}
 
             for item in cart_items:
-                # ✅ Split product name properly
-                parts = item.product_name.split(" - ", 1)  # only split on the first " - "
+                parts = item.product_name.split(" - ", 1)
                 if len(parts) < 2:
-                    # no variation, just use full name
                     name = parts[0].strip()
                     variation = ""
                 else:
                     name = parts[0].strip()
                     variation = parts[1].split(" (₱")[0].strip()
 
-                # Deduct stock at variation level
                 try:
                     product = Products.objects.get(
                         name__iexact=name,
@@ -3732,7 +3732,6 @@ def pos_place_order(request):
                         product.stocks = max(0, product.stocks - item.quantity)
                         product.save(update_fields=["stocks"])
 
-                # ✅ Accumulate sales at base product name level
                 grouped_sales[name.lower()] = grouped_sales.get(name.lower(), 0) + item.quantity
 
                 checkout = Checkout.objects.create(
@@ -3746,15 +3745,16 @@ def pos_place_order(request):
                     quantity=item.quantity,
                     price=item.price * item.quantity,
                     sub_total=subtotal,
-                    order_type="walkin",  # general
-                    specific_order_type=specific_order_type,  # ✅ save dropdown value
+                    order_type="walkin",
+                    specific_order_type=specific_order_type,
                     order_code=order_code,
                     payment_method=payment_method,
                     proof_of_payment=proof,
                     additional_notes=additional_notes,
                     status="completed",
                     cash_given=cash_given,
-                    change=change
+                    change=change,
+                    group_id=group_id,  # ✅ same group_id for all walkin items
                 )
                 checkout_entries.append(checkout)
 
