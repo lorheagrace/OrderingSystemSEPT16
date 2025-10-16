@@ -1918,7 +1918,7 @@ def dashboard(request):
     grouped_accepted_orders = defaultdict(list)
     for order in accepted_orders_raw:
         order_date = order.created_at.date() if order.created_at else None
-        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        composite_key = f"{order.order_code}_{order.group_id}"
         grouped_accepted_orders[composite_key].append(order)
 
     accepted_orders_grouped = []
