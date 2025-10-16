@@ -122,11 +122,11 @@
             color: {{ customization.button_text_color|default:'#ffffff' }};
             font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
             border-radius: {{ customization.button_rounded_corner|default:1 }}px;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
+            box-shadow: 0 4px 6px rgba(59, 131, 246, 0);
         }
     
         .header-btn-secondary {
-            background: white;
+            backdrop-filter: blur(3px);
             border-style: solid;
             border-color: var(--primary-color);
             color: var(--primary-color);
@@ -174,12 +174,64 @@
     
         .btn-outline-primary:hover {
             transform: translateY(-2px);
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
             box-shadow: 0 8px 15px rgba(0,0,0,0.2);
             text-decoration: none;
-            color: var(--accent-color);
-            border-color: var(--accent-color);
-            background-color: transparent;
+            color: var(--primary-color);
+            border-style: solid;
+            border-color: var(--primary-color);
         }
+
+        .form-select {
+            padding: 14px 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            border-color: var(--primary-color);
+            color: {{ customization.body_font_color|default:"#000000" }};
+            font-family: '{{ customization.body_font_family|default:"Arial" }}';
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+            border-width: {{ customization.input_border_width|default:1 }}px; 
+            border-style: {{ customization.input_border_style|default:'solid' }};
+            border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+        }
+
+        .form-select:focus{
+            border-color: var(--secondary-color);
+            box-shadow: none;
+            outline: none;
+        }
+
+        .form-select:hover {
+            border-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .select-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            appearance: none; /* hides native arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-right: 35px; /* space for arrow */
+        }
+
+        .select-wrapper i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none; /* arrow won't block clicks */
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
     
     
         .section-title {
@@ -239,7 +291,7 @@
     
         .image-placeholder {
             font-size: 1.5rem;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
     
         .item-details {
@@ -285,6 +337,7 @@
             align-items: center;
             border-radius: 8px;
             overflow: hidden;
+            background: white;
         }
     
         .qty-btn {
@@ -298,6 +351,7 @@
             user-select: none;
             min-width: 36px;
             font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+            background: white;
         }
     
         .qty-btn:hover {
@@ -369,8 +423,7 @@
         }
     
         .summary-card {
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 1);
             border: 1px solid var(--accent-color);
             border-radius: 5px;
             padding: 20px;
@@ -411,8 +464,7 @@
             border: 2px solid;
             border-color: var(--primary-color);
             border-radius: 12px;
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(8px);
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
@@ -433,7 +485,6 @@
         /* Selected state for the option button */
         .option-btn.selected {
             color: {{ customization.button_text_color|default:'#ffffff' }};
-            border-color:linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
         }
     
@@ -591,8 +642,8 @@
         .empty-cart {
             text-align: center;
             padding: 100px 20px;
-            color: #1f2937;
-            background-color: #ffffff; /* White background for readability */
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(20px);
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 100%;
@@ -602,6 +653,7 @@
             justify-content: center;
             align-items: center;
             margin: 0 auto; /* centers horizontally */
+            
         }
 
         .empty-cart i {
@@ -611,16 +663,20 @@
         }
 
         .empty-cart h4 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 8px;
+            font-weight: 800;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            color: {{ customization.header_font_color|default:"#000000" }};
+            font-family: {{ customization.header_font_family|default:"Arial" }};
+            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 25 %}{{ customization.header_font_size|default:20 }}{% else %}25{% endif %}px;
+
         }
 
         .empty-cart p {
-            font-size: 1rem;
-            color: #4b5563;
-            margin: 0;
+            font-weight: 500;
+            color: {{ customization.body_font_color|default:"#000000" }};
+            font-family: {{ customization.body_font_family|default:"Arial" }};
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:12 }}{% else %}16{% endif %}px;
         }
 
         /* Responsive Design */
@@ -657,6 +713,7 @@
             }
             
             .product-image, .no-image {
+                margin: 0;
                 width: 80px;
                 height: 80px;
             }
@@ -685,7 +742,6 @@
             
             .product-image, .no-image {
                 justify-self: center;
-                margin-bottom: 12px;
             }
             
             .item-controls {
@@ -878,12 +934,15 @@
                         <i class="fas fa-list"></i>
                         Order Type
                     </h4>
-                    <select id="orderType" name="order_type" class="form-select">
-                        <option value="">Select Order Type</option>
-                        {% for service in services %}
-                            <option value="{{ service }}">{{ service }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="select-wrapper">
+                        <select id="orderType" name="order_type" class="form-select">
+                            <option value="">Select Order Type</option>
+                            {% for service in services %}
+                                <option value="{{ service }}">{{ service }}</option>
+                            {% endfor %}
+                        </select>
+                        <i class="bi bi-chevron-down"></i> <!-- Bootstrap icon -->
+                    </div>
                 </div>
             </div>
             {% endif %}
