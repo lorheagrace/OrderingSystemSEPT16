@@ -435,3 +435,32 @@ class Customization(models.Model):
 
     def __str__(self):
         return f"Customization Settings - {self.id}"
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=Checkout)
+def auto_disable_user_on_bad_orders(sender, instance, **kwargs):
+    """
+    Automatically disable a user if they have 3 or more
+    unclaimed, canceled, or returned orders.
+    """
+    try:
+        # Match user by email (since Checkout stores email)
+        user = User.objects.filter(email=instance.email).first()
+        if not user:
+            return
+
+        # Count problematic orders for that user
+        bad_orders = Checkout.objects.filter(
+            email=user.email,
+            void_reason__in=['unclaimed', 'canceled', 'returned']
+        ).count()
+
+        # Disable the account if they have 3 or more
+        if bad_orders >= 3 and user.access != 'disabled':
+            user.access = 'disabled'
+            user.save()
+            print(f"[AUTO-DISABLE] {user.email} was disabled due to {bad_orders} bad orders.")
+    except Exception as e:
+        print("Auto-disable check failed:", e)
