@@ -2617,28 +2617,31 @@ def generate_payment_methods_pie_chart(payment_methods):
 def _generate_orders_report(orders, period_label, styles): 
     story = []
     story.append(Paragraph("ORDERS REPORT", styles['title']))
-    
+
     if period_label:
         story.append(Paragraph(period_label, styles['subtitle']))
-    
-    # --- Group orders by order_code + created_at date ---
+
+    # --- Group orders by order_code + group_id ---
     grouped_orders = defaultdict(list)
     for order in orders:
-        date_key = order.created_at.date() if order.created_at else None
-        group_key = (order.order_code, date_key)
+        group_key = (order.order_code, str(order.group_id))  # ✅ use group_id for uniqueness
         grouped_orders[group_key].append(order)
-    
+
     total_orders = len(grouped_orders)
     completed = rejected = ongoing = pending = voided = 0
     payment_methods = defaultdict(int)
     order_types = defaultdict(int)
     order_details = []
-    
-    for (order_code, order_date), order_items in grouped_orders.items():
-        order_items = sorted(order_items, key=lambda o: o.created_at)
+
+    # Define status groups
+    completed_statuses = ["completed"]
+    ongoing_statuses = ["accepted", "preparing", "packed", "out for delivery", "ready for pickup", "delivered"]
+
+    for (order_code, group_id), order_items in grouped_orders.items():
+        order_items = sorted(order_items, key=lambda o: o.created_at or timezone.now())
         first_order = order_items[0]
-        
-        # ✅ Status counters (now includes pending)
+
+        # ✅ Status counters
         status_lower = first_order.status.lower()
         if status_lower in completed_statuses:
             completed += 1
@@ -2650,36 +2653,36 @@ def _generate_orders_report(orders, period_label, styles):
             ongoing += 1
         elif status_lower == "void":
             voided += 1
-        
+
         # Payment + order type
         payment_methods[first_order.payment_method] += 1
-        if hasattr(first_order, "order_type"):
+        if hasattr(first_order, "order_type") and first_order.order_type:
             order_types[first_order.order_type] += 1
-        
+
         total_items = len(order_items)
         order_details.append({
-            'date': first_order.created_at.strftime('%m/%d/%Y'),
-            'time': first_order.created_at.strftime('%H:%M:%S'),
+            'date': first_order.created_at.strftime('%m/%d/%Y') if first_order.created_at else '',
+            'time': first_order.created_at.strftime('%H:%M:%S') if first_order.created_at else '',
             'order_code': order_code,
+            'group_id': group_id,  # ✅ optional (helps debugging)
             'customer': f"{first_order.first_name} {first_order.last_name}",
             'status': first_order.status.title(),
             'payment': first_order.payment_method,
             'total_items': total_items
         })
-    
+
     # ================= ORDER STATUS SUMMARY =================
     story.append(Paragraph("ORDER STATUS SUMMARY", styles['heading']))
 
     status_data = [
         ["Status", "Orders", "Percentage"],
-        ["Completed", str(completed), f"{(completed/total_orders*100 if total_orders else 0):.1f}%"],
-        ["Voided", str(voided), f"{(voided/total_orders*100 if total_orders else 0):.1f}%"],
-        ["Rejected", str(rejected), f"{(rejected/total_orders*100 if total_orders else 0):.1f}%"],
-        ["Ongoing", str(ongoing), f"{(ongoing/total_orders*100 if total_orders else 0):.1f}%"],
-        ["Pending", str(pending), f"{(pending/total_orders*100 if total_orders else 0):.1f}%"],
+        ["Completed", str(completed), f"{(completed / total_orders * 100 if total_orders else 0):.1f}%"],
+        ["Voided", str(voided), f"{(voided / total_orders * 100 if total_orders else 0):.1f}%"],
+        ["Rejected", str(rejected), f"{(rejected / total_orders * 100 if total_orders else 0):.1f}%"],
+        ["Ongoing", str(ongoing), f"{(ongoing / total_orders * 100 if total_orders else 0):.1f}%"],
+        ["Pending", str(pending), f"{(pending / total_orders * 100 if total_orders else 0):.1f}%"],
         ["Total Orders", str(total_orders), "100%" if total_orders else "0%"],
     ]
-
 
     status_table = Table(status_data, colWidths=[120, 80, 100])
     status_table.setStyle(_get_table_style())
@@ -2689,7 +2692,7 @@ def _generate_orders_report(orders, period_label, styles):
     order_status_chart = generate_order_status_bar_chart(completed, rejected, ongoing, voided)
     story.append(Image(order_status_chart, width=400, height=200))
     story.append(Spacer(1, 5))
-    
+
     # Inline explanation for order status
     if total_orders == 0:
         status_expl = (
@@ -2742,22 +2745,22 @@ def _generate_orders_report(orders, period_label, styles):
 
     story.append(Paragraph(status_expl, styles['explanation']))
     story.append(Spacer(1, 7))
-    
+
     # ================= PAYMENT METHODS =================
     story.append(Paragraph("PAYMENT METHODS", styles['heading']))
     payment_data = [["Payment Method", "Orders", "Percentage"]]
     for method, count in sorted(payment_methods.items(), key=lambda x: x[1], reverse=True):
         pct = (count / total_orders * 100) if total_orders > 0 else 0
         payment_data.append([method, str(count), f"{pct:.1f}%"])
-    
+
     payment_methods_chart = generate_payment_methods_pie_chart(payment_methods)
     story.append(Image(payment_methods_chart, width=200, height=200))
-    
+
     payment_table = Table(payment_data, colWidths=[150, 80, 80])
     payment_table.setStyle(_get_table_style())
     story.append(payment_table)
     story.append(Spacer(1, 5))
-    
+
     # Inline explanation for payment methods
     if total_orders == 0 or not payment_methods:
         pay_expl = (
@@ -2769,7 +2772,6 @@ def _generate_orders_report(orders, period_label, styles):
         top_method, top_count = sorted_methods[0]
         top_pct = (top_count / total_orders) * 100
 
-        # Base statement
         pay_expl = (
             f"Out of {total_orders} total orders, the most preferred payment option "
             f"was <b>{top_method}</b>, selected in {top_count} transactions "
@@ -2784,7 +2786,6 @@ def _generate_orders_report(orders, period_label, styles):
                 f"{second_count} orders ({second_pct:.1f}%). "
             )
 
-            # Add commentary depending on dominance
             if top_pct >= 70:
                 pay_expl += (
                     f"This shows a strong reliance on {top_method}, suggesting customers "
@@ -2808,7 +2809,7 @@ def _generate_orders_report(orders, period_label, styles):
 
     story.append(Paragraph(pay_expl, styles['explanation']))
     story.append(Spacer(1, 7))
-    
+
     # ================= ORDER TYPES =================
     if order_types:
         story.append(Paragraph("ORDER TYPES", styles['heading']))
@@ -2816,61 +2817,46 @@ def _generate_orders_report(orders, period_label, styles):
         story.append(Image(order_types_chart, width=400, height=200))
         story.append(Spacer(1, 5))
 
-    # Inline explanation for order types
     sorted_types = sorted(order_types.items(), key=lambda x: x[1], reverse=True)
-    top_type, top_count = sorted_types[0]
-    top_pct = (top_count / total_orders * 100)
-
-
-    # Base statement
-    type_expl = (
-        f"Out of {total_orders} total orders, the most common type was "
-        f"<b>{top_type}</b>, with {top_count} transactions "
-        f"({top_pct:.1f}%). "
-    )
-
-    if len(sorted_types) > 1:
-        second_type, second_count = sorted_types[1]
-        second_pct = (second_count / total_orders * 100)
-        type_expl += (
-            f"The second most frequent type was <b>{second_type}</b>, chosen in "
-            f"{second_count} orders ({second_pct:.1f}%). "
+    if sorted_types:
+        top_type, top_count = sorted_types[0]
+        top_pct = (top_count / total_orders * 100)
+        type_expl = (
+            f"Out of {total_orders} total orders, the most common type was "
+            f"<b>{top_type}</b>, with {top_count} transactions ({top_pct:.1f}%). "
         )
+        if len(sorted_types) > 1:
+            second_type, second_count = sorted_types[1]
+            second_pct = (second_count / total_orders * 100)
+            type_expl += (
+                f"The second most frequent type was <b>{second_type}</b>, chosen in "
+                f"{second_count} orders ({second_pct:.1f}%). "
+            )
 
-        # Add commentary based on dominance
-        if top_pct >= 70:
-            type_expl += (
-                f"This indicates a strong customer preference for {top_type}, "
-                f"making it the clear dominant order type this period."
-            )
-        elif top_pct >= 40:
-            type_expl += (
-                f"Although {top_type} leads, {second_type} also captured a "
-                f"substantial share, reflecting diverse customer behavior."
-            )
+            if top_pct >= 70:
+                type_expl += f"This indicates a strong customer preference for {top_type}."
+            elif top_pct >= 40:
+                type_expl += f"Although {top_type} leads, {second_type} also captured a large share."
+            else:
+                type_expl += "Customers used multiple order types fairly evenly."
         else:
-            type_expl += (
-                f"No single order type dominates, showing that customers "
-                f"utilized multiple order channels fairly evenly."
-            )
-    else:
-        type_expl += (
-            f"Since no other order types were recorded, {top_type} was the only "
-            f"channel customers relied on for this period."
-        )
+            type_expl += f"{top_type} was the only order type recorded this period."
 
-    story.append(Paragraph(type_expl, styles['explanation']))
-    story.append(Spacer(1, 7))
+        story.append(Paragraph(type_expl, styles['explanation']))
+        story.append(Spacer(1, 7))
 
-    
-   # ================= ORDER DETAILS =================
+    # ================= ORDER DETAILS =================
     story.append(Paragraph("ORDER DETAILS", styles['heading']))
 
     order_data = [["Date", "Order Code", "Customer", "Total Items", "Status", "Payment"]]
     for order in order_details:
         order_data.append([
-            order['date'], order['order_code'], order['customer'],
-            str(order['total_items']), order['status'], order['payment']
+            order['date'],
+            order['order_code'],
+            order['customer'],
+            str(order['total_items']),
+            order['status'],
+            order['payment']
         ])
 
     order_table = Table(order_data, colWidths=[70, 80, 120, 80, 80, 80])
@@ -2896,28 +2882,24 @@ def _generate_orders_report(orders, period_label, styles):
             "status, and payment method. "
         )
 
-        # Add insights based on data
         if completed > max(rejected, ongoing):
             pct = (completed / total_orders) * 100
             order_expl += (
                 f"A majority of these orders were successfully completed "
-                f"({completed} orders, {pct:.1f}%), which reflects strong order fulfillment performance. "
+                f"({completed} orders, {pct:.1f}%), reflecting strong order fulfillment."
             )
         elif rejected > max(completed, ongoing):
             pct = (rejected / total_orders) * 100
             order_expl += (
                 f"A significant portion of orders were rejected "
-                f"({rejected} orders, {pct:.1f}%), highlighting potential issues with cancellations "
-                "or order validation. "
+                f"({rejected} orders, {pct:.1f}%), highlighting possible order issues."
             )
         elif ongoing > max(completed, rejected):
             pct = (ongoing / total_orders) * 100
             order_expl += (
-                f"Many of the orders remain in ongoing statuses "
-                f"({ongoing} orders, {pct:.1f}%), suggesting active processing during this period. "
+                f"Many orders remain ongoing ({ongoing} orders, {pct:.1f}%), suggesting active processing."
             )
 
-        # Payment mode highlight
         payments = {}
         for o in order_details:
             payments[o['payment']] = payments.get(o['payment'], 0) + 1
@@ -2926,8 +2908,8 @@ def _generate_orders_report(orders, period_label, styles):
             top_count = payments[top_method]
             pct = (top_count / total_orders) * 100
             order_expl += (
-                f"In terms of payments, the most frequently used method was "
-                f"<b>{top_method}</b>, applied in {top_count} orders ({pct:.1f}%)."
+                f" The most used payment method was <b>{top_method}</b>, "
+                f"appearing in {top_count} orders ({pct:.1f}%)."
             )
 
     story.append(Paragraph(order_expl, styles['explanation']))
