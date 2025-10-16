@@ -1464,6 +1464,22 @@
 </div>
 
 <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const productNameInput = document.getElementById('product_name');
+
+        // Block typing '-'
+        productNameInput.addEventListener('keydown', function (e) {
+            if (e.key === '-') e.preventDefault();
+        });
+
+        // Remove any pasted '-'
+        productNameInput.addEventListener('input', function () {
+            this.value = this.value.replace(/-/g, '');
+        });
+    });
+
+
     document.addEventListener('DOMContentLoaded', function () {
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
