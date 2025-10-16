@@ -65,14 +65,15 @@
             left: var(--sidebar-width);
             right: 0;
             height: var(--navbar-height);
-            background-color: var(--navbar-bg);
-            border-bottom: 1px solid #dee2e6;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(30px);
+            border-bottom: 2px solid var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
             z-index: 1030;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.32);
             transition: left 0.3s ease;
         }
 
@@ -156,7 +157,7 @@
         }
 
         .sidebar-header{
-            line-height: 20px;;
+            line-height: 15px;;
             text-shadow: 2px 2px 5px black;
             font-family: "{{ customization.header_font_family|default:"Arial" }}";
             color: {{ customization.header_font_color|default:"#000000" }};
@@ -167,9 +168,9 @@
         .sidebar-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 1.25rem;
-            padding: 15px;
+            gap: 10px;
+            font-size: 1.20rem;
+            padding: 9px;
             border-bottom: 2px solid;
             border-color: var(--primary-color);
             cursor: pointer;
@@ -186,7 +187,6 @@
             line-height: 1.2;
         }
 
-
         .sidebar-logo img {
             width: auto;
             height: 50px;
@@ -199,13 +199,15 @@
         }
 
         .sidebar.collapsed .sidebar-logo img {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
+            align-items: center;
         }
 
         .sidebar.collapsed .sidebar-logo span {
             opacity: 0;
             visibility: hidden;
+            align-items: center;
         }
 
         .sidebar.collapsed .logo-text {
@@ -270,7 +272,7 @@
 
         /* Sidebar Footer */
         .sidebar-footer {
-            padding: 15px 0;
+            padding: 5px 0 30px 0;
             border-top: 2px solid;
             border-color: var(--primary-color);
         }
@@ -839,7 +841,7 @@
 
                 <li><a href="{% url 'inventory' %}" class="{% if request.resolver_match.url_name == 'inventory' %}active{% endif %}">
                     <i class="bi bi-box-seam"></i> 
-                    <span class="sidebar-label">Inventory</span>
+                    <span class="sidebar-label">Products</span>
                 </a></li>
 
                 {% if 'OnSite' in business.services_offered %}
