@@ -1881,7 +1881,7 @@ def dashboard(request):
             order_date = order.updated_at.date() if use_updated and order.updated_at else (
                 order.created_at.date() if order.created_at else None
             )
-            composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+            composite_key = f"{order.order_code}_{order.group_id}_{order_date}" if order_date else f"{order.order_code}_{order.group_id}"
             unique_orders.add(composite_key)
         return len(unique_orders)
 
