@@ -440,21 +440,23 @@ def update_order_status(request):
 
     return JsonResponse({"success": False, "error": "Invalid request"})
 
-def send_email_notification(recipient_email, status, order_code, orders, void_reason=None):
-    # Get customization settings
+def send_email_notification(recipient_email, status, order_code, orders, rejection_reason=None, void_reason=None):
+    # Get customization and business info
     customization = get_or_create_customization()
     business = BusinessDetails.objects.first()
 
     # Prepare subject
     subject = f"Your order has been {status.capitalize()}"
 
-    # Generate item lines dynamically from the passed 'orders' list
-    item_lines = []
-    total_price = 0
-    for order in orders:
-        item_lines.append(f"<tr><td style='padding: 10px; text-align: left;'>{order.product_name} (x{order.quantity})</td><td style='padding: 10px; text-align: right;'>₱{order.price:.2f}</td></tr>")
-        total_price += order.price * order.quantity  # Calculate total price
+    # ✅ Correct total price computation
+    total_price = sum(order.price for order in orders)
 
+    # Generate item rows
+    item_lines = [
+        f"<tr><td style='padding: 10px; text-align: left;'>{order.product_name} (x{order.quantity})</td>"
+        f"<td style='padding: 10px; text-align: right;'>₱{order.price:.2f}</td></tr>"
+        for order in orders
+    ]
     item_list = "\n".join(item_lines)
 
     # Message Content Based on Status
