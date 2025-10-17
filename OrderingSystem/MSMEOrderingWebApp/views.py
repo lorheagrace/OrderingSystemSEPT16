@@ -4602,6 +4602,7 @@ def staff_profile(request):
         'customization': customization,
         'business': business,
         'user_data': staff_data,
+		'title':'Profile'
         'base_template': base_template
     }
 
