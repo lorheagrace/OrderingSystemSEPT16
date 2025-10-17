@@ -34,7 +34,7 @@
     
     {% load static %}
     
-    <style>
+        <style>
         :root {
             --sidebar-width: 250px;
             --navbar-height: 70px;
@@ -65,14 +65,15 @@
             left: var(--sidebar-width);
             right: 0;
             height: var(--navbar-height);
-            background-color: var(--navbar-bg);
-            border-bottom: 1px solid #dee2e6;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(30px);
+            border-bottom: 2px solid var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
             z-index: 1030;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.32);
             transition: left 0.3s ease;
         }
 
@@ -156,7 +157,7 @@
         }
 
         .sidebar-header{
-            line-height: 20px;
+            line-height: 15px;;
             text-shadow: 2px 2px 5px black;
             font-family: "{{ customization.header_font_family|default:"Arial" }}";
             color: {{ customization.header_font_color|default:"#000000" }};
@@ -167,9 +168,9 @@
         .sidebar-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 1.25rem;
-            padding: 15px;
+            gap: 10px;
+            font-size: 1.20rem;
+            padding: 9px;
             border-bottom: 2px solid;
             border-color: var(--primary-color);
             cursor: pointer;
@@ -186,7 +187,6 @@
             line-height: 1.2;
         }
 
-
         .sidebar-logo img {
             width: auto;
             height: 50px;
@@ -199,13 +199,15 @@
         }
 
         .sidebar.collapsed .sidebar-logo img {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
+            align-items: center;
         }
 
         .sidebar.collapsed .sidebar-logo span {
             opacity: 0;
             visibility: hidden;
+            align-items: center;
         }
 
         .sidebar.collapsed .logo-text {
@@ -252,6 +254,7 @@
             color: {{ customization.navigation_text_color|default:"#000000" }};
         }
 
+
         .sidebar-nav a:hover,
         .sidebar-nav a.active {
             border-left: 5px solid;
@@ -269,7 +272,7 @@
 
         /* Sidebar Footer */
         .sidebar-footer {
-            padding: 15px 0;
+            padding: 5px 0 30px 0;
             border-top: 2px solid;
             border-color: var(--primary-color);
         }
@@ -342,7 +345,7 @@
         .sidebar.collapsed .logout-btn span {
             display: none !important;
         }
-
+        
         /* Responsive Design */
         
         /* Tablets and small desktops (768px - 1199px) */
@@ -456,6 +459,259 @@
             }
         }
 
+        .delivery-fee-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 15px;
+            z-index: 10000;
+            width: 380px;
+            box-shadow: 0 20px 40px var(--primary-color);
+        }
+
+        .delivery-modal-content {
+            background: white;
+            border-radius: 15px;
+        }
+
+        .delivery-modal-header {
+            display: flex;
+            align-items: center;
+            flex-direction: column; 
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .delivery-fee-modal h4 {
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            font-family: "{{ customization.header_font_family|default:"Arial" }}";
+            color: {{ customization.button_text_color|default:'#ffffff' }};
+            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
+            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+        }
+
+        .delivery-modal-section {
+            padding-bottom: 15px;
+            padding-left: 15px;
+            padding-right: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .delivery-modal-section:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .delivery-modal-label {
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 12 %}12
+            {% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+            color: {{ customization.body_font_color|default:"#000000" }};
+        }
+
+        .delivery-modal-value {
+            margin: 0;
+            color: #1f2937;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .delivery-address-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .delivery-address-container .modal-value {
+            flex: 1;
+        }
+
+        .delivery-copyAddressBtn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+            padding: 6px 12px;
+            font-size: 10px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: transform 0.2s ease;
+        }
+
+        .delivery-copyAddressBtn:hover {
+            transform: translateY(-1px) scale(1.05);
+        }
+
+        .modalItems {
+            background: rgba(248, 249, 250, 0.8);
+            border: 1px solid rgba(233, 236, 239, 0.5);
+            border-radius: 6px;
+            padding: 12px;
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.4;
+            font-weight: 700;
+            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+            color: {{ customization.body_font_color|default:"#000000" }};
+        }
+
+        .delivery-total-price {
+            background: rgba(255, 255, 255, 0.6);
+            padding-left: 15px;
+            padding-right: 15px;
+
+        }
+
+        .delivery-total-price .delivery-modal-value {
+            background: var(--primary-color);
+            font-weight: 700;
+            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 12 %}12
+            {% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+            color: {{ customization.body_font_color|default:"#000000" }};
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .delivery-input-section {
+            margin-bottom: 20px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .delivery-fee-modal label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+        }
+
+        .delivery-fee-modal input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            color: {{ customization.body_font_color|default:"#000000" }};
+            font-family: '{{ customization.body_font_family|default:"Arial" }}';
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+            border-width: {{ customization.input_border_width|default:1 }}px; 
+            border-style: {{ customization.input_border_style|default:'solid' }};
+            border-color: {{ customization.primary_color|default:'#000000' }};
+            border-radius: {{ customization.input_rounded_corner|default:1 }}px;
+        }
+
+        .delivery-fee-modal input[type="number"]:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .delivery-button-container {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            padding-right: 15px;
+        }
+
+        .rejectDeliveryFeeBtn{
+            background: rgba(107, 114, 128, 0.1);
+            border: none;
+            padding: 10px 20px;
+            font-size: 12px;
+            color: #6b7280;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            font-family: {{ customization.header_font_family|default:"Arial" }};
+            border-radius: {{ customization.button_rounded_corner|default:1 }}px;
+        }
+
+        .rejectDeliveryFeeBtn:hover {
+            background: rgba(107, 114, 128, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .submitDeliveryFeeBtn {
+            padding: 10px 24px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            border-radius: {{ customization.button_rounded_corner|default:1 }}px;
+            font-family: {{ customization.header_font_family|default:"Montserrat" }};
+            background: linear-gradient(90deg, {{ customization.primary_color|default:'#000000' }}, {{ customization.secondary_color|default:'#808080' }}); /* Gradient background */
+            color: {{ customization.button_text_color|default:'#ffffff' }};
+        }
+
+        .submitDeliveryFeeBtn:hover {
+            background: linear-gradient(90deg, {{ customization.secondary_color|default:'#000000' }}, {{ customization.primary_color|default:'#808080' }}); /* Gradient background */
+        }
+
+        /* Backdrop to disable background clicks */
+        .delivery-fee-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 9999; /* Just below the modal */
+        }
+
+        /* Responsive notification badge size */
+        #notification-badge {
+            font-size: 0.7em;          /* Scale with icon size */
+            padding: 0.35em 0.5em;     /* Relative padding */
+            min-width: 1.4em;          /* Keeps round shape */
+            min-height: 1.4em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Medium devices: make badge slightly bigger */
+        @media (max-width: 992px) {
+            #notification-badge {
+                font-size: 0.8em;
+                min-width: 1.6em;
+                min-height: 1.6em;
+            }
+        }
+
+        /* Small devices: bigger for visibility */
+        @media (max-width: 576px) {
+            #notification-badge {
+                font-size: 0.9em;
+                min-width: 1.8em;
+                min-height: 1.8em;
+            }
+        }
+
         /* Reuse main logo-circle styles, but adjust size for sidebar */
         .sidebar-logo-circle {
             width: 55px;
@@ -471,6 +727,48 @@
             font-weight: bold;
             font-size: 15px;
             color: #333;
+        }
+
+        .timer-container {
+            margin-top: -4px;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: left;
+            align-items: left;
+            gap: 6px;
+        }
+    
+        .timer-label {
+            font-size: 13px;
+            font-weight: 700;
+            font-family: "{{ customization.header_font_family|default:"Arial" }}";
+            color: {{ customization.button_text_color|default:'#ffffff' }};
+            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
+            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+        }
+    
+    
+        .timer-display {
+            fontsize: 12px;
+            font-weight: 600;
+            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+            color: {{ customization.body_font_color|default:"#000000" }};
+            color: {{ customization.button_text_color|default:'#ffffff' }};   
+        }
+        .timer-icon {
+            width: 13px;
+            height: 13px;
+            border: 2px solid {{ customization.body_font_color|default:"#000000" }};
+            border-top: 2px solid transparent; /* creates spinner effect */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
         }
         
     </style>
