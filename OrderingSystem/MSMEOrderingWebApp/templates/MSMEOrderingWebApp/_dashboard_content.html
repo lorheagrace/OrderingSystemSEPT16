@@ -194,10 +194,8 @@
         }
 
         .tabs-container {
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(20px);
+            background: rgba(255,255,255,0.35);
             border-radius: 16px;
-            box-shadow: var(--card-shadow);
             padding: 2px;
         }
 
@@ -205,24 +203,30 @@
             display: flex;
             border-bottom: 2px solid var(--primary-color);
             overflow-x: auto;
+            background: rgba(255, 255, 255, 0.30);
+            border-radius: 16px 16px 0 0;
+
         }
 
         .tab-button {
             color: rgba(61, 61, 61, 1);
             padding: 1rem 2rem;
-            background: none;
+            background: transparent ;
+            backdrop-filter: blur(20px);
             border: none;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
             position: relative;
+            border-radius: 16px 16px 0 0;
             font-family:  {{ customization.header_font_family|default:"Montserrat" }};
             font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 15 %}{{ customization.header_font_size|default:12 }}{% else %}15{% endif %}px;
         }
 
         .tab-button.active {
             color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(20px);
             font-weight: 900;
             border-radius: 16px 16px 0 0;
@@ -311,12 +315,13 @@
 
         .filter-badges {
             display: flex;
-            gap: 0.5rem;
+            gap: 5px;
             flex-wrap: wrap;
             font-family: {{ customization.body_font_family|default:"Arial" }};
         }
 
         .filter-badge {
+            font-weight: 600; 
             padding: 0.5rem 1rem;
             background: #f3f4f6;
             border: 1px solid #d1d5db;
@@ -344,7 +349,8 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            background: white;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(20px);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
@@ -356,14 +362,14 @@
         }
 
         .modern-table th {
-             text-align: center;
-            border-right: 1px solid var(--primary-color);
+            text-align: center;
             border-top: none;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             padding: 1rem 0.75rem;
             white-space: nowrap;
+            color: {{ customization.button_text_color|default:"#ffffff" }};
             background-color: var(--accent-color);
             font-family: '{{ customization.header_font_family|default:"Arial" }}';
             font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
@@ -375,7 +381,7 @@
             line-height: 1.2;
             word-break: break-word; 
             white-space: normal;    
-            border-right: 0.5px solid var(--primary-color);
+            border-right: 0.5px solid #80808081;
             border-bottom: 0.5px solid #80808081;
             font-weight: 600;
             font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
@@ -535,8 +541,12 @@
     
 
     .order-card {
+        background: rgba(255,255,255,0.55);
+        border-top: none;
+        border-left: 1px solid var(--primary-color);
+        border-right: 1px solid var(--primary-color);
+        border-bottom: 1px solid var(--primary-color);
         backdrop-filter: blur(5px);
-        border: 1px solid var(--accent-color);
         border-radius: 12px;
         overflow: hidden;
         position: relative;
