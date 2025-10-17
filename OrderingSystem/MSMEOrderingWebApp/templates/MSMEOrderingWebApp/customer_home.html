@@ -1306,6 +1306,32 @@
         font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 15 %}{{ customization.body_font_size|default:12 }}{% else %}15{% endif %}px !important;  
     }
 
+     /* ✅ Center 3rd best-seller on phones and keep same size as others */
+    @media (max-width: 768px) {
+        #bestsellerGrid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #bestsellerGrid > .col-6 {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 3rd card stays centered but keeps same width */
+        #bestsellerGrid > .col-6:nth-child(3) {
+            flex: 0 0 50%;
+            max-width: 50%;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        #bestsellerGrid > .col-6 > .card {
+            width: 100%;
+        }
+    }
+
 </style>
 
 
