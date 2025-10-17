@@ -71,8 +71,8 @@
 
     /* Card Enhancements */
     .card {
-        backdrop-filter: blur(10px);
-        background: rgba(255, 255, 255, 0.95) !important;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
         transition: all 0.3s ease;
     }
 
@@ -115,7 +115,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f8f9fa;
+        backdrop-filter: blur(20px);
         transition: all 0.3s ease;
         overflow: hidden;
         position: relative; /* Needed for overlay positioning */
@@ -330,7 +330,8 @@
 
     
     .saved-payment-title {
-        background-color: white;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -355,47 +356,38 @@
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        font-size: 0.95rem;
-        background-color: #fff;
+        font-size: 0.95rem;   
     }
 
     #payment-table thead th {
-        position: relative; /* Required for ::before to work */
-        font-family: {{ customization.header_font_family|default:"Montserrat" }};
-        color: {{ customization.header_font_color|default:"#000000" }};
-        font-weight: 700;
-        border-bottom: 2px solid #dee2e6;
+        text-align: center;
+        border-right: 1px solid var(--primary-color);
+        border-top: none;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        padding: 12px;
-        overflow: hidden; /* Clip the ::before to the cell */
-        z-index: 1;
-        background-color: transparent; /* let ::before show through */
-    }
-
-    #payment-table thead th::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, #f8fafc, {{ customization.accent_color|default:'#FF5733' }});
-        opacity: 0.5;
-        z-index: -1;
+        padding: 1rem 0.75rem;
+        white-space: nowrap;
+        background-color: var(--accent-color);
+        color: {{customization.body_font_color|default:"#ffffff"}};
+        font-family: '{{ customization.header_font_family|default:"Arial" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
     }
 
     #payment-table tbody td {
-        font-weight: 600;;
+        text-align: center;
+        padding: 0.80rem;
         vertical-align: middle;
-        padding: 12px;
-        font-family: {{ customization.body_font_family|default:"Montserrat" }};
+        font-weight: 600;
+        border-bottom: 1px solid var(--accent-color);
+        font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
         color: {{ customization.body_font_color|default:"#000000" }};
-        background-color: #ffffff;
     }
 
     #payment-table tbody tr:hover {
-        background-color: #f1f3f5;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
         transition: background-color 0.2s ease-in-out;
     }
 
@@ -493,7 +485,8 @@
         font-size: 13px;
         font-weight: 500;
         color: var(--text-muted);
-        background-color: #f8f9fa; /* Light background for badge */
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
         padding: 5px 10px;
         border-radius: 10px;
     }
