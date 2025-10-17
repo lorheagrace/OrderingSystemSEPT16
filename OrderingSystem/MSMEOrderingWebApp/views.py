@@ -3359,7 +3359,7 @@ def inventory(request):
     context = {
         'categories': categories,
         'products': products,
-        'title': 'Inventory',
+        'title': 'Products',
         'customization': customization,
         'business': business
     }
