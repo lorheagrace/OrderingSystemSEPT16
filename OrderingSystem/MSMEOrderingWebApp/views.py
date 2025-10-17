@@ -3870,7 +3870,7 @@ def delivery(request):
     out_for_delivery_count = len([group for group in delivery_orders_grouped if group['status'].lower() == 'out for delivery'])
     delivered_today_count = len([
         group for group in delivery_orders_grouped
-        if group['status'].lower() == 'delivered' and group['created_at'].date() == today
+        if group['status'].lower() == 'delivered' and group['first'].updated_at.date() == today
     ])
 
     context = {
@@ -4409,7 +4409,7 @@ def deliveryrider_home(request):
     out_for_delivery_count = len([group for group in delivery_orders_grouped if group['status'].lower() == 'out for delivery'])
     delivered_today_count = len([
         group for group in delivery_orders_grouped
-        if group['status'].lower() == 'delivered' and group['created_at'].date() == today
+        if group['status'].lower() == 'delivered' and group['first'].updated_at.date() == today
     ])
 
     context = {
