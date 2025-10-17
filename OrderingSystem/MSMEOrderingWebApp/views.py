@@ -215,7 +215,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
     <html>
     <body style="margin: 0; padding: 0; 
                 font-family: '{{{{ customization.header_font_family|default:"Arial" }}}}', sans-serif;
-                background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary});
+                background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
                 min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 
         <!-- Glass Card -->
@@ -563,7 +563,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
     <html>
     <body style="margin: 0; padding: 0; 
                 font-family: '{{{{ customization.header_font_family|default:"Arial" }}}}', sans-serif;
-                background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary});
+                background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
                 min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 
         <!-- Glass Card -->
@@ -1865,7 +1865,7 @@ def register_user(request):
         # Email body
         body = f"""
         <html>
-        <body style="margin: 0; padding: 0; font-family: "{{ customization.header_font_family|default:"Arial" }}"; background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary}); min-height: 100vh;">
+        <body style="margin: 0; padding: 0; font-family: "{{ customization.header_font_family|default:"Arial" }}"; background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color}); min-height: 100vh;">
 
             <table align="center" width="600" style="border-collapse: collapse; margin: 40px auto; background: rgba(255, 255, 255, 0.05); border-radius: 25px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); overflow: hidden;">
 
@@ -5697,7 +5697,7 @@ def forgot_password(request):
             <html>
             <body style="margin: 0; padding: 0; 
                         font-family: '{{{{ customization.header_font_family|default:"Arial" }}}}', sans-serif; 
-                        background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary}); 
+                        background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color}); 
                         min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 
                 <!-- Card Container -->
