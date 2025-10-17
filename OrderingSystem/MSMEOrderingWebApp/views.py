@@ -212,105 +212,162 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         """
 
     # Build the body of the email
+
     body = f"""
     <html>
-    <body style="margin: 0; padding: 0; 
-                font-family: '{{{{ customization.header_font_family|default:"Arial" }}}}', sans-serif;
-                background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
-                min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <head>
+    <style>
+        /* Default (Light Mode) Styles */
+        body {{
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
+            color: #222;
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+        }}
 
-        <!-- Glass Card -->
-        <div style="max-width: 650px; width: 90%; background: rgba(255, 255, 255, 0.8);
-                    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-                    border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-                    overflow: hidden; border: 1px solid rgba(255,255,255,0.2);
-                    text-align: center; padding: 30px 25px; margin: 40px auto; position: relative;">
+        .card {{
+            max-width: 650px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            padding: 30px 25px;
+            margin: 40px auto;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+        }}
 
-        <!-- Header Strip -->
-        <div style="background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
-                    padding: 8px 0; border-radius: 6px; margin-bottom: 16px;">
-            <h1 style="font-size: 24px; font-weight: 800;
-                    color: {{{{ customization.button_text_color|default:'#ffffff' }}}};
-                    letter-spacing: 0.5px; margin: 0; text-transform: uppercase;">
-            Order Update
-            </h1>
-        </div>
+        .message {{
+            font-size: 16px;
+            color: #222;
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }}
 
-        <!-- Order Code Box -->
-        <div style="display: inline-block; background: rgba(255,255,255,0.25); 
-                    padding: 12px 30px; border-radius: 8px; 
-                    border: 1px solid rgba(255,255,255,0.3); 
-                    color: {customization.primary_color}; 
-                    font-size: 26px; font-weight: 800; 
-                    letter-spacing: 1px; 
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
-                    margin-bottom: 18px;">
-            {order_code}
-        </div>
+        .receipt {{
+            background: #fff;
+            color: #222;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            padding: 22px;
+            margin-top: 10px;
+            border: 1px solid rgba(0,0,0,0.2);
+            font-family: 'Courier New', monospace;
+        }}
 
-        <div style="font-size: 17px; color: rgba(255,255,255,0.85); text-align: center; margin-bottom: 20px;">
-            {message_content}
-        </div>
+        .contact {{
+            margin-top: 22px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            text-align: center;
+        }}
 
-        <!-- Receipt Section -->
-        <div style="background: #fff; color: #333; border-radius: 10px; 
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-                    text-align: left; padding: 22px; margin-top: 10px; 
-                    font-family: 'Courier New', monospace; border: 1px solid #fff;">
+        .contact a {{
+            color: {customization.button_text_color};
+            text-decoration: none;
+            font-weight: 500;
+        }}
 
-            <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">
-            🧾 Order Summary
-            </h3>
-            <hr style="border: none; border-top: 1px dashed #aaa; margin: 10px 0;">
+        /* Dark Mode Styles */
+        @media (prefers-color-scheme: dark) {{
+            body {{
+                background: linear-gradient(135deg, #1a1a1a, #333);
+                color: #eee;
+            }}
 
-            <table width="100%" style="border-collapse: collapse; font-size: 14px;">
-            <thead>
-                <tr>
-                <th align="left" style="padding-bottom: 6px;">Item</th>
-                <th align="right" style="padding-bottom: 6px;">Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                {item_list}
-            </tbody>
-            </table>
+            .card {{
+                background: rgba(30, 30, 30, 0.9);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                color: #eee;
+            }}
 
-            <hr style="border: none; border-top: 1px dashed #aaa; margin: 10px 0;">
-            <p style="text-align: right; font-weight: bold; font-size: 15px;">Total: ₱{total_price:.2f}</p>
-            <p style="text-align: center; font-size: 13px; color: #555; margin-top: 12px;">
+            .message {{
+                background: rgba(255, 255, 255, 0.05);
+                color: #f0f0f0;
+            }}
+
+            .receipt {{
+                background: rgba(40, 40, 40, 0.9);
+                color: #f0f0f0;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }}
+
+            .contact {{
+                color: rgba(255,255,255,0.8);
+            }}
+
+            .contact a {{
+                color: {customization.button_text_color};
+            }}
+        }}
+    </style>
+    </head>
+    <body>
+
+        <div class="card">
+
+            <!-- Header Strip -->
+            <div style="background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
+                        padding: 8px 0; border-radius: 6px; margin-bottom: 16px;">
+                <h1 style="font-size: 24px; font-weight: 800; color: {customization.button_text_color};
+                        letter-spacing: 0.5px; margin: 0; text-transform: uppercase;">
+                    Order Update
+                </h1>
+            </div>
+
+            <!-- Order Code Box -->
+            <div style="display: inline-block; background: rgba(255,255,255,0.25);
+                        padding: 12px 30px; border-radius: 8px;
+                        border: 1px solid rgba(255,255,255,0.3);
+                        color: {customization.primary_color};
+                        font-size: 26px; font-weight: 800;
+                        letter-spacing: 1px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                        margin-bottom: 18px;">
+                {order_code}
+            </div>
+
+            <!-- Dynamic Message -->
+            <div class="message">
+                {message_content}
+            </div>
+
+            <!-- Receipt Section -->
+            <div class="receipt">
+                <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
+                <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
+                <table width="100%" style="border-collapse: collapse; font-size: 14px;">
+                    <thead>
+                        <tr><th align="left" style="padding-bottom: 6px;">Item</th><th align="right" style="padding-bottom: 6px;">Price</th></tr>
+                    </thead>
+                    <tbody>{item_list}</tbody>
+                </table>
+                <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
+                <p style="text-align: right; font-weight: bold; font-size: 15px;">Total: ₱{total_price:.2f}</p>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="contact">
+                <span>📍 {business.store_address}</span>
+                <span>📞 {business.contact_number}</span>
+                <span>✉️ <a href="mailto:{business.email_address}">{business.email_address}</a></span>
+            </div>
+
+            <p style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.75);">
+                © 2025 {business.business_name}. All rights reserved.
             </p>
         </div>
 
-
-       <div style="
-            margin-top: 22px; 
-            font-size: 13px; 
-            color: rgba(255,255,255,0.8);
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 18px; 
-            flex-wrap: wrap;
-            text-align: center;
-            ">
-            <span style="flex: 1 1 200px;">📍 {business.store_address}</span>
-            <span style="flex: 1 1 200px;">📞 {business.contact_number}</span>
-            <span style="flex: 1 1 200px;">
-                ✉️ 
-                <a href="mailto:{business.email_address}" 
-                style="color: {customization.button_text_color}; text-decoration: none;">
-                {business.email_address}
-                </a>
-            </span>
-        </div>
-
-
-        <p style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.6);">
-            © 2025 {business.business_name}. All rights reserved.
-        </p>
-        </div>
-
-        </div>
     </body>
     </html>
     """
@@ -557,105 +614,162 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         """
 
     # Build the body of the email
+
     body = f"""
     <html>
-    <body style="margin: 0; padding: 0; 
-                font-family: '{{{{ customization.header_font_family|default:"Arial" }}}}', sans-serif;
-                background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
-                min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <head>
+    <style>
+        /* Default (Light Mode) Styles */
+        body {{
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
+            color: #222;
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+        }}
 
-        <!-- Glass Card -->
-        <div style="max-width: 650px; width: 90%; background: rgba(255, 255, 255, 0.8);
-                    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-                    border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-                    overflow: hidden; border: 1px solid rgba(255,255,255,0.2);
-                    text-align: center; padding: 30px 25px; margin: 40px auto; position: relative;">
+        .card {{
+            max-width: 650px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            padding: 30px 25px;
+            margin: 40px auto;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+        }}
 
-        <!-- Header Strip -->
-        <div style="background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
-                    padding: 8px 0; border-radius: 6px; margin-bottom: 16px;">
-            <h1 style="font-size: 24px; font-weight: 800;
-                    color: {{{{ customization.button_text_color|default:'#ffffff' }}}};
-                    letter-spacing: 0.5px; margin: 0; text-transform: uppercase;">
-            Order Update
-            </h1>
-        </div>
+        .message {{
+            font-size: 16px;
+            color: #222;
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }}
 
-        <!-- Order Code Box -->
-        <div style="display: inline-block; background: rgba(255,255,255,0.25); 
-                    padding: 12px 30px; border-radius: 8px; 
-                    border: 1px solid rgba(255,255,255,0.3); 
-                    color: {customization.primary_color}; 
-                    font-size: 26px; font-weight: 800; 
-                    letter-spacing: 1px; 
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
-                    margin-bottom: 18px;">
-            {order_code}
-        </div>
+        .receipt {{
+            background: #fff;
+            color: #222;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            padding: 22px;
+            margin-top: 10px;
+            border: 1px solid rgba(0,0,0,0.2);
+            font-family: 'Courier New', monospace;
+        }}
 
-        <div style="font-size: 17px; color: rgba(255,255,255,0.85); text-align: center; margin-bottom: 20px;">
-            {message_content}
-        </div>
+        .contact {{
+            margin-top: 22px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            text-align: center;
+        }}
 
-        <!-- Receipt Section -->
-        <div style="background: #fff; color: #333; border-radius: 10px; 
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-                    text-align: left; padding: 22px; margin-top: 10px; 
-                    font-family: 'Courier New', monospace; border: 1px solid #fff;">
+        .contact a {{
+            color: {customization.button_text_color};
+            text-decoration: none;
+            font-weight: 500;
+        }}
 
-            <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">
-            🧾 Order Summary
-            </h3>
-            <hr style="border: none; border-top: 1px dashed #aaa; margin: 10px 0;">
+        /* Dark Mode Styles */
+        @media (prefers-color-scheme: dark) {{
+            body {{
+                background: linear-gradient(135deg, #1a1a1a, #333);
+                color: #eee;
+            }}
 
-            <table width="100%" style="border-collapse: collapse; font-size: 14px;">
-            <thead>
-                <tr>
-                <th align="left" style="padding-bottom: 6px;">Item</th>
-                <th align="right" style="padding-bottom: 6px;">Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                {item_list}
-            </tbody>
-            </table>
+            .card {{
+                background: rgba(30, 30, 30, 0.9);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                color: #eee;
+            }}
 
-            <hr style="border: none; border-top: 1px dashed #aaa; margin: 10px 0;">
-            <p style="text-align: right; font-weight: bold; font-size: 15px;">Total: ₱{total_price:.2f}</p>
-            <p style="text-align: center; font-size: 13px; color: #555; margin-top: 12px;">
+            .message {{
+                background: rgba(255, 255, 255, 0.05);
+                color: #f0f0f0;
+            }}
+
+            .receipt {{
+                background: rgba(40, 40, 40, 0.9);
+                color: #f0f0f0;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }}
+
+            .contact {{
+                color: rgba(255,255,255,0.8);
+            }}
+
+            .contact a {{
+                color: {customization.button_text_color};
+            }}
+        }}
+    </style>
+    </head>
+    <body>
+
+        <div class="card">
+
+            <!-- Header Strip -->
+            <div style="background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
+                        padding: 8px 0; border-radius: 6px; margin-bottom: 16px;">
+                <h1 style="font-size: 24px; font-weight: 800; color: {customization.button_text_color};
+                        letter-spacing: 0.5px; margin: 0; text-transform: uppercase;">
+                    Order Update
+                </h1>
+            </div>
+
+            <!-- Order Code Box -->
+            <div style="display: inline-block; background: rgba(255,255,255,0.25);
+                        padding: 12px 30px; border-radius: 8px;
+                        border: 1px solid rgba(255,255,255,0.3);
+                        color: {customization.primary_color};
+                        font-size: 26px; font-weight: 800;
+                        letter-spacing: 1px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                        margin-bottom: 18px;">
+                {order_code}
+            </div>
+
+            <!-- Dynamic Message -->
+            <div class="message">
+                {message_content}
+            </div>
+
+            <!-- Receipt Section -->
+            <div class="receipt">
+                <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
+                <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
+                <table width="100%" style="border-collapse: collapse; font-size: 14px;">
+                    <thead>
+                        <tr><th align="left" style="padding-bottom: 6px;">Item</th><th align="right" style="padding-bottom: 6px;">Price</th></tr>
+                    </thead>
+                    <tbody>{item_list}</tbody>
+                </table>
+                <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
+                <p style="text-align: right; font-weight: bold; font-size: 15px;">Total: ₱{total_price:.2f}</p>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="contact">
+                <span>📍 {business.store_address}</span>
+                <span>📞 {business.contact_number}</span>
+                <span>✉️ <a href="mailto:{business.email_address}">{business.email_address}</a></span>
+            </div>
+
+            <p style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.75);">
+                © 2025 {business.business_name}. All rights reserved.
             </p>
         </div>
 
-
-       <div style="
-            margin-top: 22px; 
-            font-size: 13px; 
-            color: rgba(255,255,255,0.8);
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 18px; 
-            flex-wrap: wrap;
-            text-align: center;
-            ">
-            <span style="flex: 1 1 200px;">📍 {business.store_address}</span>
-            <span style="flex: 1 1 200px;">📞 {business.contact_number}</span>
-            <span style="flex: 1 1 200px;">
-                ✉️ 
-                <a href="mailto:{business.email_address}" 
-                style="color: {customization.button_text_color}; text-decoration: none;">
-                {business.email_address}
-                </a>
-            </span>
-        </div>
-
-
-        <p style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.6);">
-            © 2025 {business.business_name}. All rights reserved.
-        </p>
-        </div>
-
-        </div>
     </body>
     </html>
     """
