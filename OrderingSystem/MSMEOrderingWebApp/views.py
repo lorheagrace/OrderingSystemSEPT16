@@ -3269,7 +3269,7 @@ def inventory(request):
         return render(request, 'MSMEOrderingWebApp/inventory.html', {
             'categories': categories,
             'products': products,
-            'title': 'Inventory',
+            'title': 'Products',
             'customization': customization,
             'business': business,
             'form_data': request.POST
@@ -3609,6 +3609,7 @@ def pos_cart_view(request):
         'business': business,
         'services': services,   # ✅ Pass services list for dropdown
         'back_url': 'pos',
+		'title': 'Point-of-Sale Cart',
 		"payment_url": "business_viewonlinepayment",
     })
 
@@ -4298,7 +4299,7 @@ def cashier_pos(request):
         'all_products': list(products.values('name', 'variation_name', 'price', 'stocks')),
         'cart_count': cart_count,
         'customization': customization,
-        'title': 'Cashier POS',
+        'title': 'Point-Of-Sale',
         'business': business,
         'cart_url': 'cashier_poscart',
     })
@@ -4322,6 +4323,7 @@ def cashier_pos_cart_view(request):
         'customization': customization,
         'business': business,  # Pass business settings
         'back_url': 'cashier_pos',
+		'title': 'Point-Of-Sale Cart',
 		"payment_url": "cashier_viewonlinepayment",
     })
 
@@ -5258,6 +5260,7 @@ def business_viewonlinepayment(request):
         'customization': customization,
         'payment_methods': payment_methods,
         'business': business,
+		'title':'Online Payment Details'
     })
 
 @login_required_session(allowed_roles=['cashier'])
@@ -5270,6 +5273,7 @@ def cashier_viewonlinepayment(request):
         'customization': customization,
         'payment_methods': payment_methods,
         'business': business,
+		'title':'Online Payment Details'
     })
 	
 @login_required_session(allowed_roles=['owner'])
