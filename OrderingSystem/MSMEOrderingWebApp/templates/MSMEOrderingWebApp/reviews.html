@@ -874,7 +874,7 @@
               data-id="{{ review.id }}" 
               data-rating="{{ review.rating|default:0 }}" 
               data-date="{{ review.submitted_at|date:'Y-m-d' }}"
-              data-customer="{{ review.name|lower }}"
+              data-customer="{% if review.anonymous %}anonymous{% elif review.user %}{{ review.user.first_name|add:' '|add:review.user.last_name|lower }}{% else %}{{ review.name|lower }}{% endif %}"
               data-content="{{ review.review|lower }}">
             
             <div class="d-flex align-items-start">
