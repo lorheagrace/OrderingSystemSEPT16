@@ -224,9 +224,6 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
                             <h1 style="font-size: 28px; font-weight: 900; color: {customization.button_text_color}; margin: 0;">
                                 Order Update
                             </h1>
-                            <div style="display: inline-block; margin-top: 3px; background-color: rgba(255,255,255,0.2); color: {customization.button_text_color}; padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-                                {order_status}
-                            </div>
                         </td>
                     </tr>
 
@@ -558,9 +555,6 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
                             <h1 style="font-size: 28px; font-weight: 900; color: {customization.button_text_color}; margin: 0;">
                                 Order Update
                             </h1>
-                            <div style="display: inline-block; margin-top: 3px; background-color: rgba(255,255,255,0.2); color: {customization.button_text_color}; padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-                                {order_status}
-                            </div>
                         </td>
                     </tr>
 
