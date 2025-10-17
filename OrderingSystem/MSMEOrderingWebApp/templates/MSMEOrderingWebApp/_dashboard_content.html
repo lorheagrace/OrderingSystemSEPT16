@@ -1671,6 +1671,28 @@
   </div>
 </div>
 
+
+<!-- Full-screen loading overlay -->
+<div id="loadingOverlay" 
+     style="
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.2rem;
+        flex-direction: column;
+     ">
+    <div class="spinner-border text-light mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+    <div>Processing... Please wait</div>
+</div>
+
+
  <!-- Add required JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
@@ -1830,6 +1852,12 @@ const statusColors = {
     const updateStatusURL = "{% url 'update_order_status_progress' %}";  // ✅ Template tag
 
     function submitStatusUpdate() {
+        const saveBtn = document.querySelector('#statusModal .btn-success');
+        saveBtn.disabled = true; // Prevent multiple clicks
+
+        // Show full-screen loading overlay
+        showLoading();
+
         const newStatus = document.getElementById("statusDropdown").value;
         const isOutForDelivery = newStatus.toLowerCase() === "out for delivery";
         const isVoid = newStatus.toLowerCase() === "void";
@@ -1862,18 +1890,21 @@ const statusColors = {
             },
             body: JSON.stringify({
                 order_code: currentOrderCode,
-                group_id: currentGroupId, 
+                group_id: currentGroupId,
                 status: newStatus,
                 delivery_method: delivery_method,
                 tracking_url: tracking_url,
                 eta_value: eta_value,
                 eta_unit: eta_unit,
-                rider_name: rider_name,     // ✅ send rider name
-                void_reason: void_reason    // ✅ send void reason
+                rider_name: rider_name,   // ✅ send rider name
+                void_reason: void_reason  // ✅ send void reason
             })
         })
         .then(response => response.json())
         .then(data => {
+            hideLoading();
+            saveBtn.disabled = false;
+
             if (data.success) {
                 // Close the status modal
                 const statusModalEl = document.getElementById('statusModal');
@@ -1885,18 +1916,21 @@ const statusColors = {
                 document.getElementById("successMessage").textContent = "Order status updated successfully!";
                 successModal.show();
 
-                // Optional: auto refresh after modal closes
+                // Auto refresh after success modal closes
                 document.getElementById('successModal').addEventListener('hidden.bs.modal', () => {
                     location.reload();
                 });
-
             } else {
                 alert("Failed to update: " + (data.error || "Unknown error"));
             }
+        })
+        .catch(err => {
+            hideLoading();
+            saveBtn.disabled = false;
+            console.error(err);
+            alert("An error occurred while updating the order status.");
         });
     }
-
-
 
     function getCookie(name) {
         let cookieValue = null;
@@ -2211,6 +2245,16 @@ const statusColors = {
         setInterval(updateTimers, 1000);
         updateTimers(); // Run immediately
     });
+
+    function showLoading() {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'flex';
+    }
+
+    function hideLoading() {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'none';
+    }
 
 </script>
 {% endblock %}
