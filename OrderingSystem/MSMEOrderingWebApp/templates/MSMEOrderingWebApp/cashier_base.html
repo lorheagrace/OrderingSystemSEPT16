@@ -858,6 +858,12 @@
                         </a>
                     </li>
                 {% endif %}
+                
+                <li><a href="{% url 'cashier_delivery' %}" class="{% if request.resolver_match.url_name == 'cashier_delivery' %}active{% endif %}">
+                    <i class="bi bi-truck"></i> 
+                    <span class="sidebar-label">Delivery</span>
+                </a></li>
+                
             </ul>
         </nav>
         
