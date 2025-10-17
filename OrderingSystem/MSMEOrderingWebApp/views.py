@@ -3885,6 +3885,70 @@ def delivery(request):
 
     return render(request, 'MSMEOrderingWebApp/delivery.html', context)
 
+def cashier_delivery(request):
+    business = BusinessDetails.objects.first()
+    customization = get_or_create_customization()
+
+    today = now().date()
+
+    # Only include delivery orders with in-house delivery
+    delivery_orders_raw = Checkout.objects.filter(
+        delivery_method='in_house'
+    ).order_by('-created_at')
+
+    # Group by both order_code AND date
+    grouped_delivery_orders = defaultdict(list)
+    for order in delivery_orders_raw:
+        order_date = order.created_at.date() if order.created_at else None
+        composite_key = f"{order.order_code}_{order_date}" if order_date else order.order_code
+        grouped_delivery_orders[composite_key].append(order)
+
+    # Convert to display format with clean order codes + JSON-safe items
+    delivery_orders_grouped = []
+    for composite_key, items in grouped_delivery_orders.items():
+        clean_order_code = composite_key.split('_')[0] if '_' in composite_key else composite_key
+        item_total = sum(item.price for item in items)
+        delivery_fee = items[0].delivery_fee or 0
+        grand_total = item_total + delivery_fee
+
+        delivery_orders_grouped.append({
+            'order_code': clean_order_code,
+            'items': items,
+            'items_json': mark_safe(json.dumps([
+                {"name": i.product_name, "qty": i.quantity}
+                for i in items
+            ])),
+            'first': items[0],
+            'created_at': items[0].created_at,
+            'status': items[0].status,
+            'total_price': item_total,
+            'delivery_fee': delivery_fee,   # ✅ now available
+            'grand_total': grand_total,     # ✅ now available
+        })
+
+
+    # Sort by creation date (newest first)
+    delivery_orders_grouped.sort(key=lambda x: x['created_at'] if x['created_at'] else now(), reverse=True)
+
+    # Count unique orders for statistics
+    pending_count = len([group for group in delivery_orders_grouped if group['status'].lower() == 'pending'])
+    out_for_delivery_count = len([group for group in delivery_orders_grouped if group['status'].lower() == 'out for delivery'])
+    delivered_today_count = len([
+        group for group in delivery_orders_grouped
+        if group['status'].lower() == 'delivered' and group['first'].updated_at.date() == today
+    ])
+
+    context = {
+        'customization': customization,
+        'title': 'Delivery',
+        'business': business,
+        'delivery_orders': delivery_orders_grouped,
+        'pending_count': pending_count,
+        'out_for_delivery_count': out_for_delivery_count,
+        'delivered_today_count': delivered_today_count,
+    }
+
+    return render(request, 'MSMEOrderingWebApp/cashier_delivery.html', context)
 
 @login_required_session(allowed_roles=['owner'])
 def reviews(request):
