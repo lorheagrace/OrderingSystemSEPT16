@@ -695,7 +695,7 @@
           <span class="input-group-text bg-white border-end-0">
             <i class="fas fa-search"></i>
           </span>
-          <input type="text" id="searchReviews" class="form-control border-start-0" placeholder="Search reviews...">
+          <input type="text" id="searchReviews" class="form-control border-start-0" placeholder="Search by customer name or content...">
         </div>
       </div>
       <div class="col-md-3">
@@ -1033,27 +1033,28 @@
 
       // Search functionality
       if (searchInput) {
-          searchInput.addEventListener('input', function() {
-              const searchTerm = this.value.toLowerCase();
-              const reviewCards = document.querySelectorAll('.review-card'); // Adjust selector to match your review card class
-              
-              reviewCards.forEach(function(card) {
-                  // Get review content
-                  const reviewText = card.querySelector('.review-text')?.textContent.toLowerCase() || '';
-                  
-                  // Get reviewer name (handle both regular users and anonymous)
-                  const reviewerName = card.querySelector('.reviewer-name')?.textContent.toLowerCase() || '';
-                  
-                  // Check if search term matches review content or reviewer name
-                  if (reviewText.includes(searchTerm) || reviewerName.includes(searchTerm)) {
-                      card.style.display = '';
-                  } else {
-                      card.style.display = 'none';
-                  }
-              });
-          });
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const reviewCards = document.querySelectorAll('.review-card');
+            
+            reviewCards.forEach(function(card) {
+                // Review text
+                const reviewText = card.querySelector('.review-text')?.textContent.toLowerCase() || '';
+
+                // Customer name (works for both logged-in and guest users)
+                const customerName = card.querySelector('.review-header')?.textContent.toLowerCase() || '';
+
+                // Match search against both
+                if (reviewText.includes(searchTerm) || customerName.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
       }
-      
+
+
       // Filter by stars
       if (filterSelect) {
           filterSelect.addEventListener('change', function() {
