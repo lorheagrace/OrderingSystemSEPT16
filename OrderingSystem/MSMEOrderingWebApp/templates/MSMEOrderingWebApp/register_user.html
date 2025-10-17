@@ -802,22 +802,24 @@ toastr.options = {
     });
 
 
-    // Allow only letters, space, and period in name fields
+    // Allow letters (including Ñ ñ and accented), spaces, and periods
     document.querySelectorAll("#first_name, #last_name, #address, #city, #province").forEach(input => {
         input.addEventListener("input", function() {
-            // Remove invalid characters (letters, numbers, space, comma, period allowed for address)
             if (this.id === "address") {
-                this.value = this.value.replace(/[^A-Za-z0-9 ,.\-]/g, ""); 
+                // Allow accented letters, Ñ/ñ, numbers, space, comma, period, and dash
+                this.value = this.value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿÑñ0-9 ,.\-]/g, "");
             } else {
-                this.value = this.value.replace(/[^A-Za-z .]/g, ""); 
+                // Allow accented letters, Ñ/ñ, spaces, and periods
+                this.value = this.value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿÑñ .]/g, "");
             }
 
             // Auto-capitalize first letter of each word
-            this.value = this.value.replace(/\b\w/g, function(char) {
+            this.value = this.value.replace(/\b([A-Za-zÀ-ÖØ-öø-ÿÑñ])/g, function(char) {
                 return char.toUpperCase();
             });
         });
     });
+
 
     // Allow only numbers in Zip Code (max 4 digits)
     document.getElementById("zipcode").addEventListener("input", function() {
