@@ -829,14 +829,14 @@
                 </div>
 
                 <!-- Rating Stars -->
-                <div class="star-display mb-2">
-                  {% for i in "12345" %}
-                    {% if forloop.counter <= review.rating %}
-                      <i class="fas fa-star"></i>
-                    {% else %}
-                      <i class="fas fa-star empty"></i>
-                    {% endif %}
-                  {% endfor %}
+                <div class="rating-stars mb-2">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star text-warning"></i>
+                        {% endif %}
+                    {% endfor %}
                 </div>
                 <span class="review-date">{{ review.submitted_at|timesince }} ago</span>
               </div>
@@ -1035,24 +1035,25 @@
       if (searchInput) {
           searchInput.addEventListener('input', function() {
               const searchTerm = this.value.toLowerCase();
-              reviewCards.forEach(card => {
-                  const nameElement = card.querySelector('h6');
-                  const reviewElement = card.querySelector('.review-text');
+              const reviewCards = document.querySelectorAll('.review-card'); // Adjust selector to match your review card class
+              
+              reviewCards.forEach(function(card) {
+                  // Get review content
+                  const reviewText = card.querySelector('.review-text')?.textContent.toLowerCase() || '';
                   
-                  if (nameElement && reviewElement) {
-                      const name = nameElement.textContent.toLowerCase();
-                      const review = reviewElement.textContent.toLowerCase();
-                      
-                      if (name.includes(searchTerm) || review.includes(searchTerm)) {
-                          card.style.display = 'block';
-                      } else {
-                          card.style.display = 'none';
-                      }
+                  // Get reviewer name (handle both regular users and anonymous)
+                  const reviewerName = card.querySelector('.reviewer-name')?.textContent.toLowerCase() || '';
+                  
+                  // Check if search term matches review content or reviewer name
+                  if (reviewText.includes(searchTerm) || reviewerName.includes(searchTerm)) {
+                      card.style.display = '';
+                  } else {
+                      card.style.display = 'none';
                   }
               });
           });
       }
-
+      
       // Filter by stars
       if (filterSelect) {
           filterSelect.addEventListener('change', function() {
