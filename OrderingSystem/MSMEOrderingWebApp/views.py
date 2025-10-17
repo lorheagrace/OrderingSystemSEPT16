@@ -185,6 +185,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         """
     elif status == "Out for Delivery":
         message_content = f"""
+        <p style="padding-left: 20px; padding-right:20px; font-size: 15px; color: #555; font-weight: bold; line-height: 1.6;">Your order is now out for delivery!</p>
         <p style="padding-left: 20px; padding-right:20px; font-size: 14px; color: #333; margin-top: 10px;">Your order is on its way and should reach you soon! If you have any questions, feel free to reach out.</p>
         """
     elif status == "Completed":
@@ -219,21 +220,14 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
                 min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 
         <!-- Glass Card -->
-        <div style="max-width: 650px; width: 90%; background: rgba(255, 255, 255, 0.1);
+        <div style="max-width: 650px; width: 90%; background: rgba(255, 255, 255, 0.8);
                     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
                     border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
                     overflow: hidden; border: 1px solid rgba(255,255,255,0.2);
                     text-align: center; padding: 30px 25px; margin: 40px auto; position: relative;">
 
-        <!-- Business Logo -->
-        <div style="text-align: center; margin-bottom: 12px;">
-            <img src="{{{{ business.logo.url }}}}" alt="Business Logo"
-                style="max-width: 120px; max-height: 120px; border-radius: 50%; 
-                        box-shadow: 0 4px 10px rgba(0,0,0,0.2); object-fit: cover;">
-        </div>
-
         <!-- Header Strip -->
-        <div style="background: linear-gradient(135deg, {customization.primary_color}, {customization.accent_color});
+        <div style="background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
                     padding: 8px 0; border-radius: 6px; margin-bottom: 16px;">
             <h1 style="font-size: 24px; font-weight: 800;
                     color: {{{{ customization.button_text_color|default:'#ffffff' }}}};
@@ -243,7 +237,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         </div>
 
         <!-- Order Code Box -->
-        <div style="display: inline-block; background: rgba(255,255,255,0.15); 
+        <div style="display: inline-block; background: rgba(255,255,255,0.25); 
                     padding: 12px 30px; border-radius: 8px; 
                     border: 1px solid rgba(255,255,255,0.3); 
                     color: {customization.primary_color}; 
@@ -254,13 +248,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
             {order_code}
         </div>
 
-        <!-- Message -->
-        <p style="font-size: 15px; color: rgba(255,255,255,0.9); margin: 8px 0 18px;">
-            Your order has been 
-            <strong style="text-transform: uppercase; color: {customization.button_text_color};">{status}</strong>.
-        </p>
-
-        <div style="font-size: 14px; color: rgba(255,255,255,0.85); text-align: left; margin-bottom: 25px;">
+        <div style="font-size: 17px; color: rgba(255,255,255,0.85); text-align: center; margin-bottom: 20px;">
             {message_content}
         </div>
 
@@ -268,9 +256,9 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         <div style="background: #fff; color: #333; border-radius: 10px; 
                     box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
                     text-align: left; padding: 22px; margin-top: 10px; 
-                    font-family: 'Courier New', monospace;">
+                    font-family: 'Courier New', monospace; border: 1px solid #fff;">
 
-            <h3 style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px;">
+            <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">
             🧾 Order Summary
             </h3>
             <hr style="border: none; border-top: 1px dashed #aaa; margin: 10px 0;">
@@ -294,18 +282,28 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         </div>
 
 
-        <div style="margin-top: 22px; font-size: 13px; color: rgba(255,255,255,0.8);
-                    display: flex; justify-content: center; align-items: center; 
-                    gap: 18px; flex-wrap: wrap;">
-            <span>📍 {business.store_address}</span>
-            <span>📞 {business.contact_number}</span>
-            <span>✉️ 
-            <a href="mailto:{business.email_address}" 
+       <div style="
+            margin-top: 22px; 
+            font-size: 13px; 
+            color: rgba(255,255,255,0.8);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 18px; 
+            flex-wrap: wrap;
+            text-align: center;
+            ">
+            <span style="flex: 1 1 200px;">📍 {business.store_address}</span>
+            <span style="flex: 1 1 200px;">📞 {business.contact_number}</span>
+            <span style="flex: 1 1 200px;">
+                ✉️ 
+                <a href="mailto:{business.email_address}" 
                 style="color: {customization.button_text_color}; text-decoration: none;">
                 {business.email_address}
-            </a>
+                </a>
             </span>
         </div>
+
 
         <p style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.6);">
             © 2025 {business.business_name}. All rights reserved.
@@ -508,10 +506,9 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
     message_content = ""
     if status.lower() == "rejected":
         message_content = f"""
-        <p style="font-size: 16px; color: #8B0000; font-weight: bold; line-height: 1.6;">Reason for rejection:</p>
-        <p style="font-size: 16px; color: #888;">{rejection_reason}</p>
+        <p style="font-size: 16px; color: #8B0000; font-weight: bold; line-height: 1.6;">Reason for rejection: <span style="font-size: 16px; color: #888;">{rejection_reason}</span></p>
         <p style="font-size: 14px; color: #d9534f; margin: 0;">We're sorry, but your order has been rejected.</p>
-        <p style="font-size: 14px; color: #333; margin-top: 10px;">Please review your order details, correct any errors, and try submitting a new order.</p>
+        <p style="font-size: 14px; color: #333; margin-top: 2 px;">Please review your order details, correct any errors, and try submitting a new order.</p>
         """
     elif status.lower() == "accepted":
         message_content = f"""
@@ -533,6 +530,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         """
     elif status == "Out for Delivery":
         message_content = f"""
+        <p style="padding-left: 20px; padding-right:20px; font-size: 15px; color: #555; font-weight: bold; line-height: 1.6;">Your order is now out for delivery!</p>
         <p style="padding-left: 20px; padding-right:20px; font-size: 14px; color: #333; margin-top: 10px;">Your order is on its way and should reach you soon! If you have any questions, feel free to reach out.</p>
         """
     elif status == "Completed":
@@ -567,21 +565,14 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
                 min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 
         <!-- Glass Card -->
-        <div style="max-width: 650px; width: 90%; background: rgba(255, 255, 255, 0.1);
+        <div style="max-width: 650px; width: 90%; background: rgba(255, 255, 255, 0.8);
                     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
                     border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
                     overflow: hidden; border: 1px solid rgba(255,255,255,0.2);
                     text-align: center; padding: 30px 25px; margin: 40px auto; position: relative;">
 
-        <!-- Business Logo -->
-        <div style="text-align: center; margin-bottom: 12px;">
-            <img src="{{{{ business.logo.url }}}}" alt="Business Logo"
-                style="max-width: 120px; max-height: 120px; border-radius: 50%; 
-                        box-shadow: 0 4px 10px rgba(0,0,0,0.2); object-fit: cover;">
-        </div>
-
         <!-- Header Strip -->
-        <div style="background: linear-gradient(135deg, {customization.primary_color}, {customization.accent_color});
+        <div style="background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color});
                     padding: 8px 0; border-radius: 6px; margin-bottom: 16px;">
             <h1 style="font-size: 24px; font-weight: 800;
                     color: {{{{ customization.button_text_color|default:'#ffffff' }}}};
@@ -591,7 +582,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         </div>
 
         <!-- Order Code Box -->
-        <div style="display: inline-block; background: rgba(255,255,255,0.15); 
+        <div style="display: inline-block; background: rgba(255,255,255,0.25); 
                     padding: 12px 30px; border-radius: 8px; 
                     border: 1px solid rgba(255,255,255,0.3); 
                     color: {customization.primary_color}; 
@@ -602,13 +593,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
             {order_code}
         </div>
 
-        <!-- Message -->
-        <p style="font-size: 15px; color: rgba(255,255,255,0.9); margin: 8px 0 18px;">
-            Your order has been 
-            <strong style="text-transform: uppercase; color: {customization.button_text_color};">{status}</strong>.
-        </p>
-
-        <div style="font-size: 14px; color: rgba(255,255,255,0.85); text-align: left; margin-bottom: 25px;">
+        <div style="font-size: 17px; color: rgba(255,255,255,0.85); text-align: center; margin-bottom: 20px;">
             {message_content}
         </div>
 
@@ -616,9 +601,9 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         <div style="background: #fff; color: #333; border-radius: 10px; 
                     box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
                     text-align: left; padding: 22px; margin-top: 10px; 
-                    font-family: 'Courier New', monospace;">
+                    font-family: 'Courier New', monospace; border: 1px solid #fff;">
 
-            <h3 style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px;">
+            <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">
             🧾 Order Summary
             </h3>
             <hr style="border: none; border-top: 1px dashed #aaa; margin: 10px 0;">
@@ -642,18 +627,28 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         </div>
 
 
-        <div style="margin-top: 22px; font-size: 13px; color: rgba(255,255,255,0.8);
-                    display: flex; justify-content: center; align-items: center; 
-                    gap: 18px; flex-wrap: wrap;">
-            <span>📍 {business.store_address}</span>
-            <span>📞 {business.contact_number}</span>
-            <span>✉️ 
-            <a href="mailto:{business.email_address}" 
+       <div style="
+            margin-top: 22px; 
+            font-size: 13px; 
+            color: rgba(255,255,255,0.8);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 18px; 
+            flex-wrap: wrap;
+            text-align: center;
+            ">
+            <span style="flex: 1 1 200px;">📍 {business.store_address}</span>
+            <span style="flex: 1 1 200px;">📞 {business.contact_number}</span>
+            <span style="flex: 1 1 200px;">
+                ✉️ 
+                <a href="mailto:{business.email_address}" 
                 style="color: {customization.button_text_color}; text-decoration: none;">
                 {business.email_address}
-            </a>
+                </a>
             </span>
         </div>
+
 
         <p style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.6);">
             © 2025 {business.business_name}. All rights reserved.
@@ -1517,11 +1512,11 @@ def force_change(request):
             <body style="font-family: 'Poppins', Arial, sans-serif; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #404040 100%); margin: 0; padding: 60px 20px; min-height: 100vh;">
                 
                 <!-- Glassmorphism Container -->
-                <div style="max-width: 580px; margin: 0 auto; background: rgba(255, 255, 255, 0.05); border-radius: 30px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); padding: 50px 45px; position: relative;">
+                <div style="max-width: 580px; margin: 0 auto; background: rgba(255, 255, 255, 0.8); border-radius: 30px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); padding: 50px 45px; position: relative;">
                 
                 <!-- Floating decorative circles -->
-                <div style="position: absolute; width: 120px; height: 120px; background: rgba(255, 255, 255, 0.03); border-radius: 50%; top: -30px; right: 40px; backdrop-filter: blur(10px);"></div>
-                <div style="position: absolute; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.02); border-radius: 50%; bottom: 30px; left: -20px; backdrop-filter: blur(10px);"></div>
+                <div style="position: absolute; width: 120px; height: 120px; background: rgba(255, 255, 255, 0.8); border-radius: 50%; top: -30px; right: 40px; backdrop-filter: blur(10px);"></div>
+                <div style="position: absolute; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.8); border-radius: 50%; bottom: 30px; left: -20px; backdrop-filter: blur(10px);"></div>
                 
                 <!-- Icon with glass effect -->
                 <div style="width: 90px; height: 90px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); position: relative; z-index: 1;">
@@ -1537,20 +1532,20 @@ def force_change(request):
                 
                 <!-- Glass button -->
                 <div style="text-align: center; margin: 40px 0; position: relative; z-index: 1;">
-                    <a href="{verify_url}" style="display: inline-block; padding: 18px 50px; background: rgba(255, 255, 255, 0.1); color: #fff; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: 600; letter-spacing: 1.5px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); transition: all 0.3s ease; text-shadow: 0 1px 3px rgba(0,0,0,0.3);">
+                    <a href="{verify_url}" style="display: inline-block; padding: 18px 50px; background: rgba(255, 255, 255, 0.8); color: #fff; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: 600; letter-spacing: 1.5px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); transition: all 0.3s ease; text-shadow: 0 1px 3px rgba(0,0,0,0.3);">
                     VERIFY EMAIL
                     </a>
                 </div>
                 
                 <!-- Glass info box -->
-                <div style="background: rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 20px 25px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 35px; position: relative; z-index: 1;">
+                <div style="background: rgba(255, 255, 255, 0.8); border-radius: 16px; padding: 20px 25px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 35px; position: relative; z-index: 1;">
                     <p style="font-size: 14px; color: rgba(255, 255, 255, 0.8); margin: 0; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
                     <strong>Didn't request this?</strong><br>If you did not request this change, please ignore this email.
                     </p>
                 </div>
                 
                 <!-- Divider -->
-                <div style="margin: 40px auto 25px; width: 60px; height: 2px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; position: relative; z-index: 1;"></div>
+                <div style="margin: 40px auto 25px; width: 60px; height: 2px; background: rgba(255, 255, 255, 0.8); border-radius: 2px; position: relative; z-index: 1;"></div>
                 
                 <!-- Footer -->
                 <p style="font-size: 13px; color: rgba(255, 255, 255, 0.6); text-align: center; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.2); position: relative; z-index: 1;">© 2025 Online Ordering System</p>
@@ -1867,7 +1862,7 @@ def register_user(request):
         <html>
         <body style="margin: 0; padding: 0; font-family: "{{ customization.header_font_family|default:"Arial" }}"; background: linear-gradient(135deg, {customization.primary_color}, {customization.secondary_color}); min-height: 100vh;">
 
-            <table align="center" width="600" style="border-collapse: collapse; margin: 40px auto; background: rgba(255, 255, 255, 0.05); border-radius: 25px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); overflow: hidden;">
+            <table align="center" width="600" style="border-collapse: collapse; margin: 40px auto; background: rgba(255, 255, 255, 0.8); border-radius: 25px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); overflow: hidden;">
 
             <!-- Header -->
             <tr>
@@ -1881,7 +1876,7 @@ def register_user(request):
             <!-- Content -->
             <tr>
                 <td style="padding: 10px 40px 30px; text-align: center;">
-                <p style="font-size: 16px; color: rgba(255,255,255,0.9); line-height: 1.7; margin: 0 0 25px;">
+                <p style="font-size: 16px; color: {customization.button_text_color}; line-height: 1.7; margin: 0 0 25px;">
                     To complete your registration, please click the button below to verify your email address and activate your account.
                 </p>
 
@@ -1905,8 +1900,8 @@ def register_user(request):
             <!-- Disclaimer -->
             <tr>
                 <td style="padding: 0 40px 30px;">
-                <div style="background: rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px 15px; border: 1px solid rgba(255, 255, 255, 0.15); text-align: center;">
-                    <p style="font-size: 13px; color: rgba(255,255,255,0.9); margin: 0;">
+                <div style="background: rgba(255, 255, 255, 0.8); border-radius: 12px; padding: 12px 15px; border: 1px solid rgba(255, 255, 255, 0.15); text-align: center;">
+                    <p style="font-size: 13px; color: {customization.button_text_color}; margin: 0;">
                     ⚠️ <strong>Didn't create this account?</strong> You can safely ignore this email.
                     </p>
                 </div>
@@ -1916,7 +1911,7 @@ def register_user(request):
             <!-- Divider -->
             <tr>
                 <td>
-                <div style="margin: 0 auto 10px; width: 60px; height: 2px; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
+                <div style="margin: 0 auto 10px; width: 60px; height: 2px; color: {customization.button_text_color}; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
                 </td>
             </tr>
 
@@ -4215,20 +4210,20 @@ def create_staff_account(request):
                     min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 
             <!-- Glass Card -->
-            <div style="max-width: 600px; width: 90%; background: rgba(255, 255, 255, 0.1);
+            <div style="max-width: 600px; width: 90%; background: rgba(255, 255, 255, 0.8);
                         backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
                         border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
                         overflow: hidden; border: 1px solid rgba(255,255,255,0.2);
                         text-align: center; padding: 40px 35px; margin: 40px auto; position: relative;">
 
             <!-- Floating Decorative Circles -->
-            <div style="position: absolute; width: 120px; height: 120px; background: rgba(255, 255, 255, 0.03);
+            <div style="position: absolute; width: 120px; height: 120px; background: rgba(255, 255, 255, 0.8);
                         border-radius: 50%; top: -30px; right: 40px; backdrop-filter: blur(10px);"></div>
-            <div style="position: absolute; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.02);
+            <div style="position: absolute; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.8);
                         border-radius: 50%; bottom: 30px; left: -20px; backdrop-filter: blur(10px);"></div>
 
                   <!-- Icon with Glass Effect -->
-            <div style="width: 90px; height: 90px; background: rgba(255, 255, 255, 0.08);
+            <div style="width: 90px; height: 90px; background: rgba(255, 255, 255, 0.8);
                   border-radius: 50%; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center;
                   backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15);
                   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); position: relative; z-index: 1;">
@@ -5701,7 +5696,7 @@ def forgot_password(request):
                         min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 
                 <!-- Card Container -->
-                <div style="max-width: 600px; width: 90%; background: rgba(255, 255, 255, 0.1); 
+                <div style="max-width: 600px; width: 90%; background: rgba(255, 255, 255, 0.8); 
                             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
                             border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
                             overflow: hidden; border: 1px solid rgba(255,255,255,0.2); 
@@ -5739,13 +5734,6 @@ def forgot_password(request):
                     <p style="font-size: 13px; color: rgba(255,255,255,0.8); margin: 0;">
                     ⚠️ <strong>Didn't request this password reset?</strong><br>
                     You can safely ignore this email.
-                    </p>
-                </div>
-
-                <!-- Footer -->
-                <div style="margin-top: 25px;">
-                    <p style="color: rgba(255,255,255,0.7); font-size: 13px; margin: 0;">
-                    © 2025 {business.business_name}. All rights reserved.
                     </p>
                 </div>
 
