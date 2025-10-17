@@ -1137,6 +1137,24 @@
           });
       }
   });
+
+  // Prevent multiple form submissions and show loading state
+  document.addEventListener("DOMContentLoaded", function () {
+    const reviewForm = document.querySelector('#reviewModal form');
+    const submitBtn = reviewForm?.querySelector('button[type="submit"]');
+
+    if (reviewForm && submitBtn) {
+      reviewForm.addEventListener("submit", function () {
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Submitting...
+        `;
+      });
+    }
+  });
+
 </script>
 
 {% endblock %}
