@@ -77,7 +77,8 @@ urlpatterns = [
     path('Cashier/Point-of-Sale/Cart/', views.cashier_pos_cart_view, name='cashier_poscart'),
     path('Cashier/Dashboard/', views.cashier_dashboard, name='cashier_dashboard'),
     path('Cashier/Notifications/', views.cashier_notifications, name='cashier_notifications'),
-    
+    path('Cashier/Delivery/', views.cashier_delivery, name='cashier_delivery'),
+
     path('owner/change-password/', views.change_owner_password, name='owner_changepassword'),
     path('staff/profile/', views.staff_profile, name='staff_profile'),
     path('reject-order/<str:order_code>/', views.reject_order, name="reject_order"),
