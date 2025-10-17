@@ -10,7 +10,23 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caudex:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Clash+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Aleo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Arapey:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Brawler:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rokkitt:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 
     <style>
         :root {
@@ -99,7 +115,7 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 10px;
             background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
         }
 
@@ -120,7 +136,7 @@
             font-family: {{ customization.header_font_family|default:"Inter" }};
             color: {{ customization.header_font_color|default:"#1f2937" }};
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: 800;
             line-height: 1;
         }
 
@@ -153,10 +169,11 @@
         }
 
         .section-title {
-            font-family: {{ customization.header_font_family|default:"Inter" }};
-            color: {{ customization.header_font_color|default:"#1f2937" }};
-            font-size: 1.75rem;
-            font-weight: 700;
+            font-family: {{ customization.header_font_family|default:"Arial" }};
+            color: {{ customization.header_font_color|default:"#000000ff" }};
+            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
+            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 30 %}{{ customization.header_font_size|default:20 }}{% else %}30{% endif %}px;
             margin: 0;
             display: flex;
             align-items: center;
@@ -343,7 +360,7 @@
 
         .filter-badges {
             display: flex;
-            gap: 0.5rem;
+            gap: 5px;
             flex-wrap: wrap;
         }
 
@@ -370,9 +387,25 @@
             color: white;
         }
 
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+
         .modern-table {
             width: 100%;
+            min-width: 800px; /* adjust if needed */
             border-collapse: separate;
+            border-spacing: 0;
+
         }
 
          .modern-table thead {
@@ -381,14 +414,16 @@
         }
 
         .modern-table th {
-            color: {{ customization.header_font_color|default:"#ffffff" }};
+            color: {{ customization.button_text_color|default:"#ffffff" }};
             text-align: center;
             border-top: none;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            padding: 1rem 0.75rem;
+            padding: 10px 5px;
             white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
             background-color: var(--accent-color);
             font-family: '{{ customization.header_font_family|default:"Arial" }}';
             font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
@@ -423,7 +458,7 @@
         .role-badge {
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 0.875rem;
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
@@ -442,7 +477,7 @@
         .status-badge {
             padding: 0.5rem 1rem;
             border-radius: 20px;
-            font-size: 0.875rem;
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
@@ -464,7 +499,7 @@
         .action-btn {
             padding: 8px 16px;
             border-radius: 8px;
-            font-size: 0.875rem;
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
             font-weight: 600;
             border: none;
             cursor: pointer;
@@ -586,6 +621,26 @@
                 font-size: 13px;
                 padding: 0.4rem 0.9rem;
                 flex: 0 1 auto;
+            }
+
+            .modern-table th {
+                font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 13 %}{{ customization.body_font_size|default:10 }}{% else %}13{% endif %}px;
+            }
+            
+            .modern-table td {
+                padding: 0.5rem 0.4rem;
+                font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 11 %}{{ customization.body_font_size|default:10 }}{% else %}11{% endif %}px;
+
+            }
+
+            .role-badge, .status-badge {
+                font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 11 %}{{ customization.body_font_size|default:10 }}{% else %}11{% endif %}px;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .action-btn {
+                font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 11 %}{{ customization.body_font_size|default:10 }}{% else %}11{% endif %}px;
+                padding: 6px 12px;
             }
         }
 
@@ -762,12 +817,12 @@
                     <table class="modern-table" id="usersTable">
                         <thead>
                             <tr>
-                                <th><i class="fas fa-user"></i> User</th>
-                                <th><i class="fas fa-envelope"></i> Email</th>
-                                <th><i class="fas fa-phone"></i> Contact Number</th>
-                                <th><i class="fas fa-user-tag"></i> Role</th>
-                                <th><i class="fas fa-toggle-on"></i> Status</th>
-                                <th><i class="fas fa-cogs"></i> Action</th>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th style="width: 10%;">Contact <br> Number</th>
+                                <th style="width: 18%;">Role</th>
+                                <th  style="width: 15%;">Status</th>
+                                <th style="width: 15%;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1045,5 +1100,3 @@
         updateStatistics();
     </script>
 {% endblock %}
-
-    
