@@ -1724,7 +1724,7 @@ const statusColors = {
         currentType = btn.dataset.orderType;
         currentGroupId = btn.dataset.groupId; 
 
-        const deliveryStatuses = ['accepted', 'Preparing', 'Packed', 'Out for Delivery', 'Completed', 'Void'];
+        const deliveryStatuses = ['accepted', 'Preparing', 'Packed', 'Out for Delivery', 'Delivered', 'Completed', 'Void'];
         const pickupStatuses = ['accepted', 'Preparing', 'Packed', 'Ready for Pickup', 'Completed', 'Void'];
         const steps = currentType === 'pickup' ? pickupStatuses : deliveryStatuses;
         const voidReasonContainer = document.getElementById('voidReasonContainer');
@@ -1733,7 +1733,16 @@ const statusColors = {
         dropdown.innerHTML = "";
 
         const currentIndex = steps.findIndex(s => s.toLowerCase() === currentStatus.toLowerCase());
-        const forwardSteps = steps.slice(currentIndex + 1);
+        
+        // ✅ Special handling for "Delivered" status
+        let forwardSteps;
+        if (currentStatus.toLowerCase() === 'delivered') {
+            // Only show Completed and Void options
+            forwardSteps = ['Completed', 'Void'];
+        } else {
+            // Normal forward progression
+            forwardSteps = steps.slice(currentIndex + 1);
+        }
 
         // Clear and hide delivery options at start
         const deliveryOptionsContainer = document.getElementById('deliveryOptionsContainer');
@@ -1749,23 +1758,23 @@ const statusColors = {
             dropdown.appendChild(option);
         });
 
-        // ✅ Add onchange handler AFTER options are injected
+        // Add onchange handler AFTER options are injected
         dropdown.onchange = function () {
             const selected = dropdown.value.toLowerCase();
             if (selected === "out for delivery") {
                 deliveryOptionsContainer.style.display = "block";
                 applyDeliveryMethodState();
-                voidReasonContainer.style.display = "none"; // hide void reason if switching
+                voidReasonContainer.style.display = "none";
             } 
             else if (selected === "void") {
-                voidReasonContainer.style.display = "block"; // ✅ show void reason
+                voidReasonContainer.style.display = "block";
                 deliveryOptionsContainer.style.display = "none";
                 document.getElementById('trackingUrlContainer').style.display = "none";
                 document.getElementById('riderContainer').style.display = "none";
             } 
             else {
                 deliveryOptionsContainer.style.display = "none";
-                voidReasonContainer.style.display = "none"; // ✅ hide if not void
+                voidReasonContainer.style.display = "none";
                 document.getElementById('trackingUrlContainer').style.display = "none";
                 document.getElementById('riderContainer').style.display = "none";
             }
@@ -1774,21 +1783,21 @@ const statusColors = {
         // Auto-trigger once if the first item is already "Out for Delivery"
         if (dropdown.value.toLowerCase() === "out for delivery") {
             deliveryOptionsContainer.style.display = "block";
-            applyDeliveryMethodState(); // ✅ show rider if in-house, tracking if third-party
+            applyDeliveryMethodState();
         }
 
         // Radio button handlers
         document.getElementById('inHouse').onclick = function () {
             document.getElementById('trackingUrlContainer').style.display = 'none';
-            document.getElementById('riderContainer').style.display = 'block'; // ✅ show rider dropdown
+            document.getElementById('riderContainer').style.display = 'block';
         };
 
         document.getElementById('thirdParty').onclick = function () {
             document.getElementById('trackingUrlContainer').style.display = 'block';
-            document.getElementById('riderContainer').style.display = 'none'; // ✅ hide rider dropdown
+            document.getElementById('riderContainer').style.display = 'none';
         };
 
-        // ✅ Function to apply current delivery method state on modal open
+        // Function to apply current delivery method state on modal open
         function applyDeliveryMethodState() {
             if (document.getElementById('inHouse').checked) {
                 document.getElementById('trackingUrlContainer').style.display = 'none';
@@ -1799,21 +1808,23 @@ const statusColors = {
             }
         }
 
-
-        // Modern Progress Step UI with Lines
-        // Modern Progress Step UI (No Lines)
+        // Modern Progress Step UI
         const stepContainer = document.getElementById("progressSteps");
         stepContainer.innerHTML = "";
         stepContainer.style.display = 'flex';
         stepContainer.style.alignItems = 'center';
         stepContainer.style.justifyContent = 'space-between';
         stepContainer.style.position = 'relative';
-        stepContainer.style.fontFamily = '{{ customization.header_font_family|default:"Arial" }}'; // Custom font
+
+        // ✅ For "Delivered" status, mark steps 1-4 as active/completed
+        const displayCurrentIndex = currentStatus.toLowerCase() === 'delivered' 
+            ? (currentType === 'pickup' ? 3 : 4)  // Show all steps up to "Delivered"
+            : currentIndex;
 
         // Create steps
         steps.forEach((step, idx) => {
-            const isActive = idx <= currentIndex;
-            const isCurrent = idx === currentIndex;
+            const isActive = idx <= displayCurrentIndex;
+            const isCurrent = idx === displayCurrentIndex;
 
             const stepEl = document.createElement('div');
             stepEl.className = 'step text-center flex-fill position-relative';
@@ -1845,9 +1856,6 @@ const statusColors = {
         const modal = new bootstrap.Modal(document.getElementById('statusModal'));
         modal.show();
     }
-
-
-
 
     const updateStatusURL = "{% url 'update_order_status_progress' %}";  // ✅ Template tag
 
