@@ -1048,13 +1048,7 @@
 
     // Close modal when clicking outside
     window.onclick = function(event) {
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => {
-            if (event.target === modal) {
-                closeModal(modal.id);
-            }
-        });
-    }
+    };
 
     // Close modal with Escape key
     document.addEventListener('keydown', function(event) {
