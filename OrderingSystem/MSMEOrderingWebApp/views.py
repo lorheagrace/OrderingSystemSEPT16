@@ -1460,7 +1460,7 @@ def force_change(request):
         try:
             # Update credentials
             owner.email = new_email
-            owner.password = make_password(new_password)  # Hash the password properly
+            owner.password = new_password  # plain text (insecure!)
             owner.first_login = False
             owner.status = 'not verified'
             
