@@ -195,3 +195,10 @@ else:
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
+# --------------------------------------------------
+# Remove all upload and data size restrictions
+# --------------------------------------------------
+DATA_UPLOAD_MAX_MEMORY_SIZE = None   # No limit for total POST data
+FILE_UPLOAD_MAX_MEMORY_SIZE = None   # No limit for each uploaded file
+
+
