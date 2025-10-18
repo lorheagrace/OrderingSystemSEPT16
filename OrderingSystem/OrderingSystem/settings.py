@@ -198,7 +198,6 @@ CSRF_COOKIE_SECURE = False
 # --------------------------------------------------
 # Remove all upload and data size restrictions
 # --------------------------------------------------
-DATA_UPLOAD_MAX_MEMORY_SIZE = 0   # No limit for total POST data
-FILE_UPLOAD_MAX_MEMORY_SIZE = 0   # No limit for each uploaded file
-
+DATA_UPLOAD_MAX_MEMORY_SIZE = 209715200  # 200 * 1024 * 1024 bytes
+FILE_UPLOAD_MAX_MEMORY_SIZE = 209715200
 
