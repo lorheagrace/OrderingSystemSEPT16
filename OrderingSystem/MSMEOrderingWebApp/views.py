@@ -1849,7 +1849,6 @@ def register_user(request):
         business_contact = business.contact_number if business else "000-000-0000"
         business_address = business.store_address if business else "Business Address"
 
-# Email body (responsive)
 		body = f"""
 		<html>
 		<head>
