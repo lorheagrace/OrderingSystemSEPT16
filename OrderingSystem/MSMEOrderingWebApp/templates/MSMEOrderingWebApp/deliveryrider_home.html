@@ -805,7 +805,7 @@
         });
     });
 
-    // Handle file upload display
+    /* Handle file upload display
     document.getElementById('proofDelivery').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -819,6 +819,93 @@
             `;
         }
     });
+    */
+
+    // ✅ Handle proof upload with automatic compression ≤ 500 KB
+    document.getElementById('proofDelivery').addEventListener('change', async function (e) {
+        const file = e.target.files[0];
+        const uploadArea = document.querySelector('.upload-area');
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            alert("Please upload a valid image file.");
+            e.target.value = "";
+            return;
+        }
+
+        // Compress the image before preview/upload
+        const maxSize = 500 * 1024; // 500 KB
+        const compressed = await compressImage(file, maxSize);
+
+        // Replace the FileList with the compressed file
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(compressed);
+        e.target.files = dataTransfer.files;
+
+        uploadArea.innerHTML = `
+            <div class="upload-icon" style="color: var(--success-color);">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <p class="mb-0 text-success">File compressed & ready: ${compressed.name}</p>
+            <small class="text-muted">Size: ${(compressed.size / 1024).toFixed(1)} KB</small>
+        `;
+
+        // ✅ Optional: show preview
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const preview = document.getElementById('riderProofImg');
+            preview.src = event.target.result;
+            preview.style.display = 'block';
+            document.getElementById('riderProofPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(compressed);
+    });
+
+
+    // ✅ Compression function (same logic as customer_reviews)
+    function compressImage(file, maxSize) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            const reader = new FileReader();
+
+            reader.onload = (e) => (img.src = e.target.result);
+
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+
+                const maxWidth = 1280; // resize width if too large
+                const scale = Math.min(maxWidth / img.width, 1);
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                let quality = 0.9;
+                let result = canvas.toDataURL("image/jpeg", quality);
+
+                // Reduce quality until under 500 KB
+                while (result.length > maxSize * 1.33 && quality > 0.1) {
+                    quality -= 0.05;
+                    result = canvas.toDataURL("image/jpeg", quality);
+                }
+
+                fetch(result)
+                    .then((res) => res.blob())
+                    .then((blob) => {
+                        const compressedFile = new File(
+                            [blob],
+                            file.name.replace(/\.[^/.]+$/, ".jpg"),
+                            { type: "image/jpeg" }
+                        );
+                        resolve(compressedFile);
+                    });
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
 
     // Add some interactive animations
     document.querySelectorAll('.stat-card').forEach(card => {
