@@ -1724,9 +1724,16 @@ const statusColors = {
         currentType = btn.dataset.orderType;
         currentGroupId = btn.dataset.groupId; 
 
+        // Progress steps include "Delivered" for visualization
         const deliveryStatuses = ['accepted', 'Preparing', 'Packed', 'Out for Delivery', 'Delivered', 'Completed', 'Void'];
         const pickupStatuses = ['accepted', 'Preparing', 'Packed', 'Ready for Pickup', 'Completed', 'Void'];
         const steps = currentType === 'pickup' ? pickupStatuses : deliveryStatuses;
+        
+        // Dropdown options exclude "Delivered" (rider sets this)
+        const deliveryDropdownStatuses = ['accepted', 'Preparing', 'Packed', 'Out for Delivery', 'Completed', 'Void'];
+        const pickupDropdownStatuses = ['accepted', 'Preparing', 'Packed', 'Ready for Pickup', 'Completed', 'Void'];
+        const dropdownStatuses = currentType === 'pickup' ? pickupDropdownStatuses : deliveryDropdownStatuses;
+        
         const voidReasonContainer = document.getElementById('voidReasonContainer');
 
         const dropdown = document.getElementById('statusDropdown');
@@ -1740,8 +1747,9 @@ const statusColors = {
             // Only show Completed and Void options
             forwardSteps = ['Completed', 'Void'];
         } else {
-            // Normal forward progression
-            forwardSteps = steps.slice(currentIndex + 1);
+            // Normal forward progression (using dropdown statuses, not full steps)
+            const currentDropdownIndex = dropdownStatuses.findIndex(s => s.toLowerCase() === currentStatus.toLowerCase());
+            forwardSteps = dropdownStatuses.slice(currentDropdownIndex + 1);
         }
 
         // Clear and hide delivery options at start
