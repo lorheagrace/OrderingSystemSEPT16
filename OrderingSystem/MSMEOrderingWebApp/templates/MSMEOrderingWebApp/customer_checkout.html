@@ -1126,6 +1126,7 @@
     toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
   }
 
+    /* OLD FILE UPLOAD
     document.getElementById('proof').addEventListener('change', function (event) {
         const file = event.target.files[0];
         const previewSection = document.getElementById('imagePreview');
@@ -1141,8 +1142,71 @@
         } else {
             previewSection.style.display = 'none';
         }
+    }); 
+    */
+
+    document.getElementById("proof").addEventListener("change", async function (event) {
+        const file = event.target.files[0];
+        const previewSection = document.getElementById("imagePreview");
+        const previewImage = document.getElementById("previewImage");
+
+        if (!file) return;
+
+        // === AUTO COMPRESS IMAGE TO MAX 500 KB ===
+        if (file.size > 500 * 1024) {
+            const compressedFile = await compressImage(file, 0.8);
+            if (compressedFile.size > 500 * 1024) {
+                const furtherCompressed = await compressImage(file, 0.6);
+                event.target.files = createFileList(furtherCompressed);
+            } else {
+                event.target.files = createFileList(compressedFile);
+            }
+        }
+
+        // === PREVIEW IMAGE ===
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            previewImage.src = e.target.result;
+            previewSection.style.display = "block";
+        };
+        reader.readAsDataURL(event.target.files[0]);
     });
 
+    // Helper: compress image using canvas
+    function compressImage(file, quality = 0.8) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    const maxWidth = 1024;
+                    const scaleSize = maxWidth / img.width;
+                    canvas.width = Math.min(img.width, maxWidth);
+                    canvas.height = img.height * scaleSize;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(
+                        (blob) => {
+                            resolve(new File([blob], file.name, { type: "image/jpeg" }));
+                        },
+                        "image/jpeg",
+                        quality
+                    );
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Helper: create a new FileList to assign to input
+    function createFileList(file) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        return dataTransfer.files;
+    }
+    
     function copyToClipboard(elementId) {
         const text = document.getElementById(elementId).textContent;
         navigator.clipboard.writeText(text).then(() => {
