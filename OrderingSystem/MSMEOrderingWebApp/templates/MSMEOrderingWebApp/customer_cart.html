@@ -1138,6 +1138,24 @@
                             <label for="scheduled_date" class="form-label">Select Date & Time:</label>
                             <input type="datetime-local" id="scheduled_date" name="scheduled_date" class="form-control">
                         </div>
+                        
+                        <!-- Info message for "Order Now" -->
+                        <div id="orderNowMessage"
+                            class="mt-3 p-3 rounded shadow-sm"
+                            style="
+                                display: none;
+                                background-color: #f0f0f0;          
+                                color: #333;                        
+                                font-family: 'Poppins', sans-serif; 
+                                font-size: 14px;
+                                border-left: 4px solid #007bff;    
+                                font-weight: 500;
+                            ">
+                            <i class="fas fa-info-circle me-2"
+                            style="color: #007bff;"></i>         
+                            Preparation time may vary. Check your notifications for progress updates.
+                        </div>
+
                     </div>
                     {% endif %}
 
@@ -1249,6 +1267,30 @@ document.addEventListener("DOMContentLoaded", function() {
         localStorage.removeItem("delivery_fee_received");
         console.log("[CustomerHomepage] Cleared localStorage for order_type and delivery_fee");
     }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const orderNow = document.getElementById("order_now");
+    const orderScheduled = document.getElementById("order_scheduled");
+    const schedulePicker = document.getElementById("schedulePicker");
+    const orderNowMessage = document.getElementById("orderNowMessage");
+
+    function toggleOrderTime() {
+        if (orderNow.checked) {
+            schedulePicker.style.display = "none";
+            orderNowMessage.style.display = "block"; // ✅ show message
+        } else if (orderScheduled.checked) {
+            schedulePicker.style.display = "block";
+            orderNowMessage.style.display = "none"; // ✅ hide message
+        }
+    }
+
+    // Run once on page load (default state)
+    toggleOrderTime();
+
+    // Listen for changes
+    orderNow.addEventListener("change", toggleOrderTime);
+    orderScheduled.addEventListener("change", toggleOrderTime);
 });
 
 const userEmail = "{{ user_email|escapejs }}";
