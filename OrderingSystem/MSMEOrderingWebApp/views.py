@@ -1849,7 +1849,7 @@ def register_user(request):
         business_contact = business.contact_number if business else "000-000-0000"
         business_address = business.store_address if business else "Business Address"
 
-		# Email body (responsive)
+# Email body (responsive)
 		body = f"""
 		<html>
 		<head>
@@ -1860,17 +1860,17 @@ def register_user(request):
 		<body style="
 		        font-family: 'Montserrat', Arial, sans-serif; 
 		        background: linear-gradient(135deg, {primary_color} 50%, {secondary_color} 100%);
-		        margin: 0; padding: 40px 0; color: #fff;">
+		        margin: 0; padding: 30px 0; color: #fff;">
 		
 		    <!-- Container with subtle blur and transparency -->
 		    <div class="email-container" style="
 		            max-width: 550px; 
-		            width: 80%;  /* make it adapt on smaller screens */
+		            width: 75%;  /* make it adapt on smaller screens */
 		            margin: 0 auto; 
 		            background: rgba(17, 17, 17, 0.25);                
 		            border-radius: 30px; 
-		            padding: 25px 15px; /* reduce padding for mobile friendliness */
-		            border: 2px solid rgba(255,255,255,0.35);  
+		            padding: 35px; /* reduce padding for mobile friendliness */
+		            border: 2px solid rgba(255,255,255,0.45);  
 		            box-shadow: 0 6px 24px rgba(0,0,0,0.25);  
 		            backdrop-filter: blur(55px); 
 		            -webkit-backdrop-filter: blur(55px); 
@@ -1929,6 +1929,9 @@ def register_user(request):
 		                ⚠️ <strong>Didn't create this account?</strong> You can safely ignore this email.
 		            </p>
 		        </div>
+
+				<!-- Divider -->
+                <div style="margin: 40px auto 25px; width: 60px; height: 2px; background: #fff; border-radius: 2px;"></div>
 		
 		        <!-- Footer -->
 		        <div style="
@@ -1973,9 +1976,7 @@ def register_user(request):
 		</body>
 		</html>
 		"""
-
-
-
+		
         # Send email using Django
         try:
             email = EmailMultiAlternatives(
@@ -4258,11 +4259,6 @@ def create_staff_account(request):
                         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(20px); 
                         position: relative;">
 
-                <!-- Icon -->
-                <div style="width: 80px; height: 80px; background: rgba(17,17,17,0.9); border: 2px solid #3A3A3A9B; border-radius: 50%; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center;">
-                    <span style="font-size: 36px;">✉️</span>
-                </div>
-
                 <!-- Heading -->
                 <h2 style="text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 20px; color: #FFFFFF;">
                     Email Verification
@@ -4281,7 +4277,7 @@ def create_staff_account(request):
                             style="display: inline-block; padding: 15px 35px; font-family: 'Montserrat', Arial, sans-serif; 
                                     font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; 
                                     border-radius: 6px;">
-                                VERIFY EMAIL
+                                VERIFY MY EMAIL
                             </a>
                         </td>
                     </tr>
