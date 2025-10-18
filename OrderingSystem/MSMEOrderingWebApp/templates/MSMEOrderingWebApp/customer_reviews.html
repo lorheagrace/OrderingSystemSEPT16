@@ -955,12 +955,89 @@
     }
   }
 
+  /*
   function limitFiles(input) {
     if (input.files.length > 3) {
       alert("You can upload up to 3 photos only.");
       input.value = "";
     }
   }
+  */
+
+  // ✅ Automatically compress images to ≤ 500 KB
+  async function limitFiles(input) {
+    const maxFiles = 3;
+    const maxSize = 500 * 1024; // 500 KB
+    const files = Array.from(input.files);
+
+    if (files.length > maxFiles) {
+      alert("You can upload up to 3 photos only.");
+      input.value = "";
+      return;
+    }
+
+    const compressedFiles = [];
+
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        alert(`${file.name} is not an image file.`);
+        input.value = "";
+        return;
+      }
+
+      const compressed = await compressImage(file, maxSize);
+      compressedFiles.push(compressed);
+    }
+
+    // Replace FileList inside input
+    const dataTransfer = new DataTransfer();
+    compressedFiles.forEach(f => dataTransfer.items.add(f));
+    input.files = dataTransfer.files;
+
+  }
+
+  // ✅ Image compression helper
+  function compressImage(file, maxSize) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        img.src = e.target.result;
+      };
+
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const maxWidth = 1280; // optional resize
+        const scale = Math.min(maxWidth / img.width, 1);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        let quality = 0.9;
+        let result = canvas.toDataURL("image/jpeg", quality);
+
+        // Iteratively reduce quality until size ≤ 500 KB
+        while (result.length > maxSize * 1.33 && quality > 0.1) {
+          quality -= 0.05;
+          result = canvas.toDataURL("image/jpeg", quality);
+        }
+
+        // Convert back to File object
+        fetch(result)
+          .then(res => res.blob())
+          .then(blob => {
+            resolve(new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: "image/jpeg" }));
+          });
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
 
   document.addEventListener('DOMContentLoaded', function() {
       const reviewCards = document.querySelectorAll('.review-card');
@@ -1158,4 +1235,3 @@
 </script>
 
 {% endblock %}
- 
