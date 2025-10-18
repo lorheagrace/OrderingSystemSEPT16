@@ -1867,7 +1867,6 @@ def register_user(request):
                         
                         <!-- Business Info -->
                         <h3 style="color: #333; font-size: 18px; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.1px;">
-                            {business.business_name}
                         </h3>
                         <p style="color: #6c757d; font-size: 14px; margin: 0 0 25px;">
                             © 2025 All rights reserved.
