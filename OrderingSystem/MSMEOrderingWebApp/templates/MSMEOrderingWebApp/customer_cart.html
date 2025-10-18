@@ -1146,7 +1146,7 @@
                                 display: none;
                                 background-color: #f0f0f0;          
                                 color: #333;                        
-                                font-family: 'Poppins', sans-serif; 
+                                font-family: {{ customization.body_font_family|default:'Poppins, sans-serif' }};
                                 font-size: 14px;
                                 border-left: 4px solid #007bff;    
                                 font-weight: 500;
