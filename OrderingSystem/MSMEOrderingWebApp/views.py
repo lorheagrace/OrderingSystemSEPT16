@@ -1868,27 +1868,30 @@ def register_user(request):
                         <!-- Business Info -->
                         <h3 style="color: #333; font-size: 18px; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.1px;">
                         </h3>
-                        <p style="color: #6c757d; font-size: 14px; margin: 0 0 25px;">
-                            © 2025 All rights reserved.
-                        </p>
+						<p style="color: #6c757d; font-size: 14px; margin: 0 0 25px;">
+						    {{ business.business_name|default:"Business Name" }}
+						    © 2025 All rights reserved.
+						</p>
+
 
                         <!-- Contact Info -->
                         <div style="font-size: 14px; color: #495057; margin-bottom: 25px; line-height: 1.5; text-align: center;">
                             <div style="display: inline-flex; justify-content: center; margin-bottom: 5px;">
                                 <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
                                     <strong>✉️:</strong> 
-                                    <a href="mailto:{business.email_address}" style="color: {customization.primary_color}; text-decoration: none; margin-left: 5px;">
-                                        {business.email_address}
-                                    </a>
+                                    <a href="mailto:{{ business.email_address|default:'emailnotexist@example.com' }}" 
+									   style="color: {{ customization.primary_color|default:'#000000' }}; text-decoration: none; margin-left: 5px;">
+									    {{ business.email_address|default:'emailnotexist@example.com' }}
+									</a>
                                 </p>
                                 <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
-                                    <strong>📞:</strong> {business.contact_number}
+                                    <strong>📞:</strong> {{ business.contact_number|default:'Not applicable' }}
                                 </p>
                             </div>
 
                             <!-- Address on a new row below -->
                             <div>
-                                <p style="margin: 5px 0;"><strong>📍:</strong> {business.store_address}</p>
+                                <p style="margin: 5px 0;"><strong>📍:</strong> {{ business.store_address|default:'Address not available' }}</p>
                             </div>
                         </div>
                     </td>
