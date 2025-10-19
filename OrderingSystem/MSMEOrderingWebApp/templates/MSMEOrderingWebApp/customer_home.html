@@ -252,7 +252,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 
         position: sticky;
-        top: 70px;
+        top: 73px;
         z-index: 1000; /* keeps it above other content */
     }
 
@@ -1540,7 +1540,7 @@
         <i class="fas fa-clock me-3 fs-4"></i>
         <div>
             <strong>WE ARE CLOSED!</strong><br>
-            <span>We’re happy to serve you from {{ business.opening_time|date:"h:i A" }} to {{ business.closing_time|date:"h:i A" }}. You’ll be able to add items to your cart once we’re open again. Thank you for your understanding!</span>
+            <span>We’re happy to serve you from {{ business.opening_time|date:"h:i A" }} to {{ business.closing_time|date:"h:i A" }} from {{ business.opening_time|date:"h:i A" }} to {{ business.closing_time|date:"h:i A" }}. You’ll be able to add items to your cart once we’re open again. Thank you for your understanding!</span>
         </div>
     </div>
 </div>
