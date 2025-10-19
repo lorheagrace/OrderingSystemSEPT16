@@ -182,7 +182,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
     elif status == "Ready for Pickup":
         message_content = f"""
         <p style="padding-left: 20px; padding-right:20px; font-size: 15px; color: #555; font-weight: bold; line-height: 1.6;">Your order is now READY FOR PICK UP!</p>
-        <p style="padding-left: 20px; padding-right:20px; font-size: 15px; color: #555; margin-top: 10px;">Please bring a valid ID or show this email including your order code.</p>
+        <p style="padding-left: 20px; padding-right:20px; font-size: 15px; color: #555; margin-top: 10px;">Please show this email including your order code.</p>
         """
     elif status == "Out for Delivery":
         message_content = f"""
@@ -331,6 +331,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         print(f"✅ Email sent to {recipient_email}")
     except Exception as e:
         print(f"❌ Failed to send email: {e}")
+
 
 @csrf_exempt
 def update_order_status(request):
@@ -506,7 +507,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
     ]
     item_list = "\n".join(item_lines)
 
-# Message Content Based on Status
+    # Message Content Based on Status
     message_content = ""
     if status.lower() == "rejected":
         message_content = f"""
@@ -531,7 +532,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
     elif status == "Ready for Pickup":
         message_content = f"""
         <p style="padding-left: 20px; padding-right:20px; font-size: 15px; color: #555; font-weight: bold; line-height: 1.6;">Your order is now READY FOR PICK UP!</p>
-        <p style="padding-left: 20px; padding-right:20px; font-size: 15px; color: #555; margin-top: 10px;">Please bring a valid ID or show this email including your order code.</p>
+        <p style="padding-left: 20px; padding-right:20px; font-size: 15px; color: #555; margin-top: 10px;">Please show this email including your order code.</p>
         """
     elif status == "Out for Delivery":
         message_content = f"""
@@ -680,6 +681,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         print(f"✅ Email sent to {recipient_email}")
     except Exception as e:
         print(f"❌ Failed to send email to {recipient_email}: {str(e)}")
+
 
 @csrf_exempt
 def update_order_status_progress(request):
@@ -1993,7 +1995,6 @@ def register_user(request):
         'customization': customization,
         'business': business,
     })
-
 
 @login_required_session(allowed_roles=['owner'])
 def dashboard(request):
@@ -5685,12 +5686,11 @@ def forgot_password(request):
                 defaults={'otp': otp_code, 'created_at': now()}
             )
 
-from django.core.mail import EmailMultiAlternatives
+            from django.core.mail import EmailMultiAlternatives
 from django.conf import settings as django_settings
 from django.http import JsonResponse
 from django.utils.timezone import now
 import random
-
 
 def forgot_password(request):
     BusinessDetails_obj = BusinessDetails.objects.first()
@@ -5801,8 +5801,6 @@ def forgot_password(request):
 </body>
 </html>
 """
-
-
             try:
                 # ✅ Use Django email system
                 email_message = EmailMultiAlternatives(
@@ -5822,6 +5820,7 @@ def forgot_password(request):
         return JsonResponse({'status': 'error', 'message': 'Email not found.'}, status=404)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
 
 @csrf_exempt
 def forgot_passwordotp(request):
