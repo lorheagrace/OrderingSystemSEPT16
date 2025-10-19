@@ -2104,35 +2104,32 @@
                 formData.append("logo", file);
                 formData.append("csrfmiddlewaretoken", document.querySelector('[name=csrfmiddlewaretoken]').value);
 
-                fetch(window.location.origin + "/upload_logo/", {
+                fetch("{% url 'upload_logo' %}", {
                     method: "POST",
                     body: formData,
                     headers: { "X-Requested-With": "XMLHttpRequest" }
                 })
-                .then(res => {
-                    if (!res.ok) throw new Error('Network response was not ok');
-                    return res.json();
-                })
-                .then(data => {
+                .then(async res => {
+                const text = await res.text(); // Get response as text first
+                try {
+                    const data = JSON.parse(text); // Try parsing as JSON
                     if (data.success) {
-                        logoPreview.src = data.logo_url;
-                        logoPreview.style.display = 'block';
-                        uploadPlaceholder.style.display = 'none';
-                        showToast('Logo uploaded successfully!', 'success');
+                    logoPreview.src = data.logo_url;
+                    logoPreview.style.display = 'block';
+                    uploadPlaceholder.style.display = 'none';
+                    showToast('Logo uploaded successfully!', 'success');
                     } else {
-                        throw new Error(data.error || 'Upload failed');
+                    throw new Error(data.error || 'Upload failed');
                     }
+                } catch (err) {
+                    // If parsing fails, probably got HTML (redirect or server error)
+                    console.error("Raw response:", text);
+                    showToast('Upload failed: Server returned unexpected response.', 'danger');
+                }
                 })
-                .catch(error => {
-                    console.error('Upload error:', error);
-                    showToast('Upload failed: ' + error.message, 'danger');
-                    this.value = '';
-                    uploadPlaceholder.innerHTML = `
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <h4>Upload Logo</h4>
-                        <p>Drag & drop or click to browse</p>
-                        <small>PNG, JPG up to 2MB</small>
-                    `;
+                .catch(err => {
+                console.error("Fetch error:", err);
+                showToast('Upload failed: ' + err.message, 'danger');
                 });
             });
         }
@@ -2613,7 +2610,8 @@
             }
 
             // Make upload placeholder clickable to trigger file upload
-            if (uploadPlaceholder && logoInput) {
+            
+            /*if (uploadPlaceholder && logoInput) {
                 uploadPlaceholder.style.cursor = 'pointer';
                 uploadPlaceholder.addEventListener('click', function() {
                     if (!logoInput.disabled) {
@@ -2621,8 +2619,10 @@
                     }
                 });
             }
+            */
 
             // Logo upload
+            /*
             if (logoInput) {
                 logoInput.addEventListener('change', function () {
                     const file = this.files[0];
@@ -2664,6 +2664,7 @@
                     });
                 });
             }
+            */    
 
             // Edit button
             if (editButton) {
