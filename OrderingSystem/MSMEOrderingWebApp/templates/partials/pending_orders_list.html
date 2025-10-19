@@ -372,6 +372,43 @@
             align-items: center;
         }
 
+        .empty-state{
+            opacity:0.6;
+        }
+        
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(50px);
+            font-family: {{ customization.header_font_family|default:"Arial" }};
+        }
+
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 5px;
+            color: {{ customization.header_font_color|default:"#000000" }};
+        }
+
+        .empty-state h3 {
+            margin-bottom: 2px;
+            color: {{ customization.header_font_color|default:"#000000" }};
+            font-family: '{{ customization.header_font_family|default:"Arial" }}';
+            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 35 %}{{ customization.header_font_size|default:35 }}{% else %}35{% endif %}px;
+            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
+            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+        }
+        .empty-state p {
+            font-weight: 600;
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:10 }}{% else %}16{% endif %}px;
+            
+        }
+
     </style>
 </head>
 <body>
@@ -488,8 +525,8 @@
                 </div>
                 {% endfor %}
             {% else %}
-                <div class="no-orders">
-                    <div class="no-orders-icon">
+                <div class="empty-state">
+                    <div class= "empty-icon">
                         <i class="fas fa-inbox"></i>
                     </div>
                     <h3>No Pending Orders</h3>
@@ -698,12 +735,6 @@
         const orderCode = button.dataset.orderCode;
         const groupId = button.dataset.groupId;
 
-        // Prevent multiple clicks
-        button.disabled = true;
-
-        // Show full-screen loading overlay
-        showLoading();
-
         fetch("/update-order-status/", {
             method: "POST",
             headers: {
@@ -714,19 +745,11 @@
         })
         .then(res => res.json())
         .then(data => {
-            hideLoading();
             if (data.success) {
-                location.reload();
+                location.reload(); // or update UI dynamically
             } else {
                 alert("Failed to update order: " + (data.error || "Unknown error"));
-                button.disabled = false; // re-enable if failed
             }
-        })
-        .catch(err => {
-            hideLoading();
-            console.error(err);
-            alert("Error updating order.");
-            button.disabled = false; // re-enable if error
         });
     }
     </script>
