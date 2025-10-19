@@ -222,7 +222,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         font-family: 'Montserrat', Arial, sans-serif; 
         margin: 0; padding: 0; 
         background: linear-gradient(135deg, {customization.primary_color or '#0F0F0F'} 40%, {customization.secondary_color or '#555555'} 100%);
-        color: #333;
+        color: #fff;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -251,7 +251,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
                 <!-- Header -->
                 <tr>
                     <td align="center" style="padding: 20px 0 0 0;">
-                        <h1 style="font-size: 28px; font-weight: 900; color: #ffffff; margin: 0;">
+                        <h1 style="font-size: 28px; font-weight: 900; color: #fff; margin: 0;">
                             ORDER UPDATE
                         </h1>
                     </td>
@@ -264,11 +264,10 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
                         <!-- Highlighted Order Code -->
                         <div style="
                             display: inline-block;
-                            background: rgba(255,255,255,0.25); 
                             backdrop-filter: blur(55px); 
                             -webkit-backdrop-filter: blur(85px);
                             color: {customization.primary_color};
-                            font-weight: bold;
+                            font-weight: 800;
                             font-size: 20px;
                             padding: 10px 25px;
                             border-radius: 8px;
@@ -289,6 +288,8 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
                         <div class="receipt" style="
                             text-align: left; 
                             background: rgba(17,17,17,0.2); 
+                            backdrop-filter: blur(55px);
+                            -webkit-backdrop-filter: blur(85px);
                             padding: 15px; 
                             border-radius: 10px; 
                             border: 2px solid rgba(255,255,255,0.45); 
@@ -300,7 +301,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
                         ">
                             <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
                             <hr style="border: none; border-top: 1px dashed rgba(255,255,255,0.3); margin: 5px 0;">
-                            <table width="100%" style="border-collapse: collapse; font-size: 14px; color: #fff;">
+                            <table width="100%" style="border-collapse: collapse; font-weight: 800;  font-size: 14px; color: #fff;">
                                 <thead>
                                     <tr>
                                         <th align="left" style="padding-bottom: 6px;">Item</th>
@@ -318,26 +319,27 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
                 <!-- Footer -->
                 <tr>
                     <td style="padding: 20px; text-align: center; background: rgba(255,255,255,0.05); border-top: 1px solid rgba(255,255,255,0.2);">
-                        <p style="font-size: 14px; color: #ffffff; margin: 0;">Thank you for shopping with us!</p>
+                        <p style="font-size: 14px; color: #fff; margin: 0;">Thank you for shopping with us!</p>
                         <div style="font-size: 14px; line-height: 1.5; text-align: center; margin-top: 10px;">
                             <div style="display: inline-flex; justify-content: center; flex-wrap: wrap;">
-                                <p style="margin: 5px 10px 0 0; color: #ffffff; display: inline-flex; align-items: center;">
+                                <p style="margin: 5px 10px 0 0; color: #fff; display: inline-flex; align-items: center;">
                                     <strong>✉️ Email:</strong> 
-                                    <a href="mailto:{business.email_address}" style="color: #ffffff; text-decoration: none; margin-left: 5px;">
+                                    <a href="mailto:{business.email_address}" style="color: #fff; text-decoration: none; margin-left: 5px;">
                                         {business.email_address}
                                     </a>
                                 </p>
-                                <p style="margin: 5px 10px 0 0; color: #ffffff; display: inline-flex; align-items: center;">
+                                <p style="margin: 5px 10px 0 0; color: #fff; display: inline-flex; align-items: center;">
                                     <strong>📞 Contact:</strong> {business.contact_number}
                                 </p>
                             </div>
                             <div>
-                                <p style="margin: 5px 0; color: #ffffff;"><strong>📍 Address:</strong> {business.store_address}</p>
+                                <p style="margin: 5px 0; color: #fff;"><strong>📍 Address:</strong> {business.store_address}</p>
                             </div>
                         </div>
-                        <p style="font-size: 12px; color: #ffffff; margin-top: 10px;">- {business.business_name}</p>
+                        <p style="font-size: 12px; color: #fff; margin-top: 10px;">- {business.business_name}</p>
                     </td>
                 </tr>
+
             </table>
         </div>
     </body>
@@ -596,7 +598,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         font-family: 'Montserrat', Arial, sans-serif; 
         margin: 0; padding: 0; 
         background: linear-gradient(135deg, {customization.primary_color or '#0F0F0F'} 40%, {customization.secondary_color or '#555555'} 100%);
-        color: #333;
+        color: #fff;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -625,7 +627,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
                 <!-- Header -->
                 <tr>
                     <td align="center" style="padding: 20px 0 0 0;">
-                        <h1 style="font-size: 28px; font-weight: 900; color: #ffffff; margin: 0;">
+                        <h1 style="font-size: 28px; font-weight: 900; color: #fff; margin: 0;">
                             ORDER UPDATE
                         </h1>
                     </td>
@@ -638,11 +640,10 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
                         <!-- Highlighted Order Code -->
                         <div style="
                             display: inline-block;
-                            background: rgba(255,255,255,0.25); 
                             backdrop-filter: blur(55px); 
                             -webkit-backdrop-filter: blur(85px);
                             color: {customization.primary_color};
-                            font-weight: bold;
+                            font-weight: 800;
                             font-size: 20px;
                             padding: 10px 25px;
                             border-radius: 8px;
@@ -663,6 +664,8 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
                         <div class="receipt" style="
                             text-align: left; 
                             background: rgba(17,17,17,0.2); 
+                            backdrop-filter: blur(55px);
+                            -webkit-backdrop-filter: blur(85px);
                             padding: 15px; 
                             border-radius: 10px; 
                             border: 2px solid rgba(255,255,255,0.45); 
@@ -674,7 +677,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
                         ">
                             <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
                             <hr style="border: none; border-top: 1px dashed rgba(255,255,255,0.3); margin: 5px 0;">
-                            <table width="100%" style="border-collapse: collapse; font-size: 14px; color: #fff;">
+                            <table width="100%" style="border-collapse: collapse; font-weight: 800;  font-size: 14px; color: #fff;">
                                 <thead>
                                     <tr>
                                         <th align="left" style="padding-bottom: 6px;">Item</th>
@@ -692,26 +695,27 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
                 <!-- Footer -->
                 <tr>
                     <td style="padding: 20px; text-align: center; background: rgba(255,255,255,0.05); border-top: 1px solid rgba(255,255,255,0.2);">
-                        <p style="font-size: 14px; color: #ffffff; margin: 0;">Thank you for shopping with us!</p>
+                        <p style="font-size: 14px; color: #fff; margin: 0;">Thank you for shopping with us!</p>
                         <div style="font-size: 14px; line-height: 1.5; text-align: center; margin-top: 10px;">
                             <div style="display: inline-flex; justify-content: center; flex-wrap: wrap;">
-                                <p style="margin: 5px 10px 0 0; color: #ffffff; display: inline-flex; align-items: center;">
+                                <p style="margin: 5px 10px 0 0; color: #fff; display: inline-flex; align-items: center;">
                                     <strong>✉️ Email:</strong> 
-                                    <a href="mailto:{business.email_address}" style="color: #ffffff; text-decoration: none; margin-left: 5px;">
+                                    <a href="mailto:{business.email_address}" style="color: #fff; text-decoration: none; margin-left: 5px;">
                                         {business.email_address}
                                     </a>
                                 </p>
-                                <p style="margin: 5px 10px 0 0; color: #ffffff; display: inline-flex; align-items: center;">
+                                <p style="margin: 5px 10px 0 0; color: #fff; display: inline-flex; align-items: center;">
                                     <strong>📞 Contact:</strong> {business.contact_number}
                                 </p>
                             </div>
                             <div>
-                                <p style="margin: 5px 0; color: #ffffff;"><strong>📍 Address:</strong> {business.store_address}</p>
+                                <p style="margin: 5px 0; color: #fff;"><strong>📍 Address:</strong> {business.store_address}</p>
                             </div>
                         </div>
-                        <p style="font-size: 12px; color: #ffffff; margin-top: 10px;">- {business.business_name}</p>
+                        <p style="font-size: 12px; color: #fff; margin-top: 10px;">- {business.business_name}</p>
                     </td>
                 </tr>
+
             </table>
         </div>
     </body>
