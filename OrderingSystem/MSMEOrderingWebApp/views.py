@@ -4243,9 +4243,14 @@ def create_staff_account(request):
                     <!-- Divider -->
                     <div style="margin: 30px auto 20px; width: 50px; height: 2px; background: #fff; border-radius: 2px;"></div>
 
-                    <!-- Business Name -->
-                    <p style="margin-top: 5px; font-size: 15px; font-weight:800; text-align:center; color: rgba(255,255,255,0.6); display: block;">
-                        - {business_name}
+                    <!-- Footer -->
+                    <p style="
+                        font-size: 13px;
+                        color: #fff;
+                        text-align: center;
+                        margin: 0;
+                    ">
+                        © 2025 Online Ordering System
                     </p>
                 </div>
             </body>
