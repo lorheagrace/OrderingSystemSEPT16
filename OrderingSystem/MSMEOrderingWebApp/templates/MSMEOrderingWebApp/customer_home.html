@@ -760,17 +760,7 @@
         box-shadow: 0 5px 15px rgba(21, 87, 36, 0.2);
     }
 
-    /* No Results */
-    .no-products {
-        text-align: center;
-        padding: 80px 20px;
-        color: #6c757d;
-    }
 
-    .no-products i {
-        opacity: 0.5;
-        margin-bottom: 20px;
-    }
 
     /* Product Count */
     .product-count {
@@ -1332,6 +1322,43 @@
         }
     }
 
+    .empty-state{
+        opacity:0.6;
+    }
+    
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px 20px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(50px);
+        font-family: {{ customization.header_font_family|default:"Arial" }};
+    }
+
+
+    .empty-icon {
+        font-size: 60px;
+        margin-bottom: 5px;
+        color: {{ customization.header_font_color|default:"#000000" }};
+    }
+
+    .empty-state h5 {
+        margin-bottom: 2px;
+        color: {{ customization.header_font_color|default:"#000000" }};
+        font-family: '{{ customization.header_font_family|default:"Arial" }}';
+        font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 35 %}{{ customization.header_font_size|default:35 }}{% else %}35{% endif %}px;
+        font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
+        font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
+    }
+    .empty-state p {
+        font-weight: 600;
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:10 }}{% else %}16{% endif %}px;
+        
+    }
+
 </style>
 
 
@@ -1465,10 +1492,10 @@
         </div>
         {% empty %}
         <div class="col-12">
-            <div class="no-products">
-                <i class="fas fa-star fa-2x"></i>
-                <h5 class="mt-2">No bestsellers available</h5>
-                <p class="text-muted small">Please check back later.</p>
+            <div class="empty-state">
+                <i class="fas fa-star fa-2x empty-icon"></i>
+                <h5>No bestsellers available</h5>
+                <p>Please check back later.</p>
             </div>
         </div>
         {% endfor %}
@@ -1540,7 +1567,7 @@
         <i class="fas fa-clock me-3 fs-4"></i>
         <div>
             <strong>WE ARE CLOSED!</strong><br>
-            <span>We’re happy to serve you from {{ business.opening_time|date:"h:i A" }} to {{ business.closing_time|date:"h:i A" }} from {{ business.opening_time|date:"h:i A" }} to {{ business.closing_time|date:"h:i A" }}. You’ll be able to add items to your cart once we’re open again. Thank you for your understanding!</span>
+            <span>We’re happy to serve you from {{ business.opening_time|date:"h:i A" }} to {{ business.closing_time|date:"h:i A" }} from {{ business.start_day }} to {{ business.end_day }}. You’ll be able to add items to your cart once we’re open again. Thank you for your understanding!</span>
         </div>
     </div>
 </div>
@@ -1600,20 +1627,20 @@
     </div>
     {% empty %}
     <div class="col-12">
-        <div class="no-products">
-            <i class="fas fa-store-slash fa-5x"></i>
-            <h3 class="mt-4">No products available</h3>
-            <p class="text-muted">Please check back later for new products.</p>
+        <div class="empty-state">
+            <i class="fas fa-store-slash fa-5x empty-icon"></i>
+            <h5>No products available</h5>
+            <p>Please check back later for new products.</p>
         </div>
     </div>
     {% endfor %}
 </div>
 
 <!-- No Results Message -->
-<div class="no-products" id="noResults" style="display: none;">
-    <i class="fas fa-search-minus fa-5x"></i>
-    <h3 class="mt-4">No products found</h3>
-    <p class="text-muted">Try adjusting your search terms or browse different categories.</p>
+<div class="empty-state" id="noResults" style="display: none;">
+    <i class="fas fa-search-minus fa-5x empty-icon"></i>
+    <h5>No products found</h5>
+    <p>Try adjusting your search terms or browse different categories.</p>
     <button class="btn btn-add-to-cart mt-3" onclick="clearSearch()">
         <i class="fas fa-refresh me-2"></i>Clear Filters
     </button>
