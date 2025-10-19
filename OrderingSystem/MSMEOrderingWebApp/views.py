@@ -306,7 +306,7 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
                                             <strong>📞 Contact:</strong> {business.contact_number}
                                         </p>
                                         <p style="margin: 5px 0;">
-                                            <strong>📍 Address:</strong> {business.business_address}
+                                            <strong>📍 Address:</strong> {business.store_address}
                                         </p>
                                     </td>
                                 </tr>
@@ -656,7 +656,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
                                             <strong>📞 Contact:</strong> {business.contact_number}
                                         </p>
                                         <p style="margin: 5px 0;">
-                                            <strong>📍 Address:</strong> {business.business_address}
+                                            <strong>📍 Address:</strong> {business.store_address}
                                         </p>
                                     </td>
                                 </tr>
