@@ -541,21 +541,40 @@
         }
 
         .empty-state {
+            opacity: 0.6;
+        }
+        
+        .empty-state {
+            grid-column: 1 / -1;
             text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-muted);
+            padding: 60px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(50px);
+            font-family: {{ customization.header_font_family|default:"Arial" }};
         }
 
+
         .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            color: var(--border-color);
+            font-size: 60px;
+            margin-bottom: 5px;
+            color: {{ customization.header_font_color|default:"#000000" }};
         }
 
         .empty-state h4 {
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
+            margin-bottom: 2px;
+            font-weight: 800;
+            color: {{ customization.header_font_color|default:"#000000" }};
+            font-family: '{{ customization.header_font_family|default:"Arial" }}';
+            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 35 %}{{ customization.header_font_size|default:35 }}{% else %}35{% endif %}px;
         }
+        .empty-state p {
+            font-weight: 600;
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:10 }}{% else %}16{% endif %}px;
+            
+    }
 
         /* Accessibility Improvements */
         .btn:focus-visible, .form-control:focus-visible, .form-select:focus-visible {
@@ -848,26 +867,6 @@
         color: #6c757d;
     }
 
-    /* Empty state styling */
-    .empty-state {
-        background-color: #f8f9fa;
-        border-radius: 0.5rem;
-        border: 2px dashed #dee2e6;
-        margin: 2rem 0;
-    }
-
-    .empty-state i {
-        opacity: 0.6;
-    }
-
-    .empty-state h4 {
-        color: #6c757d;
-        font-weight: 600;
-    }
-
-    .empty-state p {
-        font-size: 0.9rem;
-    }
 
     /* Category data attribute styling (optional for filtering) */
     tr[data-category] {
@@ -1556,7 +1555,7 @@
         if (!noResultsDiv) {
             noResultsDiv = document.createElement('div');
             noResultsDiv.id = 'no-results-message';
-            noResultsDiv.className = 'empty-state text-center py-5';
+            noResultsDiv.className = 'empty-state text-center';
             // Place the message below the table container
             const productContainer = document.getElementById('product_container');
             productContainer.parentNode.insertBefore(noResultsDiv, productContainer.nextSibling);
@@ -1568,14 +1567,16 @@
         const categoryName = activeTab ? activeTab.textContent.trim().replace(/\s+/g, ' ') : 'ALL';
         
         if (searchTerm) {
+            noResultsDiv.className = 'empty-state text-center';
             noResultsDiv.innerHTML = `
-                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <i class="fas fa-search fa-3x text-muted"></i>
                 <h4>No Products Found</h4>
                 <p class="text-muted">No products named "${searchTerm}" found in ${categoryName} category.</p>
             `;
         } else {
+            noResultsDiv.className = 'empty-state text-center';
             noResultsDiv.innerHTML = `
-                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <i class="fas fa-box-open fa-3x"></i>
                 <h4>No Products in Category</h4>
                 <p class="text-muted">No products found in ${categoryName} category.</p>
             `;
