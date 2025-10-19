@@ -5652,6 +5652,7 @@ from django.utils.timezone import now
 import random
 
 
+
 def forgot_password(request):
     customization = get_or_create_customization()
 
@@ -5748,7 +5749,7 @@ def forgot_password(request):
                 </div>
                 """
 
-            body += f"""
+            body += """
             </div>
         </div>
 
@@ -5770,38 +5771,10 @@ def forgot_password(request):
             border-radius: 2px;
         "></div>
 
-        <!-- Business Name -->
-        <p style="
-            margin-top: 5px;
-            font-size: 16px;
-            font-weight: 700;
-            text-align: center;
-            color: rgba(255,255,255,0.6);
-        ">
-            - {business_name}
-        </p>
-
         <!-- Footer -->
-        <div style="
-            margin-top: 15px;
-            text-align: center;
-            font-size: 12px;
-            color: rgba(255,255,255,0.95);
-        ">
-            <p style="margin: 5px 0;">
-                <strong>✉️ Email:</strong> 
-                <a href="mailto:{business_email}" style="color: #FFFFFF; text-decoration: none; margin-left: 5px;">
-                    {business_email}
-                </a>
-            </p>
-            <p style="margin: 5px 0;">
-                <strong>📞 Contact:</strong> {business_contact}
-            </p>
-            <p style="margin: 5px 0;">
-                <strong>📍 Address:</strong> {business_address}
-            </p>
-        </div>
-
+        <p style="font-size: 13px; color: #fff; text-align: center; margin: 0;">
+            © 2025 Online Ordering System
+        </p>
     </div>
 </body>
 </html>
@@ -5826,6 +5799,7 @@ def forgot_password(request):
         return JsonResponse({'status': 'error', 'message': 'Email not found.'}, status=404)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
 
 @csrf_exempt
 def forgot_passwordotp(request):
