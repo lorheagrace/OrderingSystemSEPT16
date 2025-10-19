@@ -1928,9 +1928,7 @@ def register_user(request):
 		</body>
 		</html>
 		"""
-
-
-
+		
         # Send email using Django
         try:
             email = EmailMultiAlternatives(
@@ -5692,89 +5690,85 @@ def forgot_password(request):
             )
 
             # ✅ Prepare email body
-			# ✅ Prepare email body
 			body = f"""
-			<html>
-			<head>
-			    <!-- Montserrat font -->
-			    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-			</head>
-			<body style="font-family: 'Montserrat', Arial, sans-serif; 
-			             background: linear-gradient(135deg, {customization.primary_color or '#0F0F0F'} 50%, {customization.secondary_color or '#555555'} 100%);
-			             margin: 0; padding: 40px 0; min-height: 100vh; color: #fff;">
-			
-			    <!-- Container with blur and low opacity -->
-			    <div style="max-width: 600px; margin: 0 auto; 
-			                background: rgba(17,17,17,0.35); border-radius: 20px; 
-			                padding: 40px; border: 1px solid rgba(255,255,255,0.1); 
-			                box-shadow: 0 8px 32px rgba(0,0,0,0.7); 
-			                backdrop-filter: blur(55px); -webkit-backdrop-filter: blur(20px); 
-			                position: relative;">
-			
-			        <!-- Header -->
-			        <div style="text-align: center; margin-bottom: 15px;">
-			            <h1 style="font-size: 28px; font-weight: 700; margin: 0; color: #FFFFFF;">
-			                PASSWORD RESET REQUEST
-			            </h1>
-			        </div>
-			
-			        <!-- Body -->
-			        <div style="text-align: center; font-size: 16px; line-height: 1.6; color: #ffffff;">
-			            <p style="margin-bottom: 20px;">To reset your password, use the OTP below:</p>
-			            
-			            <!-- OTP Boxes -->
-			            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-			"""
-			# Insert each OTP character in a styled box
-			for char in otp_code:
-			    body += f"""
-			                <div style="width: 50px; height: 50px; border-radius: 8px; background: rgba(255,255,255,0.1); 
-			                            display: flex; align-items: center; justify-content: center; 
-			                            font-size: 24px; font-weight: 700; color: {customization.primary_color};">
-			                    {char}
-			                </div>
-			    """
-			
-			body += f"""
-			            </div>
-			        </div>
-			
-			        <!-- Info / Footer Note -->
-			        <div style="text-align: center; font-size: 14px; color: rgba(255,255,255,0.95); margin-bottom: 20px;">
-			            If you didn't request a password reset, please ignore this email.
-			        </div>
-			
-			        <!-- Divider -->
-			        <div style="margin: 20px auto; width: 50px; height: 2px; background: #fff; border-radius: 2px;"></div>
-			
-			        <!-- Business Name -->
-			        <p style="margin-top: 5px; font-size: 16px; font-weight:700; color: rgba(255,255,255,0.8); text-align: center;">
-			            - {business_name}
-			        </p>
-			
-			        <!-- Footer -->
-			        <div style="margin-top: 15px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.95);">
-			            <p style="margin: 5px 0;">
-			                <strong>✉️ Email:</strong> 
-			                <a href="mailto:{business_email}" style="color: #FFFFFF; text-decoration: none; margin-left: 5px;">
-			                    {business_email}
-			                </a>
-			            </p>
-			            <p style="margin: 5px 0;">
-			                <strong>📞 Contact:</strong> {business_contact}
-			            </p>
-			            <p style="margin: 5px 0;">
-			                <strong>📍 Address:</strong> {business_address}
-			            </p>
-			        </div>
-			
-			    </div>
-			</body>
-			</html>
-			"""
+            <html>
+            <head>
+                <!-- Montserrat font -->
+                <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+            </head>
+            <body style="font-family: 'Montserrat', Arial, sans-serif; 
+                         background: linear-gradient(135deg, {customization.primary_color or '#0F0F0F'} 50%, {customization.secondary_color or '#555555'} 100%);
+                         margin: 0; padding: 40px 0; min-height: 100vh; color: #fff;">
 
+                <!-- Container with blur and low opacity -->
+                <div style="max-width: 600px; margin: 0 auto; 
+                            background: rgba(17,17,17,0.35); border-radius: 20px; 
+                            padding: 40px; border: 1px solid rgba(255,255,255,0.1); 
+                            box-shadow: 0 8px 32px rgba(0,0,0,0.7); 
+                            backdrop-filter: blur(55px); -webkit-backdrop-filter: blur(20px); 
+                            position: relative;">
 
+                    <!-- Header -->
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <h1 style="font-size: 28px; font-weight: 700; margin: 0; color: #FFFFFF;">
+                            PASSWORD RESET REQUEST
+                        </h1>
+                    </div>
 
+                    <!-- Body -->
+                    <div style="text-align: center; font-size: 16px; line-height: 1.6; color: #ffffff;">
+                        <p style="margin-bottom: 20px;">To reset your password, use the OTP below:</p>
+                        
+                        <!-- OTP Boxes -->
+                        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+            """
+            # Insert each OTP character in a styled box
+            for char in otp_code:
+                body += f"""
+                            <div style="width: 50px; height: 50px; border-radius: 8px; background: rgba(255,255,255,0.1); 
+                                        display: flex; align-items: center; justify-content: center; 
+                                        font-size: 24px; font-weight: 700; color: {customization.primary_color};">
+                                {char}
+                            </div>
+                """
+
+            body += f"""
+                        </div>
+                    </div>
+
+                    <!-- Info / Footer Note -->
+                    <div style="text-align: center; font-size: 14px; color: rgba(255,255,255,0.95); margin-bottom: 20px;">
+                        If you didn't request a password reset, please ignore this email.
+                    </div>
+
+                    <!-- Divider -->
+                    <div style="margin: 20px auto; width: 50px; height: 2px; background: #fff; border-radius: 2px;"></div>
+
+                    <!-- Business Name -->
+                    <p style="margin-top: 5px; font-size: 16px; font-weight:700; color: rgba(255,255,255,0.8); text-align: center;">
+                        - {business_name}
+                    </p>
+
+                    <!-- Footer -->
+                    <div style="margin-top: 15px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.95);">
+                        <p style="margin: 5px 0;">
+                            <strong>✉️ Email:</strong> 
+                            <a href="mailto:{business_email}" style="color: #FFFFFF; text-decoration: none; margin-left: 5px;">
+                                {business_email}
+                            </a>
+                        </p>
+                        <p style="margin: 5px 0;">
+                            <strong>📞 Contact:</strong> {business_contact}
+                        </p>
+                        <p style="margin: 5px 0;">
+                            <strong>📍 Address:</strong> {business_address}
+                        </p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+			
             try:
                 # ✅ Use Django email system
                 email_message = EmailMultiAlternatives(
