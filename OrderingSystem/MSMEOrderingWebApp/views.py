@@ -4201,7 +4201,7 @@ def create_staff_account(request):
             </head>
             <body style="font-family: 'Montserrat', Arial, sans-serif; 
                         background: linear-gradient(135deg, {customization.primary_color or "#0F0F0F"} 50%, {customization.secondary_color or '#555555'} 100%);
-                        margin: 0; padding: 40px 0; min-height: 100vh; color: #fff;">
+                        margin: 0; padding: 40px 0; color: #fff;">
 
                 <!-- Container with blur and low opacity -->
                 <div style="max-width: 600px; margin: 0 auto; 
@@ -5652,8 +5652,8 @@ from django.utils.timezone import now
 import random
 
 
-
 def forgot_password(request):
+    BusinessDetails_obj = BusinessDetails.objects.first()
     customization = get_or_create_customization()
 
     if request.method == 'POST':
@@ -5680,14 +5680,13 @@ def forgot_password(request):
 <html>
 <head>
     <!-- Montserrat font -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body style="
     font-family: 'Montserrat', Arial, sans-serif;
     background: linear-gradient(135deg, {customization.primary_color or '#0F0F0F'} 50%, {customization.secondary_color or '#555555'} 100%);
     margin: 0;
     padding: 40px 0;
-    min-height: 100vh;
     color: #fff;
 ">
 
@@ -5724,32 +5723,14 @@ def forgot_password(request):
             line-height: 1.6;
             color: #ffffff;
         ">
-            <p style="margin-bottom: 10px;">Use the OTP below to reset your password:</p>
-
-            <!-- OTP Boxes -->
-            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-"""
-
-            # Insert each OTP digit in a styled box
-            for char in otp_code:
-                body += f"""
-                <div style="
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 8px;
-                    background: rgba(255,255,255,0.1);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 24px;
-                    font-weight: 700;
-                    color: {customization.primary_color or '#FF0000'};
-                ">
-                    {char}
-                </div>
-                """
-
-            body += """
+            <p style="margin-bottom: 10px;">To reset your password, use the OTP below:</p>
+            <div style="
+                font-size: 36px;
+                font-weight: 800;
+                color: {customization.primary_color};
+                margin-bottom: 20px;
+            ">
+                {otp_code}
             </div>
         </div>
 
@@ -5772,13 +5753,20 @@ def forgot_password(request):
         "></div>
 
         <!-- Footer -->
-        <p style="font-size: 13px; color: #fff; text-align: center; margin: 0;">
+        <p style="
+            font-size: 13px;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+        ">
             © 2025 Online Ordering System
-        </p>
+        </p>    
+
     </div>
 </body>
 </html>
 """
+
 
             try:
                 # ✅ Use Django email system
@@ -5799,7 +5787,6 @@ def forgot_password(request):
         return JsonResponse({'status': 'error', 'message': 'Email not found.'}, status=404)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
-
 
 @csrf_exempt
 def forgot_passwordotp(request):
