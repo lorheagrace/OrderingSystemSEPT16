@@ -1484,14 +1484,22 @@ def force_change(request):
 			    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 			    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 			</head>
-			<body style="font-family: 'Montserrat', Arial, sans-serif; background: linear-gradient(135deg, #000000 0%, #555555 100%); margin: 0; padding: 40px 10px; color: #fff;">
+			<body style="font-family: 'Montserrat', Arial, sans-serif; 
+			             background: linear-gradient(135deg, #000000 0%, #555555 100%);
+			             margin: 0; padding: 40px 10px; color: #fff;">
 			
 			    <!-- Container with subtle blur and transparency -->
-			    <div style="max-width: 580px; margin: 0 auto; background: rgba(255, 255, 255, 0.08);  /* lighter opacity */ border-radius: 30px; padding: 40px 30px; border: 2px solid rgba(255,255,255,0.30);  box-shadow: 0 6px 24px rgba(0,0,0,0.25);  /* lighter shadow */ backdrop-filter: blur(55px); -webkit-backdrop-filter: blur(55px); position: relative;">
+			    <div style="max-width: 580px; margin: 0 auto; 
+			                background: rgba(255, 255, 255, 0.08);  /* lighter opacity */
+			                border-radius: 30px; padding: 40px 30px; 
+			                border: 1px solid rgba(255,255,255,0.15);  /* softer border */
+			                box-shadow: 0 6px 24px rgba(0,0,0,0.25);  /* lighter shadow */
+			                backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
+			                position: relative;">
 			
 			        <!-- Heading -->
 			        <h1 style="font-size: 28px; color: #fff; margin: 0 0 15px; font-weight: 800; text-align: center;">
-			            VERIFY YOUR EMAIL
+			            Verify Your Email
 			        </h1>
 			
 			        <!-- Paragraph -->
@@ -1501,13 +1509,16 @@ def force_change(request):
 			
 			        <!-- Button -->
 			        <div style="text-align: center; margin: 25px 0;">
-			            <a href="{verify_url}" style="display: inline-block; padding: 16px 45px; background: #fff; color: #000; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: 900; letter-spacing: 1.2px; border: 1px solid #fff; transition: all 0.3s ease;">
+			            <a href="{verify_url}" style="display: inline-block; padding: 16px 45px; background: #fff; color: #000; 
+			                                         text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: 900; 
+			                                         letter-spacing: 1.2px; border: 1px solid #fff; transition: all 0.3s ease;">
 			                VERIFY UPDATED EMAIL
 			            </a>
 			        </div>
 			
 			        <!-- Info Box -->
-			        <div style="background: rgba(17,17,17,0.2); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px 20px; margin-top: 25px;">
+			        <div style="background: rgba(17,17,17,0.2); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; 
+			                    padding: 18px 20px; margin-top: 25px;">
 			            <p style="font-size: 14px; color: #fff; margin: 0; text-align: center;">
 			                <strong>Didn't request this?</strong><br>If you did not request this change, please ignore this email.
 			            </p>
@@ -1847,78 +1858,74 @@ def register_user(request):
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
         <body style="font-family: 'Montserrat', Arial, sans-serif; 
-                     background: linear-gradient(135deg, {primary_color} 50%, {secondary_color} 100%);
-                     margin: 0; padding: 30px 0; color: #fff;">
-        
+                    background: linear-gradient(135deg, {primary_color} 50%, {secondary_color} 100%);
+                    margin: 0; padding: 30px 0; color: #fff;">
+
             <!-- Container with subtle blur and transparency -->
-            <div class="email-container" style="max-width: 500px; width: 75%; margin: 0 auto; 
-                        background: rgba(17, 17, 17, 0.20);                
+            <div class="email-container" style="max-width: 550px; width: 75%; margin: 0 auto; 
+                        background: rgba(17, 17, 17, 0.10);                
                         border-radius: 30px; padding: 40px 30px; 
                         border: 2px solid rgba(255,255,255,0.20);  
-                        box-shadow: 0 6px 24px rgba(0,0,0,0.35);  
-                        backdrop-filter: blur(75px); -webkit-backdrop-filter: blur(55px); 
+                        box-shadow: 0 6px 24px rgba(0,0,0,0.25);  
+                        backdrop-filter: blur(55px); -webkit-backdrop-filter: blur(55px); 
                         position: relative;">
-        
+
                 <!-- Heading -->
-                <h2 style="text-align: center; font-size: 28px; font-weight: 800; margin-bottom: 15px; color: #FFFFFF;">
-                    EMAIL VERIFICATION
+                <h2 style="text-align: center; font-size: 28px; font-weight: 800; margin-bottom: 20px; color: #FFFFFF;">
+                    Email Verification
                 </h2>
-        
+
                 <!-- Greeting -->
                 <p style="text-align: center; font-size: 16px; line-height: 1.6; color: #ffffff;">
                     To complete your registration, please click the button below to verify your email address and activate your account.
                 </p>
-        
+
                 <!-- Button as table (email-friendly) -->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 20px auto;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 30px auto;">
                     <tr>
-                        <td align="center" bgcolor="{secondary_color}" style="border-radius: 50px;">
+                        <td align="center" bgcolor="{primary_color}" style="border-radius: 6px;">
                             <a href="{verification_url}" target="_blank" class="email-button"
-                               style="display: inline-block; padding: 15px 35px; font-family: 'Montserrat', Arial, sans-serif; 
-                                      font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; 
-                                      border-radius: 20px;">
+                            style="display: inline-block; padding: 15px 35px; font-family: 'Montserrat', Arial, sans-serif; 
+                                    font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; 
+                                    border-radius: 6px;">
                                 VERIFY MY EMAIL
                             </a>
                         </td>
                     </tr>
                 </table>
-        
+
                 <!-- Info Box -->
                 <div style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.3); border-radius: 6px; padding: 15px; margin-bottom: 30px; text-align: center;">
                     <p style="color: #ffffff; font-size: 13px; font-weight: 500;">
                         ⚠️ <strong>Didn't create this account?</strong> You can safely ignore this email.
                     </p>
                 </div>
-        
-                <!-- Divider -->
-                <div style="margin: 30px auto 20px; width: 50px; height: 2px; background: #fff; border-radius: 2px;"></div>
-        
-                <!-- Business Name -->
-                <p style="margin-top: 5px; text-align: center; text-transform: uppercase; font-weight: 700; font-size: 15px; color: rgba(255,255,255,0.6); display: block;">
-                    - {business_name}
-                </p>
-        
+
                 <!-- Footer -->
-                <div style="margin-top: 10px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.95);">
-                    <p style="margin: 5px 0; display: block;">
-                        <strong>✉️ Email:</strong> 
-                        <a href="mailto:{business_email}" style="color: #FFFFFF; text-decoration: none; margin-left: 5px;">
-                            {business_email}
-                        </a>
-                    </p>
-                    <p style="margin: 5px 0; display: block;">
-                        <strong>📞 Contact:</strong> {business_contact}
-                    </p>
-                    <p style="margin: 5px 0; display: block;">
-                        <strong>📍 Address:</strong> {business_address}
-                    </p>
+                <div style="margin-top: 30px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.95);">
+                    <div style="display: inline-flex; justify-content: center; flex-wrap: wrap;">
+                        <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
+                            <strong>✉️ Email:</strong> 
+                            <a href="mailto:{business_email}" style="color: #FFFFFF; text-decoration: none; margin-left: 5px;">
+                                {business_email}
+                            </a>
+                        </p>
+                        <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
+                            <strong>📞 Contact:</strong> {business_contact}
+                        </p>
+                    </div>
+                    <div>
+                        <p style="margin: 5px 0;"><strong>📍 Address:</strong> {business_address}</p>
+                    </div>
+                    <p style="margin-top: 5px; font-size: 12px; color: rgba(255,255,255,0.6);">- {business_name}</p>
                 </div>
             </div>
         </body>
         </html>
         """
-		
-		# Send email using Django
+
+
+        # Send email using Django
         try:
             email = EmailMultiAlternatives(
                 "Email Verification",
@@ -4181,81 +4188,76 @@ def create_staff_account(request):
             f"/verify-email/?{urlencode({'token': verification_token})}"
         )
 
-       	# ✅ Prepare email body
-		body = f"""
-		<html>
-		<head>
-		    <!-- Montserrat font -->
-		    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-		</head>
-		<body style="font-family: 'Montserrat', Arial, sans-serif; 
-		             background: linear-gradient(135deg, {customization.primary_color or "#0F0F0F"} 50%, {customization.secondary_color or '#555555'} 100%);
-		             margin: 0; padding: 40px 0; min-height: 100vh; color: #fff;">
-		
-		    <!-- Container with blur and low opacity -->
-		    <div style="max-width: 600px; margin: 0 auto; 
-		                background: rgba(17,17,17,0.20); border-radius: 20px; 
-		                padding: 40px; border: 2px solid rgba(255,255,255,0.2); 
-		                box-shadow: 0 8px 32px rgba(0,0,0,0.7); 
-		                backdrop-filter: blur(75px); -webkit-backdrop-filter: blur(20px); 
-		                position: relative;">
-		
-		        <!-- Heading -->
-		        <h2 style="text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 15px; color: #FFFFFF;">
-		            EMAIL VERIFICATION
-		        </h2>
-		
-		        <!-- Greeting -->
-		        <p style="text-align: center; font-size: 16px; line-height: 1.6; color: #ffffff;">
-		            Hello {first_name}, please verify your email to activate your account:
-		        </p>
-		
-		        <!-- Button as table (email-friendly) -->
-		        <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 20px auto;">
-		            <tr>
-		                <td align="center" bgcolor="{customization.primary_color or '#000000'}" style="border-radius: 50px;">
-		                    <a href="{verify_url}" target="_blank" 
-		                       style="display: inline-block; padding: 15px 35px; font-family: 'Montserrat', Arial, sans-serif; 
-		                              font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; 
-		                              border-radius: 20px;">
-		                        VERIFY MY EMAIL
-		                    </a>
-		                </td>
-		            </tr>
-		        </table>
-		
-		        <!-- Info text -->
-		        <p style="text-align: center; font-size: 14px; color: rgba(255,255,255,0.95);">
-		            If you did not request this, please ignore this email.
-		        </p>
-		
-		        <!-- Divider -->
-		        <div style="margin: 30px auto 20px; width: 50px; height: 2px; background: #fff; border-radius: 2px;"></div>
-		
-		        <!-- Business Name -->
-		        <p style="margin-top: 5px; font-size: 15px; font-weight:800; text-align:center; color: rgba(255,255,255,0.6); display: block;">
-		            - {business_name}
-		        </p>
-		
-		        <!-- Footer -->
-		        <div style="margin-top: 15px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.95);">
-		            <p style="margin: 5px 0; display: block;">
-		                <strong>✉️ Email:</strong> 
-		                <a href="mailto:{business_email}" style="color: #FFFFFF; text-decoration: none; margin-left: 5px;">
-		                    {business_email}
-		                </a>
-		            </p>
-		            <p style="margin: 5px 0; display: block;">
-		                <strong>📞 Contact:</strong> {business_contact}
-		            </p>
-		            <p style="margin: 5px 0; display: block;">
-		                <strong>📍 Address:</strong> {business_address}
-		            </p>
-		        </div>
-		    </div>
-		</body>
-		</html>
-		"""
+        # ✅ Prepare email body
+        body = f"""
+        <html>
+        <head>
+            <!-- Montserrat font -->
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+        </head>
+        <body style="font-family: 'Montserrat', Arial, sans-serif; 
+                    background: linear-gradient(135deg, {customization.primary_color or "#0F0F0F"} 50%, {customization.secondary_color or '#555555'} 100%);
+                    margin: 0; padding: 40px 0; min-height: 100vh; color: #fff;">
+
+            <!-- Container with blur and low opacity -->
+            <div style="max-width: 600px; margin: 0 auto; 
+                        background: rgba(17,17,17,0.50); border-radius: 20px; 
+                        padding: 40px; border: 1px solid rgba(255,255,255,0.1); 
+                        box-shadow: 0 8px 32px rgba(0,0,0,0.7); 
+                        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(20px); 
+                        position: relative;">
+
+                <!-- Heading -->
+                <h2 style="text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 20px; color: #FFFFFF;">
+                    Email Verification
+                </h2>
+
+                <!-- Greeting -->
+                <p style="text-align: center; font-size: 16px; line-height: 1.6; color: #ffffff;">
+                    Hello {first_name}, please verify your email to activate your account:
+                </p>
+
+                <!-- Button as table (email-friendly) -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 30px auto;">
+                    <tr>
+                        <td align="center" bgcolor="{customization.primary_color or '#000000'}" style="border-radius: 6px;">
+                            <a href="{verify_url}" target="_blank" 
+                            style="display: inline-block; padding: 15px 35px; font-family: 'Montserrat', Arial, sans-serif; 
+                                    font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; 
+                                    border-radius: 6px;">
+                                VERIFY MY EMAIL
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Info text -->
+                <p style="text-align: center; font-size: 14px; color: rgba(255,255,255,0.95);">
+                    If you did not request this, please ignore this email.
+                </p>
+
+                <!-- Footer -->
+                <div style="margin-top: 30px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.95);">
+                    <div style="display: inline-flex; justify-content: center; flex-wrap: wrap;">
+                        <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
+                            <strong>✉️ Email:</strong> 
+                            <a href="mailto:{business.email_address}" style="color: #FFFFFF; text-decoration: none; margin-left: 5px;">
+                                {business.email_address}
+                            </a>
+                        </p>
+                        <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
+                            <strong>📞 Contact:</strong> {business.contact_number}
+                        </p>
+                    </div>
+                    <div>
+                        <p style="margin: 5px 0;"><strong>📍 Address:</strong> {business.store_address}</p>
+                    </div>
+                    <p style="margin-top: 5px; font-size: 12px; color: rgba(255,255,255,0.6);">- {business.business_name}</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
 		
         try:
             # ✅ Use Django email system
@@ -5677,7 +5679,7 @@ def forgot_password(request):
                 defaults={'otp': otp_code, 'created_at': now()}
             )
 
-           	# ✅ Prepare email body
+            # ✅ Prepare email body
 			body = f"""
 			<html>
 			<head>
@@ -5720,7 +5722,7 @@ def forgot_password(request):
 			        <div style="margin: 20px auto; width: 50px; height: 2px; background: #fff; border-radius: 2px;"></div>
 			
 			        <!-- Business Name -->
-			        <p style="margin-top: 5px; font-size: 16px; font-weight:700; color: rgba(255,255,255,0.8); text-align: center;">
+			        <p style="margin-top: 5px; font-size: 16px; font- color: rgba(255,255,255,0.6); text-align: center;">
 			            - {business_name}
 			        </p>
 			
@@ -5739,12 +5741,11 @@ def forgot_password(request):
 			                <strong>📍 Address:</strong> {business_address}
 			            </p>
 			        </div>
-			
 			    </div>
 			</body>
 			</html>
 			"""
-			
+
             try:
                 # ✅ Use Django email system
                 email_message = EmailMultiAlternatives(
