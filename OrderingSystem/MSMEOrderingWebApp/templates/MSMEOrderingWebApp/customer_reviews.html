@@ -682,6 +682,11 @@
       font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
       font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
   }
+   
+  .empty-state p {
+        font-weight: 600;
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:10 }}{% else %}16{% endif %}px;
+  } 
 
   @media (max-width: 576px) {
     .empty-state {
