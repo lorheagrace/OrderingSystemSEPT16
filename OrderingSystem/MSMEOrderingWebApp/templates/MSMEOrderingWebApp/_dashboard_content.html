@@ -791,6 +791,10 @@
         transform: translateY(-1px);
     }
 
+    .empty-state{
+        opacity:0.6;
+    }
+    
     .empty-state {
         grid-column: 1 / -1;
         text-align: center;
@@ -1575,7 +1579,7 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                     <td colspan="8" class="empty-state" style="padding: 60px 20px;"> <!-- ✅ colspan updated -->
+                                    <td colspan="8" class="empty-state" style="padding: 60px 20px;"> <!-- ✅ colspan updated -->
                                         <i class="fas fa-times-circle empty-icon"></i>
                                         <h3>No Completed Orders</h3>
                                         <p>You haven't completed any orders recently.</p>
