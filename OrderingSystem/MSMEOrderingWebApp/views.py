@@ -5101,6 +5101,7 @@ def generate_order_code(order_type):
     next_number = last_number + 1
     return f"{prefix}{str(next_number).zfill(3)}"
 
+from django.urls import reverse
 
 @login_required_session(allowed_roles=['customer'])
 @csrf_exempt
@@ -5157,7 +5158,7 @@ def customer_checkout(request):
         })
 
     if request.method == 'POST':
-        order_type = request.POST.get('order_type')
+        order_type = request.GET.get('order_type') or request.POST.get('order_type')
         payment_method = request.POST.get('payment_method')
         notes = request.POST.get('notes')
         proof = request.FILES.get('proof') if payment_method == 'online' else None
@@ -5189,12 +5190,14 @@ def customer_checkout(request):
                     variation_name__iexact=variation
                 )
 
+                # ✅ Check stock and preserve order_type on redirect
                 if product.track_stocks and product.stocks < item.quantity:
                     messages.error(request, f"Not enough stocks for {item.product_name}. Available: {product.stocks}")
-                    return redirect('customer_checkout')
+                    return redirect(f"{reverse('customer_checkout')}?order_type={request.POST.get('order_type', '')}")
+                    
             except Exception as e:
                 messages.error(request, str(e))
-                return redirect('customer_checkout')
+                return redirect(f"{reverse('customer_checkout')}?order_type={request.POST.get('order_type', '')}")
 
         # Create Checkout records
         for item in cart_items:
@@ -5253,7 +5256,6 @@ def customer_checkout(request):
         'scheduled_date_str': scheduled_date_str,  # Pass for template display
         'scheduled_at': scheduled_at,  # Add this for debugging
     })
-
 
 @login_required_session(allowed_roles=['customer'])
 def customer_notifications(request):
