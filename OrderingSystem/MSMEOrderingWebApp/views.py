@@ -1490,11 +1490,11 @@ def force_change(request):
                 
                     <!-- Container with subtle blur and transparency -->
                     <div style="max-width: 580px; margin: 0 auto; 
-                                background: rgba(255, 255, 255, 0.08);  /* lighter opacity */
+                                background: rgba(255, 255, 255, 0.25);  /* lighter opacity */
                                 border-radius: 30px; padding: 40px 30px; 
                                 border: 1px solid rgba(255,255,255,0.15);  /* softer border */
                                 box-shadow: 0 6px 24px rgba(0,0,0,0.25);  /* lighter shadow */
-                                backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); 
+                                backdrop-filter: blur(75px); -webkit-backdrop-filter: blur(100px); 
                                 position: relative;">
                 
                         <!-- Heading -->
@@ -1536,7 +1536,6 @@ def force_change(request):
 			</html>
 			"""
 
-            
             # Send email
             email_message = EmailMultiAlternatives(
                 subject=subject,
@@ -5724,7 +5723,7 @@ def forgot_password(request):
             line-height: 1.6;
             color: #ffffff;
         ">
-            <p style="margin-bottom: 10px;">Hello {user.first_name}, use the OTP below to reset your password:</p>
+            <p style="margin-bottom: 10px;">Use the OTP below to reset your password:</p>
 
             <!-- OTP Boxes -->
             <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
