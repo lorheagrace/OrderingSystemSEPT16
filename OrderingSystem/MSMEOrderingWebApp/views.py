@@ -275,14 +275,14 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
                             ">
                                 <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
                                 <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 5px 0;">
-                                <table width="100%" style="border-collapse: collapse; font-size: 14px;">
+                                <table width="100%" font-weight:700;  style="border-collapse: collapse; font-size: 14px;">
                                     <thead>
                                         <tr>
                                             <th align="left" style="padding-bottom: 6px;">Item</th>
                                             <th align="right" style="padding-bottom: 6px;">Price</th>
                                         </tr>
                                     </thead>
-                                    <tbody>{item_list}</tbody>
+                                    <tbody style="font-weight:700;">{item_list}</tbody>
                                 </table>
                                 <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
                                 <p style="text-align: right; font-weight: 900; font-size: 15px;">Total: ₱{total_price:.2f}</p>
@@ -292,25 +292,25 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
 
                     <!-- Footer -->
                     <tr>
-                        <td style="padding: 20px; background-color: #f5f5f5; text-align: center; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
-                            <p style="font-size: 14px; color: #333; margin: 0;">Thank you for shopping with us!</p>
-                            <div style="font-size: 14px; color: #495057; margin-bottom: 10px; line-height: 1.5; text-align: center;">
-                                <div style="display: inline-flex; justify-content: center;">
-                                    <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
-                                        <strong>✉️ Email:</strong> 
-                                        <a href="mailto:{business.email_address}" style="color: {customization.primary_color}; text-decoration: none; margin-left: 5px;">
-                                            {business.email_address}
-                                        </a>
-                                    </p>
-                                    <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
-                                        <strong>📞 Contact:</strong> {business.contact_number}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p style="margin: 5px 0;"><strong>📍 Address:</strong> {business.store_address}</p>
-                                </div>
-                            </div>
-                            <p style="font-size: 12px; color: #888; margin-top: 10px;">- {business.business_name}</p>
+                    <td style="padding: 20px; background-color: #f5f5f5; text-align: center; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+                            <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" width="100%" style="text-align: center;">
+                                <tr>
+                                    <td style="color: {customization.button_text_color}; font-size: 13px; line-height: 1.8; padding: 0 15px;">
+                                        <p style="margin: 5px 0;">
+                                            <strong>✉️ Email:</strong>
+                                            <a href="mailto:{business.email_address}" style="color: {customization.button_text_color}; text-decoration: none; margin-left: 5px;">
+                                                {business.email_address}
+                                            </a>
+                                        </p>
+                                        <p style="margin: 5px 0;">
+                                            <strong>📞 Contact:</strong> {business.contact_number}
+                                        </p>
+                                        <p style="margin: 5px 0;">
+                                            <strong>📍 Address:</strong> {business.business_address}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
@@ -318,7 +318,6 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         </body>
     </html>
     """
-
 
     try:
         email = EmailMultiAlternatives(
@@ -625,14 +624,14 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
                             ">
                                 <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
                                 <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 5px 0;">
-                                <table width="100%" style="border-collapse: collapse; font-size: 14px;">
+                                <table width="100%" font-weight:700;  style="border-collapse: collapse; font-size: 14px;">
                                     <thead>
                                         <tr>
                                             <th align="left" style="padding-bottom: 6px;">Item</th>
                                             <th align="right" style="padding-bottom: 6px;">Price</th>
                                         </tr>
                                     </thead>
-                                    <tbody>{item_list}</tbody>
+                                    <tbody style="font-weight:700;">{item_list}</tbody>
                                 </table>
                                 <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
                                 <p style="text-align: right; font-weight: 900; font-size: 15px;">Total: ₱{total_price:.2f}</p>
@@ -642,25 +641,25 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
 
                     <!-- Footer -->
                     <tr>
-                        <td style="padding: 20px; background-color: #f5f5f5; text-align: center; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
-                            <p style="font-size: 14px; color: #333; margin: 0;">Thank you for shopping with us!</p>
-                            <div style="font-size: 14px; color: #495057; margin-bottom: 10px; line-height: 1.5; text-align: center;">
-                                <div style="display: inline-flex; justify-content: center;">
-                                    <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
-                                        <strong>✉️ Email:</strong> 
-                                        <a href="mailto:{business.email_address}" style="color: {customization.primary_color}; text-decoration: none; margin-left: 5px;">
-                                            {business.email_address}
-                                        </a>
-                                    </p>
-                                    <p style="margin: 5px 10px 0 0; display: inline-flex; align-items: center;">
-                                        <strong>📞 Contact:</strong> {business.contact_number}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p style="margin: 5px 0;"><strong>📍 Address:</strong> {business.store_address}</p>
-                                </div>
-                            </div>
-                            <p style="font-size: 12px; color: #888; margin-top: 10px;">- {business.business_name}</p>
+                    <td style="padding: 20px; background-color: #f5f5f5; text-align: center; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+                            <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" width="100%" style="text-align: center;">
+                                <tr>
+                                    <td style="color: {customization.button_text_color}; font-size: 13px; line-height: 1.8; padding: 0 15px;">
+                                        <p style="margin: 5px 0;">
+                                            <strong>✉️ Email:</strong>
+                                            <a href="mailto:{business.email_address}" style="color: {customization.button_text_color}; text-decoration: none; margin-left: 5px;">
+                                                {business.email_address}
+                                            </a>
+                                        </p>
+                                        <p style="margin: 5px 0;">
+                                            <strong>📞 Contact:</strong> {business.contact_number}
+                                        </p>
+                                        <p style="margin: 5px 0;">
+                                            <strong>📍 Address:</strong> {business.business_address}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
@@ -668,6 +667,7 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         </body>
     </html>
     """
+
 
     try:
         email = EmailMultiAlternatives(
