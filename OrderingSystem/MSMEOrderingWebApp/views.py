@@ -597,7 +597,6 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         margin: 0; padding: 0; 
         background: linear-gradient(135deg, {customization.primary_color or '#0F0F0F'} 40%, {customization.secondary_color or '#555555'} 100%);
         color: #333;
-        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
