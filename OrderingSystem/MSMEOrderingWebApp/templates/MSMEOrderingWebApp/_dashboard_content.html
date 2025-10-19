@@ -107,7 +107,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 20px 20px 5px rgb(0 0 0 / 0.2);
+            box-shadow: 0 15px 10px 1px rgb(0 0 0 / 0.12);
             border-top: none;
             border-left: 2px solid  rgba(255, 255, 255, 0.50);
             border-right: 2px solid  rgba(255, 255, 255, 0.50);
@@ -117,7 +117,7 @@
 
         .stat-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2);
         }
 
         .stat-card::before {
@@ -819,7 +819,7 @@
         color: {{ customization.header_font_color|default:"#000000" }};
         font-family: '{{ customization.header_font_family|default:"Arial" }}';
         font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 35 %}{{ customization.header_font_size|default:35 }}{% else %}35{% endif %}px;
-        font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
+        font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
         font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
     }
     .empty-state p {
