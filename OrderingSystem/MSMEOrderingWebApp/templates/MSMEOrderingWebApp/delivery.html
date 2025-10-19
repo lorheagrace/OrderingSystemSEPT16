@@ -450,54 +450,42 @@
             }
         }
 
-        @media (max-width: 992px) { /* Tablets */
-            .table td, .table th {
-                font-size: 13px !important;
-            }
+        .empty-state {
+            opacity: 0.6;
         }
 
-        @media (max-width: 768px) { /* Mobile */
-            .table td, .table th {
-                font-size: 12px !important;
-                padding: 8px !important;
-            }
-            .view-details-btn {
-                font-size: 12px !important;
-                padding: 0.4rem 0.8rem !important;
-            }
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(50px);
+            font-family: {{ customization.header_font_family|default:"Arial" }};
         }
 
-        @media (max-width: 576px) { /* Small phones */
-            .table td, .table th {
-                font-size: 11px !important;
-                padding: 6px !important;
-            }
-            .view-details-btn {
-                font-size: 11px !important;
-            }
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 5px;
+            color: {{ customization.header_font_color|default:"#000000" }};
         }
 
-        @media (max-width: 992px) {
-            .status-badge {
-                font-size: 13px !important;
-                padding: 4px 8px !important;
-            }
+        .empty-state {
+            margin-bottom: 2px;
+            color: {{ customization.header_font_color|default:"#000000" }};
+            font-family: '{{ customization.header_font_family|default:"Arial" }}';
+            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 35 %}{{ customization.header_font_size|default:35 }}{% else %}35{% endif %}px;
+            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
+            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
         }
-
-        @media (max-width: 768px) {
-            .status-badge {
-                font-size: 12px !important;
-                padding: 3px 7px !important;
-            }
+        .empty-state p {
+            font-weight: 600;
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:10 }}{% else %}16{% endif %}px;
+            
         }
-
-        @media (max-width: 576px) {
-            .status-badge {
-                font-size: 11px !important;
-                padding: 2px 6px !important;
-            }
-        }
-
     </style>
 </head>
 <body>
@@ -605,9 +593,9 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">
-                                <i class="fas fa-box-open fa-2x mb-2"></i>
-                                <div>No delivery orders found.</div>
+                            <td colspan="8" class="empty-state" style="padding: 60px 20px;"> <!-- ✅ colspan updated -->
+                                <i class="fas fa-box-open fa-2x empty-icon"></i>
+                                <div>No pending delivery orders found.</div>
                             </td>
                         </tr>
                         {% endfor %}
