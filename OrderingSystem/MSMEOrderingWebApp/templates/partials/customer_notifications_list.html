@@ -354,38 +354,7 @@
             background: rgba(16, 185, 129, 0.3);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: none;
-            border: 1px solid #374151;
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-        }
-
-
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
-        }
-
-        .empty-title {
-            margin-bottom: 0.5rem;
-            font-family: "{{ customization.header_font_family|default:"Arial" }}";
-            font-size: {{ customization.header_font_size|default:24 }}px;
-            color: {{ customization.header_font_color|default:"#000000" }};
-            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
-            font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
-        }
-
-        .empty-subtitle {
-            font-weight: 600;
-            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
-            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 15 %}15
-            {% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
-        }
+        
 
         @media (max-width: 768px) {
             .page-title {
@@ -422,40 +391,41 @@
             color: orange !important;
         }
 
-        /* Empty state responsiveness */
+        .empty-state{
+            opacity:0.6;
+        }
+        
         .empty-state {
+            grid-column: 1 / -1;
             text-align: center;
-            padding: 4rem 2rem;
-            background: none;
-            border: 1px solid #374151;
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
+            padding: 60px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(50px);
+            font-family: {{ customization.header_font_family|default:"Arial" }};
         }
 
-        .empty-illustration {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.6;
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 5px;
+            color: {{ customization.header_font_color|default:"#000000" }};
         }
 
-        .empty-title {
-            margin-bottom: 0.5rem;
-            font-family: "{{ customization.header_font_family|default:'Arial' }}";
-            font-size: clamp(1.5rem, 5vw, 2.2rem); /* adjusts with screen width */
-            color: {{ customization.header_font_color|default:'#000000' }};
-            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
+        .empty-state h3 {
+            margin-bottom: 2px;
+            color: {{ customization.header_font_color|default:"#000000" }};
+            font-family: '{{ customization.header_font_family|default:"Arial" }}';
+            font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 35 %}{{ customization.header_font_size|default:35 }}{% else %}35{% endif %}px;
+            font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
             font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
         }
-
-        .empty-subtitle {
+        .empty-state p {
             font-weight: 600;
-            font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
-            font-size: clamp(0.8rem, 3.5vw, 1rem); /* scales smaller on phones */
-            line-height: 1.4;
-            color: #333;
-            opacity: 0.9;
-            padding: 0 1rem;
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:10 }}{% else %}16{% endif %}px;
+            
         }
 
         /* Responsive padding & alignment */
@@ -650,11 +620,13 @@
                 </div>
             {% endfor %}
         {% else %}
-            <div class="empty-state">
-                <div class="empty-illustration">📭</div>
-                <div class="empty-title">No Notifications</div>
-                <div class="empty-subtitle">You'll see order updates here when they're available</div>
-            </div>
+                <div class="empty-state">
+                    <div class= "empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <h3>No Notifications</h3>
+                    <p>You'll see order updates here when they're available</p>
+                </div>
         {% endif %}
     </div>
 </body>
