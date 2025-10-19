@@ -5652,7 +5652,7 @@ def forgot_password(request):
                 defaults={'otp': otp_code, 'created_at': now()}
             )
 
-            from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.conf import settings as django_settings
 from django.http import JsonResponse
 from django.utils.timezone import now
@@ -5678,8 +5678,6 @@ def forgot_password(request):
                 email=email,
                 defaults={'otp': otp_code, 'created_at': now()}
             )
-
-            # ✅ Prepare email body
 			body = f"""
 			<html>
 			<head>
