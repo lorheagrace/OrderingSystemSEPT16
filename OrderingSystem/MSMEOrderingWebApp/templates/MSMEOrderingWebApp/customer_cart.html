@@ -959,6 +959,42 @@
         }
     }
 
+
+
+    .form-control {
+        padding: 14px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+        font-weight: 600;
+        border-color: var(--primary-color);
+        color: {{ customization.body_font_color|default:"#000000" }};
+        font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+        border-width: {{ customization.input_border_width|default:1 }}px; 
+        border-style: {{ customization.input_border_style|default:'solid' }};
+        border-radius: {{ customization.input_rounded_corner|default:1 }}px;        
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--secondary-color);
+        box-shadow: none;
+        outline: none;
+    }
+
+    .form-label {
+        margin-top: 15px;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: {{ customization.header_font_color|default:"#000000" }};
+        font-family: '{{ customization.body_font_family|default:"Montserrat" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 16 %}{{ customization.body_font_size|default:12 }}{% else %}16{% endif %}px;
+    }
+
 </style>
 
 <div class="cart-container">
@@ -1134,7 +1170,7 @@
                         </div>
 
                         <!-- Date & Time Picker -->
-                        <div id="schedulePicker" class="mt-3" style="display:none;">
+                        <div id="schedulePicker" class="form" style="display:none;">
                             <label for="scheduled_date" class="form-label">Select Date & Time:</label>
                             <input type="datetime-local" id="scheduled_date" name="scheduled_date" class="form-control">
                         </div>
@@ -1148,11 +1184,11 @@
                                 color: #333;                        
                                 font-family: {{ customization.body_font_family|default:'Poppins, sans-serif' }};
                                 font-size: 14px;
-                                border-left: 4px solid #007bff;    
+                                border-left: 4px solid var(--primary-color);    
                                 font-weight: 500;
                             ">
                             <i class="fas fa-info-circle me-2"
-                            style="color: #007bff;"></i>         
+                            style="color: var(--primary-color);"></i>         
                             Preparation time may vary. Check your notifications for progress updates.
                         </div>
 
@@ -1253,6 +1289,149 @@
 
 
 <script>
+
+ // NOT ALLOWED TO SELECT THE CURRENT TIME 
+ 
+
+(function () {
+  // CONFIG: change to 2 for 2-hour restriction
+  const MIN_HOURS_AHEAD = 1;
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function toLocalDateTimeInputValue(d) {
+    return d.getFullYear() + '-' +
+           pad(d.getMonth() + 1) + '-' +
+           pad(d.getDate()) + 'T' +
+           pad(d.getHours()) + ':' +
+           pad(d.getMinutes());
+  }
+
+  const scheduledDateInput = document.getElementById('scheduled_date');
+  const scheduledRadio = document.getElementById('order_scheduled');
+  const nowRadio = document.getElementById('order_now');
+  const schedulePicker = document.getElementById('schedulePicker');
+  const checkoutBtn = document.querySelector('.checkout-btn');
+  const checkoutForm = checkoutBtn ? checkoutBtn.closest('form') : null;
+
+  if (!scheduledDateInput) return;
+
+  // Inline error
+  let inlineError = document.getElementById('scheduled_date_error');
+  if (!inlineError) {
+    inlineError = document.createElement('div');
+    inlineError.id = 'scheduled_date_error';
+    inlineError.style.color = '#b91c1c';
+    inlineError.style.fontSize = '0.9rem';
+    inlineError.style.marginTop = '6px';
+    inlineError.style.display = 'none';
+    scheduledDateInput.parentNode.appendChild(inlineError);
+  }
+
+  // Helper to enable/disable checkout button
+  function toggleCheckout(disable) {
+    if (!checkoutBtn) return;
+    checkoutBtn.disabled = disable;
+    if (disable) {
+      checkoutBtn.classList.add('disabled-btn');
+    } else {
+      checkoutBtn.classList.remove('disabled-btn');
+    }
+  }
+
+  // Set min time
+  function updateMin() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + MIN_HOURS_AHEAD * 60);
+    const minValue = toLocalDateTimeInputValue(now);
+    scheduledDateInput.min = minValue;
+
+    if (scheduledDateInput.value) {
+      const selected = new Date(scheduledDateInput.value);
+      if (isNaN(selected.getTime()) || selected < new Date(scheduledDateInput.min)) {
+        inlineError.textContent = `Please pick a date/time at least ${MIN_HOURS_AHEAD} hour(s) from now.`;
+        inlineError.style.display = 'block';
+        toggleCheckout(true);
+      } else {
+        inlineError.style.display = 'none';
+        toggleCheckout(false);
+      }
+    }
+  }
+
+  updateMin();
+  const minUpdater = setInterval(updateMin, 60 * 1000);
+
+  function togglePickerVisibility() {
+    if (scheduledRadio && scheduledRadio.checked) {
+      schedulePicker.style.display = 'block';
+    } else {
+      schedulePicker.style.display = 'none';
+      inlineError.style.display = 'none';
+      toggleCheckout(false);
+    }
+  }
+  if (scheduledRadio) scheduledRadio.addEventListener('change', togglePickerVisibility);
+  if (nowRadio) nowRadio.addEventListener('change', togglePickerVisibility);
+
+  // Validate input
+  scheduledDateInput.addEventListener('input', function () {
+    if (!this.value) {
+      inlineError.style.display = 'none';
+      toggleCheckout(false);
+      return;
+    }
+    const selected = new Date(this.value);
+    const minDate = new Date(this.min);
+    if (isNaN(selected.getTime())) {
+      inlineError.textContent = 'Invalid date/time format.';
+      inlineError.style.display = 'block';
+      toggleCheckout(true);
+      return;
+    }
+    if (selected < minDate) {
+      inlineError.textContent = `Please select a time at least ${MIN_HOURS_AHEAD} hour(s) from now.`;
+      inlineError.style.display = 'block';
+      toggleCheckout(true);
+    } else {
+      inlineError.style.display = 'none';
+      toggleCheckout(false);
+    }
+  });
+
+  // Final validation on submit
+  if (checkoutForm) {
+    checkoutForm.addEventListener('submit', function (e) {
+      if (scheduledRadio && scheduledRadio.checked) {
+        const val = scheduledDateInput.value;
+        const selected = new Date(val);
+        const minDate = new Date(scheduledDateInput.min);
+
+        if (!val) {
+          e.preventDefault();
+          inlineError.textContent = 'Please choose a date and time for your scheduled order.';
+          inlineError.style.display = 'block';
+          toggleCheckout(true);
+          scheduledDateInput.focus();
+          return false;
+        }
+
+        if (isNaN(selected.getTime()) || selected < minDate) {
+          e.preventDefault();
+          inlineError.textContent = `Please select a time at least ${MIN_HOURS_AHEAD} hour from now.`;
+          inlineError.style.display = 'block';
+          toggleCheckout(true);
+          scheduledDateInput.focus();
+          return false;
+        }
+      }
+      toggleCheckout(false);
+      return true;
+    });
+  }
+
+  window.addEventListener('beforeunload', () => clearInterval(minUpdater));
+})();
+
 // === CLEAR LOCAL STORAGE ONLY ON HOMEPAGE ===
 document.addEventListener("DOMContentLoaded", function() {
     const currentPath = window.location.pathname.toLowerCase();
