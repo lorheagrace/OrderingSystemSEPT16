@@ -1350,7 +1350,7 @@
         color: {{ customization.header_font_color|default:"#000000" }};
         font-family: '{{ customization.header_font_family|default:"Arial" }}';
         font-size: {% if customization.header_font_size and customization.header_font_size|add:'0' <= 35 %}{{ customization.header_font_size|default:35 }}{% else %}35{% endif %}px;
-        font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}700{% else %}normal{% endif %};
+        font-weight: {% if customization.header_font_style == 'bold' or customization.header_font_style == 'bolditalic' %}800{% else %}normal{% endif %};
         font-style: {% if customization.header_font_style == 'italic' or customization.header_font_style == 'bolditalic' %}italic{% else %}normal{% endif %};
     }
     .empty-state p {
