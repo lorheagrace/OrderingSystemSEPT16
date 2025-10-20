@@ -1373,28 +1373,24 @@ document.addEventListener("DOMContentLoaded", () => {
         let open = parseTimeToToday(openingTime);
         let close = parseTimeToToday(closingTime);
     
-        // Subtract 5 minutes from closing time for checkout cutoff
-        const closeWithBuffer = new Date(close.getTime() - (5 * 60 * 1000));
-    
         // Handle special case: closing exactly at midnight (00:00:00)
         if (closingTime === "00:00:00") {
             close = new Date(open);
             close.setHours(23, 59, 59, 999);
-            const closeWithBuffer = new Date(close.getTime() - (5 * 60 * 1000));
-            return now >= open && now <= closeWithBuffer;
+            return now >= open && now <= close;
         }
         
         // Check if this is an overnight operation (closing time is "earlier" than opening)
-        const isOvernight = closeWithBuffer <= open;
+        const isOvernight = close <= open;
         
         if (isOvernight) {
             // For overnight hours, we're open if:
             // - Current time is after opening time (still same day), OR
-            // - Current time is before closing time minus 5 mins (early morning of next day)
-            return now >= open || now <= closeWithBuffer;
+            // - Current time is before closing time (early morning of next day)
+            return now >= open || now <= close;
         } else {
             // Normal same-day operation
-            return now >= open && now <= closeWithBuffer;
+            return now >= open && now <= close;
         }
     }
 
@@ -1431,7 +1427,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!forceClosed) {
             updateCheckoutButton();
         }
-    }, 1000);
+    }, 60000);
 
     // Poll backend every 3s to refresh forceClosed flag
     setInterval(() => {
