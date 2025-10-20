@@ -1058,21 +1058,5 @@ toastr.options = {
         });
     });
 </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const registerBtn = document.getElementById("registerBtn");
-
-    registerBtn.addEventListener("click", function () {
-        if (this.disabled) return; // prevent double click
-        this.disabled = true;
-        this.innerHTML = `
-            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-            Registering...
-        `;
-        this.form.submit(); // optional: auto-submit form
-    });
-});
-</script>
 </body>
 </html>
