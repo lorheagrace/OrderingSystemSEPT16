@@ -735,6 +735,12 @@
         const orderCode = button.dataset.orderCode;
         const groupId = button.dataset.groupId;
 
+        // Prevent multiple clicks
+        button.disabled = true;
+
+        // Show full-screen loading overlay
+        showLoading();
+
         fetch("/update-order-status/", {
             method: "POST",
             headers: {
@@ -745,11 +751,19 @@
         })
         .then(res => res.json())
         .then(data => {
+            hideLoading();
             if (data.success) {
-                location.reload(); // or update UI dynamically
+                location.reload();
             } else {
                 alert("Failed to update order: " + (data.error || "Unknown error"));
+                button.disabled = false; // re-enable if failed
             }
+        })
+        .catch(err => {
+            hideLoading();
+            console.error(err);
+            alert("Error updating order.");
+            button.disabled = false; // re-enable if error
         });
     }
     </script>
