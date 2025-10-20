@@ -828,8 +828,45 @@
         </div>
     </div>
 
+    <div class="container-fluid">
+    <div class="pos-toolbar-container">
+        <!-- Top Bar: Search Input + Cart Button -->
+        <div class="control-bar mb-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <!-- Search Input -->
+                <div class="flex-grow-1 me-3">
+                    <div class="search-input-group position-relative">
+                        <i class="fas fa-search search-icon position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <input type="text" class="form-control ps-5 search-input" id="searchInput" 
+                            placeholder="Search products..." oninput="filterProducts()">
+                    </div>
+                </div>
+
+                <!-- View Cart Button -->
+                <a href="{% url cart_url %}" class="btn cart-button d-flex align-items-center gap-2">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>View Cart (<span id="cartCount">{{ cart_count }}</span>)</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Category Filter Buttons -->
+        <div id="categoryButtons" class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-secondary active" data-category="" onclick="filterProductsByCategory('', this)">
+                <i class="fas fa-th-large me-1"></i> All
+            </button>
+            {% for cat in categories %}
+                <button class="btn btn-outline-secondary" data-category="{{ cat.name }}" onclick="filterProductsByCategory('{{ cat.name }}', this)">
+                    <i class="fas fa-tag me-1"></i> {{ cat.name }}
+                </button>
+            {% endfor %}
+        </div>
+    </div>
+
     <div class="row g-2" id="productGrid">
         {% for product in products %}
+        <!-- ✅ Only show if stocks > 0 when tracking stocks -->
+        {% if not product.track_stocks or product.stocks > 0 %}
         <div class="col-6 col-md-4 col-xl-3 product-card" data-name="{{ product.name }}" data-category="{{ product.category }}">
             <div class="card product-layout">
             <!-- Image Section -->
@@ -869,6 +906,7 @@
             </div>
             </div>
         </div>
+        {% endif %}
         {% endfor %}
     </div>
 
