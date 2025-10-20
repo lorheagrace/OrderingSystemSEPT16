@@ -1341,8 +1341,8 @@
 {% if business %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const openingTime = "{{ business.opening_time }}";
-    const closingTime = "{{ business.closing_time }}";
+    const openingTime = "{{ business.opening_time|time:'H:i:s' }}";
+    const closingTime = "{{ business.closing_time|time:'H:i:s' }}";
     const startDay = "{{ business.start_day }}";
     const endDay = "{{ business.end_day }}";
     let forceClosed = {{ business.force_closed|yesno:"true,false" }};
