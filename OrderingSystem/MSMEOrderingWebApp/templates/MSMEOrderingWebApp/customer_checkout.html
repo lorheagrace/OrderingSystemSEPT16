@@ -1337,4 +1337,113 @@
         }
     });
 </script>
+
+{% if business %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const openingTime = "{{ business.opening_time }}";
+    const closingTime = "{{ business.closing_time }}";
+    const startDay = "{{ business.start_day }}";
+    const endDay = "{{ business.end_day }}";
+    let forceClosed = {{ business.force_closed|yesno:"true,false" }};
+
+    const weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+    function parseTimeToToday(t) {
+        const [h, m, s] = t.split(":").map(Number);
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, s, 0);
+    }
+
+    function isWithinOperatingDays() {
+        const now = new Date();
+        const todayIndex = now.getDay(); 
+        const startIndex = weekdays.indexOf(startDay);
+        const endIndex = weekdays.indexOf(endDay);
+
+        if (startIndex <= endIndex) {
+            return todayIndex >= startIndex && todayIndex <= endIndex;
+        } else {
+            return todayIndex >= startIndex || todayIndex <= endIndex;
+        }
+    }
+
+    function isWithinOperatingHours() {
+        const now = new Date();
+        let open = parseTimeToToday(openingTime);
+        let close = parseTimeToToday(closingTime);
+    
+        // Handle special case: closing exactly at midnight (00:00:00)
+        if (closingTime === "00:00:00") {
+            close = new Date(open);
+            close.setHours(23, 59, 59, 999);
+            return now >= open && now <= close;
+        }
+        
+        // Check if this is an overnight operation (closing time is "earlier" than opening)
+        const isOvernight = close <= open;
+        
+        if (isOvernight) {
+            // For overnight hours, we're open if:
+            // - Current time is after opening time (still same day), OR
+            // - Current time is before closing time (early morning of next day)
+            return now >= open || now <= close;
+        } else {
+            // Normal same-day operation
+            return now >= open && now <= close;
+        }
+    }
+
+    function isShopClosed() {
+        // Forced closed overrides schedule
+        if (forceClosed === true) return true;
+
+        return !(isWithinOperatingDays() && isWithinOperatingHours());
+    }
+
+    function updateCheckoutButton() {
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        if (!checkoutBtn) return;
+
+        if (isShopClosed()) {
+            checkoutBtn.disabled = true;
+            checkoutBtn.classList.add('disabled-btn');
+            checkoutBtn.title = "Shop is currently closed";
+        } else {
+            // Only enable if not already disabled by form validation
+            if (!checkoutBtn.classList.contains('form-invalid')) {
+                checkoutBtn.disabled = false;
+                checkoutBtn.classList.remove('disabled-btn');
+                checkoutBtn.title = "";
+            }
+        }
+    }
+
+    // Initial check
+    updateCheckoutButton();
+
+    // Recheck every 60 seconds
+    setInterval(() => {
+        if (!forceClosed) {
+            updateCheckoutButton();
+        }
+    }, 60000);
+
+    // Poll backend every 3s to refresh forceClosed flag
+    setInterval(() => {
+        fetch("{% url 'toggle_shop_status' %}", { method: "GET" })
+        .then(res => res.json())
+        .then(data => {
+            const newForceClosed = data.force_closed;
+            if (forceClosed !== newForceClosed) {
+                forceClosed = newForceClosed;
+                updateCheckoutButton();
+            }
+        })
+        .catch(() => {});
+    }, 3000);
+
+});
+</script>
+{% endif %}
 {% endblock %}
