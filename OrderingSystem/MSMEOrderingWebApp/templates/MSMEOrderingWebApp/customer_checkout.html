@@ -1373,36 +1373,59 @@ document.addEventListener("DOMContentLoaded", () => {
         let open = parseTimeToToday(openingTime);
         let close = parseTimeToToday(closingTime);
     
+        console.log("Current time:", now.toLocaleTimeString());
+        console.log("Opening time:", openingTime, "->", open.toLocaleTimeString());
+        console.log("Closing time:", closingTime, "->", close.toLocaleTimeString());
+    
         // Handle special case: closing exactly at midnight (00:00:00)
         if (closingTime === "00:00:00") {
             close = new Date(open);
             close.setHours(23, 59, 59, 999);
             const closeWithBuffer = new Date(close.getTime() - (5 * 60 * 1000));
-            return now >= open && now <= closeWithBuffer;
+            console.log("Midnight closing. Buffer time:", closeWithBuffer.toLocaleTimeString());
+            const result = now >= open && now <= closeWithBuffer;
+            console.log("Within hours result:", result);
+            return result;
         }
         
         // Check if this is an overnight operation (closing time is "earlier" than opening)
         const isOvernight = close <= open;
+        console.log("Is overnight:", isOvernight);
         
         // Subtract 5 minutes from closing time for checkout cutoff
         const closeWithBuffer = new Date(close.getTime() - (5 * 60 * 1000));
+        console.log("Close with 5min buffer:", closeWithBuffer.toLocaleTimeString());
         
         if (isOvernight) {
             // For overnight hours, we're open if:
             // - Current time is after opening time (still same day), OR
             // - Current time is before closing time minus 5 mins (early morning of next day)
-            return now >= open || now <= closeWithBuffer;
+            const result = now >= open || now <= closeWithBuffer;
+            console.log("Overnight check result:", result);
+            return result;
         } else {
             // Normal same-day operation
-            return now >= open && now <= closeWithBuffer;
+            const result = now >= open && now <= closeWithBuffer;
+            console.log("Same-day check result:", result);
+            return result;
         }
     }
 
     function isShopClosed() {
         // Forced closed overrides schedule
-        if (forceClosed === true) return true;
+        if (forceClosed === true) {
+            console.log("Shop is force closed");
+            return true;
+        }
 
-        return !(isWithinOperatingDays() && isWithinOperatingHours());
+        const withinDays = isWithinOperatingDays();
+        const withinHours = isWithinOperatingHours();
+        
+        console.log("Within operating days:", withinDays);
+        console.log("Within operating hours:", withinHours);
+        console.log("Shop closed:", !(withinDays && withinHours));
+
+        return !(withinDays && withinHours);
     }
 
     function updateCheckoutButton() {
@@ -1431,7 +1454,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!forceClosed) {
             updateCheckoutButton();
         }
-    }, 1000);
+    }, 60000);
 
     // Poll backend every 3s to refresh forceClosed flag
     setInterval(() => {
