@@ -837,7 +837,7 @@
         <div class="review-card {% if review.is_hidden %}hidden-review{% endif %}" 
             data-id="{{ review.id }}" 
             data-rating="{{ review.rating|default:0 }}" 
-            data-date="{{ review.submitted_at|date:'Y-m-d' }}"
+            data-date="{{ review.submitted_at|date:'c' }}"
             data-customer="{{ review.name|lower }}"
             data-content="{{ review.review|lower }}">
           
@@ -1205,25 +1205,17 @@
               const sortBy = this.value;
               
               cards.sort((a, b) => {
-                const ratingA = parseInt(a.dataset.rating) || 5;
-                const ratingB = parseInt(b.dataset.rating) || 5;
-                const dateA = new Date(a.dataset.date);
-                const dateB = new Date(b.dataset.date);
+                  const ratingA = parseInt(a.dataset.rating) || 5;
+                  const ratingB = parseInt(b.dataset.rating) || 5;
+                  const dateA = Date.parse(a.dataset.date) || 0;
+                  const dateB = Date.parse(b.dataset.date) || 0;
 
-                switch (sortBy) {
-                    case 'newest':
-                        return dateB - dateA; // Most recent first
-                    case 'oldest':
-                        return dateA - dateB; // Oldest first
-                    case 'highest':
-                        return ratingB - ratingA;
-                    case 'lowest':
-                        return ratingA - ratingB;
-                    default:
-                        return 0;
-                }
-            });
-
+                  if (sortBy === 'newest') return dateB - dateA;
+                  if (sortBy === 'oldest') return dateA - dateB;
+                  if (sortBy === 'highest') return ratingB - ratingA;
+                  if (sortBy === 'lowest') return ratingA - ratingB;
+                  return 0;
+              });
               
               cards.forEach(card => container.appendChild(card));
           });
