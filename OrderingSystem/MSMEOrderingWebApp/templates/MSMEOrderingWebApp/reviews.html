@@ -897,7 +897,7 @@
           <div class="review-card {% if review.is_hidden %}hidden-review{% endif %}" 
               data-id="{{ review.id }}" 
               data-rating="{{ review.rating|default:0 }}" 
-              data-date="{{ review.submitted_at|date:'Y-m-d' }}"
+              data-date="{{ review.submitted_at|date:'U' }}"
               data-customer="{% if review.anonymous %}anonymous{% elif review.user %}{{ review.user.first_name|add:' '|add:review.user.last_name|lower }}{% else %}{{ review.name|lower }}{% endif %}"
               data-content="{{ review.review|lower }}">
             
@@ -1168,33 +1168,29 @@ document.getElementById('searchReviews').addEventListener('input', function() {
 });
 
 // Sort functionality
-document.getElementById('sortReviews').addEventListener('change', function() {
+document.getElementById('sortReviews').addEventListener('change', function () {
     const sortBy = this.value;
     const container = document.getElementById('reviewsContainer');
     const cards = Array.from(document.querySelectorAll('.review-card'));
-    
+
     cards.sort((a, b) => {
         const ratingA = parseInt(a.dataset.rating) || 0;
         const ratingB = parseInt(b.dataset.rating) || 0;
-        const dateA = new Date(a.dataset.date);
-        const dateB = new Date(b.dataset.date);
-        
-        switch (sortBy) {
-            case 'newest':
-                return dateB - dateA;
-            case 'oldest':
-                return dateA - dateB;
-            case 'highest':
-                return ratingB - ratingA;
-            case 'lowest':
-                return ratingA - ratingB;
-            default:
-                return 0;
-        }
+        const dateA = parseInt(a.dataset.date) || 0;
+        const dateB = parseInt(b.dataset.date) || 0;
+
+        if (sortBy === 'newest') return dateB - dateA;
+        if (sortBy === 'oldest') return dateA - dateB;
+        if (sortBy === 'highest') return ratingB - ratingA;
+        if (sortBy === 'lowest') return ratingA - ratingB;
+        return 0;
     });
-    
+
+    // Re-append in new order
     cards.forEach(card => container.appendChild(card));
 });
+
+
 
 // Calculate and display rating summary
 function calculateRatingSummary() {
