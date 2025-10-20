@@ -1058,19 +1058,23 @@
             
                 // Handle special case: closing exactly at midnight (00:00:00)
                 if (closingTime === "00:00:00") {
-                    // midnight means "end of the current day"
                     close = new Date(open);
                     close.setHours(23, 59, 59, 999);
+                    return now >= open && now <= close;
                 }
-                else if (close <= open) {
-                    // Overnight support
-                    close.setDate(close.getDate() + 1);
-                    if (now < open) {
-                        open.setDate(open.getDate() - 1);
-                    }
+                
+                // Check if this is an overnight operation (closing time is "earlier" than opening)
+                const isOvernight = close <= open;
+                
+                if (isOvernight) {
+                    // For overnight hours, we're open if:
+                    // - Current time is after opening time (still same day), OR
+                    // - Current time is before closing time (early morning of next day)
+                    return now >= open || now <= close;
+                } else {
+                    // Normal same-day operation
+                    return now >= open && now <= close;
                 }
-            
-                return now >= open && now <= close;
             }
         
             function isShopClosed() {
@@ -1098,8 +1102,12 @@
             // Initial check
             updateCartLink();
         
-            // Recheck every second
-            setInterval(updateCartLink, 1000);
+            // Recheck every 60 seconds
+            setInterval(() => {
+                if (!forceClosed) {
+                    updateCartLink();
+                }
+            }, 60000);
         
             // --- Poll backend every 3s to refresh forceClosed ---
             setInterval(() => {
@@ -1117,6 +1125,6 @@
         
         });
     </script>
-    {% endif %}    
+    {% endif %}  
 </body>
 </html>
