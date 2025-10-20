@@ -949,6 +949,28 @@
 </script>
 {% endif %}
 
+<!-- Global Loading Spinner -->
+<div id="loadingOverlay" class="loading-overlay" style="display:none;">
+  <div class="spinner-border text-light" role="status">
+    <span class="visually-hidden">Processing...</span>
+  </div>
+  <p class="text-light mt-2">Creating staff account...</p>
+</div>
+
+<style>
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+</style>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
 
@@ -983,22 +1005,39 @@
         document.querySelector("#staffForm form").addEventListener("submit", function(e) {
             e.preventDefault();
 
+            const submitBtn = this.querySelector(".btn-submit");
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirmPassword").value;
 
+            // Disable button and show spinner
+            submitBtn.disabled = true;
+            showLoading();
+
             if (!validatePasswordStrength(password)) {
+                hideLoading();
+                submitBtn.disabled = false;
                 showToast("Password must be at least 8 characters long and include letters, numbers, and special characters.", "error");
                 return;
             }
 
             if (password !== confirmPassword) {
+                hideLoading();
+                submitBtn.disabled = false;
                 showToast("Passwords do not match.", "error");
                 return;
             }
 
-            // If everything is valid, submit form
+            // Safe submit
             this.submit();
         });
+
+        function showLoading() {
+            document.getElementById("loadingOverlay").style.display = "flex";
+        }
+
+        function hideLoading() {
+            document.getElementById("loadingOverlay").style.display = "none";
+        }
 
         // Show/Hide Password for Password Field
         function togglePassword() {
