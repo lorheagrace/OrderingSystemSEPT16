@@ -3818,6 +3818,12 @@ def pos_place_order(request):
             if not cart_items.exists():
                 return JsonResponse({'success': False, 'error': 'Cart is empty'})
 
+            # ✅ Get the latest name info from the most recent cart entry
+            latest_cart = cart_items.last()
+            first_name = latest_cart.first_name.strip() if latest_cart and latest_cart.first_name else "Walk-in"
+            last_name = latest_cart.last_name.strip() if latest_cart and latest_cart.last_name else "Customer"
+
+
             subtotal = sum(item.price * item.quantity for item in cart_items)
             data = json.loads(request.body)
 
@@ -3884,8 +3890,8 @@ def pos_place_order(request):
                 grouped_sales[name.lower()] = grouped_sales.get(name.lower(), 0) + item.quantity
 
                 checkout = Checkout.objects.create(
-                    first_name=item.first_name,
-                    last_name=item.last_name,
+                    first_name=first_name,
+                    last_name=last_name,
                     contact_number=item.contact_number,
                     address=item.address,
                     email=item.email,
@@ -3960,7 +3966,6 @@ def pos_place_order(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid method'})
-
 
 
 from collections import defaultdict
