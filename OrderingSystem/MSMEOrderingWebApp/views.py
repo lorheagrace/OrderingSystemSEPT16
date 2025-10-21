@@ -211,113 +211,117 @@ def send_order_status_email(recipient_email, order_code, status, orders, rejecti
         <p style="font-size: 15px; color: #333; line-height: 1.6;">Your order status is now {status}.</p>
         <p style="font-size: 13px; color: #333; margin-top: 10px;">We will notify you once there are any changes or updates regarding your order.</p>
         """
+		
+	# Build the body of the email
+	body = f"""
+	<html>
+	    <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; color: #333;">
+	        <div style="width: 100%; height: 100%; padding: 40px 0;">
+	            <table align="center" width="700" style="border-collapse: collapse; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin: 0 auto;">
+	                
+	                <!-- Header -->
+	                <tr>
+	                    <td align="center" style="padding: 25px; background: linear-gradient(135deg, {customization.primary_color} 100%, {customization.secondary_color} 100%); border-top-left-radius: 12px; border-top-right-radius: 12px;">
+	                        
+	                        <!-- Business Name (smaller font) -->
+	                        <p style="font-size: 14px; font-weight: 600; color: {customization.button_text_color}; margin: 0 0 1px 0;">
+	                            {business.business_name}
+	                        </p>
+	
+	                        <!-- Main Title -->
+	                        <h1 style="font-size: 35px; font-weight: 800; color: {customization.button_text_color}; margin: 0;">
+	                            ORDER UPDATE
+	                        </h1>
+	                    </td>
+	                </tr>
+	
+	                <!-- Content -->
+	                <tr>
+	                    <td style="padding: 25px; text-align: center; font-size: 18px; line-height: 1.6; color: #555;">
+	                        
+	                        <!-- Highlighted Order Code -->
+	                        <div style="
+	                            display: inline-block;
+	                            background-color: {customization.primary_color};
+	                            color: {customization.button_text_color};
+	                            font-weight: 800;
+	                            font-size: 25px;
+	                            padding: 10px 25px;
+	                            border-radius: 8px;
+	                            letter-spacing: 1px;
+	                            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	                            margin-top: -10px;
+	                            margin-bottom: 15px;
+	                        ">
+	                            {order_code}
+	                        </div>
+	
+	                        <!-- Dynamic Message -->
+	                        <div class="message" style="font-size: 16px; color: #333; margin-bottom: 20px; line-height: 1.6; text-align: center;">
+	                            {message_content}
+	                        </div>
+	
+	                        <!-- Receipt Section -->
+	                        <div class="receipt" style="
+	                            text-align: left; 
+	                            background: #fafafa; 
+	                            padding: 15px; 
+	                            border-radius: 10px; 
+	                            border: 1px solid #eee; 
+	                            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+	                            max-width: 580px; 
+	                            margin: 0 auto; 
+	                            font-family: 'Courier New', monospace;
+	                        ">
+	                            <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
+	                            <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 5px 0;">
+	                            <table width="100%" style="border-collapse: collapse; font-size: 14px; font-weight: 700;">
+	                                <thead>
+	                                    <tr>
+	                                        <th align="left" style="padding-bottom: 6px;">Item</th>
+	                                        <th align="right" style="padding-bottom: 6px;">Price</th>
+	                                    </tr>
+	                                </thead>
+	                                <tbody style="font-weight: 700; line-height: 1.8;">
+	                                    {item_list}
+	                                </tbody>
+	                            </table>
+	                            <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
+	                            <p style="text-align: right; font-weight: 900; font-size: 15px;">Total: ₱{total_price:.2f}</p>
+	                        </div>
+	                    </td>
+	                </tr>
+	
+	                <!-- Footer -->
+	                <tr>
+	                    <td style="padding: 20px; background-color: {customization.accent_color}; text-align: center; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+	                        <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" width="100%" style="text-align: center;">
+	                            <tr>
+	                                <td style="color: {customization.button_text_color}; font-size: 13px; line-height: 1.8; padding: 0 15px;">
+	                                    <p style="margin: 5px 0;">
+	                                        <strong>✉️ Email:</strong>
+	                                        <a href="mailto:{business.email_address}" style="color: {customization.button_text_color}; text-decoration: none; margin-left: 5px;">
+	                                            {business.email_address}
+	                                        </a>
+	                                    </p>
+	                                    <p style="margin: 5px 0;">
+	                                        <strong>📞 Contact:</strong> {business.contact_number}
+	                                    </p>
+	                                    <p style="margin: 5px 0;">
+	                                        <strong>📍 Address:</strong> {business.store_address}
+	                                    </p>
+	                                </td>
+	                            </tr>
+	                        </table>
+	                    </td>
+	                </tr>
+	
+	            </table>
+	        </div>
+	    </body>
+	</html>
+	"""
 
-    # Build the body of the email
-    body = f"""
-    <html>
-        <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; color: #333;">
-            <div style="width: 100%; height: 100%; padding: 40px 0;">
-                <table align="center" width="700" style="border-collapse: collapse; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin: 0 auto;">
-                    
-                    <!-- Header -->
-                    <tr>
-                        <td align="center" style="padding: 25px; background: linear-gradient(135deg, {customization.primary_color} 100%, {customization.secondary_color} 100%); border-top-left-radius: 12px; border-top-right-radius: 12px;">
-                            
-                            <!-- Business Name (smaller font) -->
-                            <p style="font-size: 14px; font-weight: 600; color: {customization.button_text_color}; margin: 0 0 1px 0;">
-                                {business.business_name}
-                            </p>
-
-                            <!-- Main Title -->
-                            <h1 style="font-size: 35px; font-weight: 800; color: {customization.button_text_color}; margin: 0;">
-                                ORDER UPDATE
-                            </h1>
-                        </td>
-                    </tr>
-
-                    <!-- Content -->
-                    <tr>
-                        <td style="padding: 25px; text-align: center; font-size: 18px; line-height: 1.6; color: #555;">
-                            
-                            <!-- Highlighted Order Code -->
-                            <div style="
-                                display: inline-block;
-                                background-color: {customization.primary_color};
-                                color: {customization.button_text_color};
-                                font-weight: 800;
-                                font-size: 25px;
-                                padding: 10px 25px;
-                                border-radius: 8px;
-                                letter-spacing: 1px;
-                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-                                margin-top: -10px;
-                                margin-bottom: 15px;
-                            ">
-                                {order_code}
-                            </div>
-
-                            <!-- Dynamic Message -->
-                            <div class="message" style="font-size: 16px; color: #333; margin-bottom: 20px; line-height: 1.6; text-align: center;">
-                                {message_content}
-                            </div>
-
-                            <!-- Receipt Section -->
-                            <div class="receipt" style="
-                                text-align: left; 
-                                background: #fafafa; 
-                                padding: 15px; 
-                                border-radius: 10px; 
-                                border: 1px solid #eee; 
-                                box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
-                                max-width: 580px; 
-                                margin: 0 auto; 
-                                font-family: 'Courier New', monospace;
-                            ">
-                                <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
-                                <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 5px 0;">
-                                <table width="100%" font-weight:700;  style="border-collapse: collapse; font-size: 14px;">
-                                    <thead>
-                                        <tr>
-                                            <th align="left" style="padding-bottom: 6px;">Item</th>
-                                            <th align="right" style="padding-bottom: 6px;">Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody style="font-weight:700;">{item_list}</tbody>
-                                </table>
-                                <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
-                                <p style="text-align: right; font-weight: 900; font-size: 15px;">Total: ₱{total_price:.2f}</p>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                    <td style="padding: 20px; background-color: #f5f5f5; text-align: center; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
-                            <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" width="100%" style="text-align: center;">
-                                <tr>
-                                    <td style="color: {customization.button_text_color}; font-size: 13px; line-height: 1.8; padding: 0 15px;">
-                                        <p style="margin: 5px 0;">
-                                            <strong>✉️ Email:</strong>
-                                            <a href="mailto:{business.email_address}" style="color: {customization.button_text_color}; text-decoration: none; margin-left: 5px;">
-                                                {business.email_address}
-                                            </a>
-                                        </p>
-                                        <p style="margin: 5px 0;">
-                                            <strong>📞 Contact:</strong> {business.contact_number}
-                                        </p>
-                                        <p style="margin: 5px 0;">
-                                            <strong>📍 Address:</strong> {business.store_address}
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </body>
-    </html>
-    """
 
     try:
         email = EmailMultiAlternatives(
@@ -562,112 +566,116 @@ def send_email_notification(recipient_email, status, order_code, orders, rejecti
         <p style="font-size: 13px; color: #333; margin-top: 10px;">We will notify you once there are any changes or updates regarding your order.</p>
         """
 
-    # Build the body of the email
-    body = f"""
-    <html>
-        <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; color: #333;">
-            <div style="width: 100%; height: 100%; padding: 40px 0;">
-                <table align="center" width="700" style="border-collapse: collapse; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin: 0 auto;">
-                    
-                    <!-- Header -->
-                    <tr>
-                        <td align="center" style="padding: 25px; background: linear-gradient(135deg, {customization.primary_color} 100%, {customization.secondary_color} 100%); border-top-left-radius: 12px; border-top-right-radius: 12px;">
-                            
-                            <!-- Business Name (smaller font) -->
-                            <p style="font-size: 14px; font-weight: 600; color: {customization.button_text_color}; margin: 0 0 1px 0;">
-                                {business.business_name}
-                            </p>
+	# Build the body of the email
+	body = f"""
+	<html>
+	    <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; color: #333;">
+	        <div style="width: 100%; height: 100%; padding: 40px 0;">
+	            <table align="center" width="700" style="border-collapse: collapse; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); margin: 0 auto;">
+	                
+	                <!-- Header -->
+	                <tr>
+	                    <td align="center" style="padding: 25px; background: linear-gradient(135deg, {customization.primary_color} 100%, {customization.secondary_color} 100%); border-top-left-radius: 12px; border-top-right-radius: 12px;">
+	                        
+	                        <!-- Business Name (smaller font) -->
+	                        <p style="font-size: 14px; font-weight: 600; color: {customization.button_text_color}; margin: 0 0 1px 0;">
+	                            {business.business_name}
+	                        </p>
+	
+	                        <!-- Main Title -->
+	                        <h1 style="font-size: 35px; font-weight: 800; color: {customization.button_text_color}; margin: 0;">
+	                            ORDER UPDATE
+	                        </h1>
+	                    </td>
+	                </tr>
+	
+	                <!-- Content -->
+	                <tr>
+	                    <td style="padding: 25px; text-align: center; font-size: 18px; line-height: 1.6; color: #555;">
+	                        
+	                        <!-- Highlighted Order Code -->
+	                        <div style="
+	                            display: inline-block;
+	                            background-color: {customization.primary_color};
+	                            color: {customization.button_text_color};
+	                            font-weight: 800;
+	                            font-size: 25px;
+	                            padding: 10px 25px;
+	                            border-radius: 8px;
+	                            letter-spacing: 1px;
+	                            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	                            margin-top: -10px;
+	                            margin-bottom: 15px;
+	                        ">
+	                            {order_code}
+	                        </div>
+	
+	                        <!-- Dynamic Message -->
+	                        <div class="message" style="font-size: 16px; color: #333; margin-bottom: 20px; line-height: 1.6; text-align: center;">
+	                            {message_content}
+	                        </div>
+	
+	                        <!-- Receipt Section -->
+	                        <div class="receipt" style="
+	                            text-align: left; 
+	                            background: #fafafa; 
+	                            padding: 15px; 
+	                            border-radius: 10px; 
+	                            border: 1px solid #eee; 
+	                            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+	                            max-width: 580px; 
+	                            margin: 0 auto; 
+	                            font-family: 'Courier New', monospace;
+	                        ">
+	                            <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
+	                            <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 5px 0;">
+	                            <table width="100%" style="border-collapse: collapse; font-size: 14px; font-weight: 700;">
+	                                <thead>
+	                                    <tr>
+	                                        <th align="left" style="padding-bottom: 6px;">Item</th>
+	                                        <th align="right" style="padding-bottom: 6px;">Price</th>
+	                                    </tr>
+	                                </thead>
+	                                <tbody style="font-weight: 700; line-height: 1.8;">
+	                                    {item_list}
+	                                </tbody>
+	                            </table>
+	                            <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
+	                            <p style="text-align: right; font-weight: 900; font-size: 15px;">Total: ₱{total_price:.2f}</p>
+	                        </div>
+	                    </td>
+	                </tr>
+	
+	                <!-- Footer -->
+	                <tr>
+	                    <td style="padding: 20px; background-color: {customization.accent_color}; text-align: center; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+	                        <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" width="100%" style="text-align: center;">
+	                            <tr>
+	                                <td style="color: {customization.button_text_color}; font-size: 13px; line-height: 1.8; padding: 0 15px;">
+	                                    <p style="margin: 5px 0;">
+	                                        <strong>✉️ Email:</strong>
+	                                        <a href="mailto:{business.email_address}" style="color: {customization.button_text_color}; text-decoration: none; margin-left: 5px;">
+	                                            {business.email_address}
+	                                        </a>
+	                                    </p>
+	                                    <p style="margin: 5px 0;">
+	                                        <strong>📞 Contact:</strong> {business.contact_number}
+	                                    </p>
+	                                    <p style="margin: 5px 0;">
+	                                        <strong>📍 Address:</strong> {business.store_address}
+	                                    </p>
+	                                </td>
+	                            </tr>
+	                        </table>
+	                    </td>
+	                </tr>
+	
+	            </table>
+	        </div>
+	    </body>
+	</html>
+	"""
 
-                            <!-- Main Title -->
-                            <h1 style="font-size: 35px; font-weight: 800; color: {customization.button_text_color}; margin: 0;">
-                                ORDER UPDATE
-                            </h1>
-                        </td>
-                    </tr>
-
-                    <!-- Content -->
-                    <tr>
-                        <td style="padding: 25px; text-align: center; font-size: 18px; line-height: 1.6; color: #555;">
-                            
-                            <!-- Highlighted Order Code -->
-                            <div style="
-                                display: inline-block;
-                                background-color: {customization.primary_color};
-                                color: {customization.button_text_color};
-                                font-weight: 800;
-                                font-size: 25px;
-                                padding: 10px 25px;
-                                border-radius: 8px;
-                                letter-spacing: 1px;
-                                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-                                margin-top: -10px;
-                                margin-bottom: 15px;
-                            ">
-                                {order_code}
-                            </div>
-
-                            <!-- Dynamic Message -->
-                            <div class="message" style="font-size: 16px; color: #333; margin-bottom: 20px; line-height: 1.6; text-align: center;">
-                                {message_content}
-                            </div>
-
-                            <!-- Receipt Section -->
-                            <div class="receipt" style="
-                                text-align: left; 
-                                background: #fafafa; 
-                                padding: 15px; 
-                                border-radius: 10px; 
-                                border: 1px solid #eee; 
-                                box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
-                                max-width: 580px; 
-                                margin: 0 auto; 
-                                font-family: 'Courier New', monospace;
-                            ">
-                                <h3 style="font-size: 18px; font-weight: 800; text-align: center; margin-bottom: 8px;">🧾 Order Summary</h3>
-                                <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 5px 0;">
-                                <table width="100%" font-weight:700;  style="border-collapse: collapse; font-size: 14px;">
-                                    <thead>
-                                        <tr>
-                                            <th align="left" style="padding-bottom: 6px;">Item</th>
-                                            <th align="right" style="padding-bottom: 6px;">Price</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody style="font-weight:700;">{item_list}</tbody>
-                                </table>
-                                <hr style="border: none; border-top: 1px dashed rgba(0,0,0,0.3); margin: 10px 0;">
-                                <p style="text-align: right; font-weight: 900; font-size: 15px;">Total: ₱{total_price:.2f}</p>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                    <td style="padding: 20px; background-color: #f5f5f5; text-align: center; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
-                            <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" width="100%" style="text-align: center;">
-                                <tr>
-                                    <td style="color: {customization.button_text_color}; font-size: 13px; line-height: 1.8; padding: 0 15px;">
-                                        <p style="margin: 5px 0;">
-                                            <strong>✉️ Email:</strong>
-                                            <a href="mailto:{business.email_address}" style="color: {customization.button_text_color}; text-decoration: none; margin-left: 5px;">
-                                                {business.email_address}
-                                            </a>
-                                        </p>
-                                        <p style="margin: 5px 0;">
-                                            <strong>📞 Contact:</strong> {business.contact_number}
-                                        </p>
-                                        <p style="margin: 5px 0;">
-                                            <strong>📍 Address:</strong> {business.store_address}
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </body>
-    </html>
-    """
 
 
     try:
