@@ -3790,6 +3790,27 @@ def update_pos_cart_quantity(request):
 
 @login_required_session(allowed_roles=['owner', 'cashier'])
 @csrf_exempt
+def update_pos_customer_name(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            first_name = data.get("first_name", "").strip() or "Walk-in"
+            last_name = data.get("last_name", "").strip() or "Customer"
+
+            # Update all walk-in cart items
+            Cart.objects.filter(email="walkin@store.com").update(
+                first_name=first_name,
+                last_name=last_name
+            )
+
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "Invalid method"})
+
+@login_required_session(allowed_roles=['owner', 'cashier'])
+@csrf_exempt
 def pos_place_order(request):
     if request.method == 'POST':
         try:
