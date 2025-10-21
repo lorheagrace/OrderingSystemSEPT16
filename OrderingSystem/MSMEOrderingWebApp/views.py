@@ -3919,6 +3919,8 @@ def pos_place_order(request):
 
             order_data = {
                 'order_code': order_code,
+				'first_name': first_name,
+				'last_name': last_name,
                 'business_name': business_name,
                 'store_address': store_address,
                 'payment_method': payment_method,
