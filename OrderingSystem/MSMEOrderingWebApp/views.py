@@ -3818,11 +3818,6 @@ def pos_place_order(request):
             if not cart_items.exists():
                 return JsonResponse({'success': False, 'error': 'Cart is empty'})
 
-            # ✅ Get the latest entered name (or fallback to Walk-in Customer)
-            latest_cart = cart_items.last()
-            first_name = latest_cart.first_name.strip() if latest_cart and latest_cart.first_name else "Walk-in"
-            last_name = latest_cart.last_name.strip() if latest_cart and latest_cart.last_name else "Customer"
-
             subtotal = sum(item.price * item.quantity for item in cart_items)
             data = json.loads(request.body)
 
@@ -3835,7 +3830,7 @@ def pos_place_order(request):
 
             order_code = generate_order_code('walkin')
 
-            # ✅ Prevent duplicate order codes within the same business day
+            # ✅ Use business day range
             day_start, day_end = get_business_day_range()
             if Checkout.objects.filter(
                 order_code=order_code,
@@ -3844,7 +3839,10 @@ def pos_place_order(request):
             ).exists():
                 return JsonResponse({'success': False, 'error': 'Duplicate order code for current business day'})
 
+            # ✅ Shared group ID for all items in the same POS transaction
             group_id = uuid.uuid4()
+
+            # ✅ Get specific order type
             specific_order_type = data.get('order_type', None)
 
             checkout_entries = []
@@ -3886,8 +3884,8 @@ def pos_place_order(request):
                 grouped_sales[name.lower()] = grouped_sales.get(name.lower(), 0) + item.quantity
 
                 checkout = Checkout.objects.create(
-                    first_name=first_name,
-                    last_name=last_name,
+                    first_name=item.first_name,
+                    last_name=item.last_name,
                     contact_number=item.contact_number,
                     address=item.address,
                     email=item.email,
@@ -3905,26 +3903,57 @@ def pos_place_order(request):
                     status="completed",
                     cash_given=cash_given,
                     change=change,
-                    group_id=group_id,
+                    group_id=group_id,  # ✅ same group_id for all walkin items
                 )
                 checkout_entries.append(checkout)
 
-            # ✅ Update sold_count
+            # ✅ Bulk update sold_count for all grouped product names
             for base_name, qty in grouped_sales.items():
                 Products.objects.filter(name__iexact=base_name).update(
                     sold_count=F("sold_count") + qty
                 )
 
-            # ✅ Print receipt directly
-            try:
-                order = checkout_entries[0]  # use first checkout entry for receipt info
-                print_receipt(order, checkout_entries)
-            except Exception as e:
-                print("Receipt printing failed:", e)
+            business = BusinessDetails.objects.first()
+            business_name = business.business_name if business else "My Store"
+            store_address = business.store_address if business else "Store Address"
 
-            # ✅ Clear cart after successful print
+            order_data = {
+                'order_code': order_code,
+                'business_name': business_name,
+                'store_address': store_address,
+                'payment_method': payment_method,
+                'order_type': 'walkin',
+                'specific_order_type': specific_order_type,
+                'cash_given': float(cash_given) if cash_given else None,
+                'change': float(change) if change else None,
+                'created_at': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M'),
+                'hide_customer_info': True
+            }
+
+            items_data = [
+                {
+                    'product_name': item.product_name,
+                    'quantity': item.quantity,
+                    'price': float(item.price),
+                }
+                for item in checkout_entries
+            ]
+
+            # ✅ Send print job
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                'printers',
+                {
+                    'type': 'send_print_job',
+                    'data': {
+                        'type': 'print',
+                        'order': order_data,
+                        'items': items_data
+                    }
+                }
+            )
+
             cart_items.delete()
-
             return JsonResponse({'success': True})
 
         except Exception as e:
