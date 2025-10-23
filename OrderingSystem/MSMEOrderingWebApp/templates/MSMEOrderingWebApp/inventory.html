@@ -1136,7 +1136,7 @@
                     </button>
                     {% for category in categories %}
                         <button class="tab-btn" onclick="filterProductsByCategory('{{ category.id }}', this)">
-                            <i class="fas fa-tag me-2"></i>{{ category.name|upper }}
+                            <i class="fas fa-tag me-2"></i>{{ category.name}}
                         </button>
                     {% endfor %}
                 </div>
@@ -1189,7 +1189,7 @@
                                                                         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
                                                                     ">
                                                                         <span style="font-size: 1.5rem; font-weight: 700; color: #fff;">
-                                                                            {{ product.name|first|upper }}
+                                                                            {{ product.name}}
                                                                         </span>
                                                                     </div>
                                                                 {% endif %}
@@ -1275,7 +1275,7 @@
                                                                     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
                                                                 ">
                                                                     <span style="font-size: 1.5rem; font-weight: 700; color: #fff;">
-                                                                        {{ product.name|first|upper }}
+                                                                        {{ product.name|first}}
                                                                     </span>
                                                                 </div>
                                                             {% endif %}
