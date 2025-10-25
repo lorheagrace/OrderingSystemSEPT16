@@ -684,6 +684,31 @@
             line-height: 1;
         }
 
+        #registerBtn.loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        #registerBtn.loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid transparent;
+            border-top-color: {{ customization.button_text_color|default:'#ffffff' }};
+            border-radius: 50%;
+            animation: button-loading-spinner 0.6s linear infinite;
+        }
+
+        @keyframes button-loading-spinner {
+            from { transform: rotate(0turn); }
+            to { transform: rotate(1turn); }
+        }
 </style>
 
 </head>
@@ -1055,6 +1080,31 @@ toastr.options = {
                 specialCharRequirement.style.color = "red";
                 specialCharRequirement.innerHTML = '- Contains at least one special character (e.g., !@#$%^&*)';
             }
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector("form");
+        const registerBtn = document.getElementById("registerBtn");
+        const originalText = registerBtn.textContent;
+
+        form.addEventListener("submit", function(e) {
+            // Prevent multiple submissions
+            if (registerBtn.disabled || registerBtn.classList.contains('loading')) {
+                e.preventDefault();
+                return false;
+            }
+
+            // Add loading state
+            registerBtn.disabled = true;
+            registerBtn.classList.add('loading');
+            registerBtn.textContent = "Processing...";
+
+            // Optional: Remove loading state after timeout (fallback)
+            setTimeout(function() {
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.textContent = originalText;
+            }, 10000); // 10 seconds timeout
         });
     });
 </script>
