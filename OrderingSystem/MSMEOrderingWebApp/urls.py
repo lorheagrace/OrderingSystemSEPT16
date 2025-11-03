@@ -89,6 +89,10 @@ urlpatterns = [
     path("upload-logo/", views.upload_logo, name="upload_logo"),
     path("toggle-shop-status/", views.toggle_shop_status, name="toggle_shop_status"),
     path('pos/update-customer-name/', views.update_pos_customer_name, name='update_pos_customer_name'),
+    path('apply-category-discount/', views.apply_category_discount, name='apply_category_discount'),
+    path('revert-category-discount/', views.revert_category_discount, name='revert_category_discount'),
+    path('clear-original-prices/', views.clear_original_prices, name='clear_original_prices'),
+    path('check-original-prices/', views.check_original_prices, name='check_original_prices'),
 
 ]
 
