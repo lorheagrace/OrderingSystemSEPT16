@@ -191,7 +191,6 @@
             border: none;
             position: relative;
             overflow: hidden;
-            text-transform: uppercase;
             letter-spacing: 0.025em;
             font-size: 0.875rem;
             border-radius: {{ customization.button_rounded_corner|default:1 }}px;
@@ -460,7 +459,7 @@
         .sc-card {
            background: rgba(255,255,255,0.8);
             backdrop-filter: blur(20px);
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             border-radius: 16px;
             padding: 20px;
             border-bottom: 3px solid var(--primary-color);
@@ -469,51 +468,130 @@
             top: 72px; /* adjust distance from top */
             z-index: 100; /* ensures it stays above other elements */
             overflow: auto;
-
-        }
-        /* Enhanced Category Tabs */
-        .category-tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 2rem;
-            padding: 0.5rem;
-            border-radius: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-light);
-            flex-wrap: wrap;
+            overflow: visible !important; /* prevent clipping */
         }
 
-        .tab-btn {
-            background: transparent;
-            border: none;
-            padding: 0.75rem 1.5rem;
+        /* 🧭 Category dropdown container */
+        .category-dropdown {
+            position: relative;
+            z-index: 1050; /* keeps dropdown on top of the card */
+            width: 100%;
+        }
+
+        /* Dropdown button */
+        .category-dropdown .btn {
+            text-transform: title !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: left;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #fff;
+            border-color: var(--primary-color);
+            border-width: {{ customization.input_border_width|default:1 }}px; 
+            border-style: {{ customization.input_border_style|default:'solid' }};
+            color: {{ customization.body_font_color|default:"#000" }};
+            font-family: '{{ customization.body_font_family|default:"Arial" }}';
+            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+            border-radius: {{ customization.input_rounded_corner|default:4 }}px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .category-dropdown .btn:hover,
+        .category-dropdown .btn:focus,
+        .category-dropdown .btn.show {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            box-shadow: none;
+        }
+
+        /* Caret alignment */
+        .category-dropdown .dropdown-toggle {
+            position: relative;
+            text-align: left;
+            padding-right: 2rem;
+        }
+
+        .category-dropdown .dropdown-toggle::after {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* 🧾 Dropdown menu styling */
+        .category-dropdown .dropdown-menu {
+            
+            position: absolute;
+            z-index: 2000;
+            max-height: 250px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) #f1f1f1;
+            font-family: '{{ customization.body_font_family|default:"Arial" }}';
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Optional: dropdown flips upward if near bottom */
+        .category-dropdown.dropup .dropdown-menu {
+            bottom: 100%;
+            top: auto;
+            margin-bottom: 5px;
+        }
+
+        /* Dropdown item */
+        .category-dropdown .dropdown-item {
+            transition: background-color 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .category-dropdown .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+            opacity: 0.8;
+        }
+
+        .category-dropdown .dropdown-item.active {
+            background-color: var(--secondary-color);
+            color: #fff;
             font-weight: 600;
-            color: var(--accent-color);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            border-radius: {{ customization.button_rounded_corner|default:1 }}px;
-            font-family: {{ customization.body_font_family|default:"Arial" }};
-            font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' <= 14 %}{{ customization.body_font_size|default:12 }}{% else %}14{% endif %}px;
         }
 
-        .tab-btn:hover {
-            border: 2px solid;
-            border-color: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: var(--primary-color);
-            transform: translateY(-1px);
+        /* Search field inside dropdown */
+        #categorySearchInput {
+            width: calc(100% - 1rem);
+            margin: 0.5rem;
+            padding: 0.4rem 0.75rem;
+            font-size: 14px;
+            border: 1px solid var(--primary-color);
+            border-radius: 6px;
+            transition: all 0.2s ease;
         }
 
-        .tab-btn.active {
-            border-color: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            background:  linear-gradient(90deg, var(--primary-color), var(--secondary-color)); 
-            text-shadow: 2px 2px 4px rgba(14, 14, 14, 0.247); /* Apply text shadow */
-            box-shadow: var(--shadow-md);
-            color: {{ customization.button_text_color|default:'#ffffff' }}
+        #categorySearchInput:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 3px var(--secondary-color);
         }
 
-
+        /* Custom scrollbar (WebKit) */
+        .category-dropdown .dropdown-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+        .category-dropdown .dropdown-menu::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+        }
+        .category-dropdown .dropdown-menu::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+        }
         /* Enhanced Form Switch */
         .form-switch .form-check-input {
             width: 3rem;
@@ -603,9 +681,6 @@
                 max-width: 100%;
             }
             
-            .category-tabs {
-                justify-content: center;
-            }
 
             .tab-btn {
                 padding: 4px 10px;
@@ -965,12 +1040,199 @@
             display: none;
         }
     }
-    
-    
+
+   /* 🧭 Product Category Select - same style as .category-dropdown */
+    #product_category {
+        position: relative;
+        z-index: 1050;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: left;
+        padding: 0.75rem 1rem;
+        background-color: #fff;
+        color: {{ customization.body_font_color|default:"#000" }};
+        font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        font-size: {% if customization.body_font_size and customization.body_font_size|add:'0' > 16 %}16{% else %}{{ customization.body_font_size|default:14 }}{% endif %}px;
+        border-radius: {{ customization.input_rounded_corner|default:4 }}px;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+
+        /* remove native select styling */
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+
+    /* Hover & focus */
+    #product_category:hover,
+    #product_category:focus {
+        border-color: var(--secondary-color);
+        color: var(--secondary-color);
+        box-shadow: none;
+        outline: none;
+    }
+
+
+    /* Dropdown (option list) styling */
+    #product_category option {
+        font-size: inherit;
+        font-weight: 500;
+        font-family: '{{ customization.body_font_family|default:"Arial" }}';
+        color: {{ customization.body_font_color|default:"#000000" }};
+        background-color: #fff;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        padding: 0.5rem;
+    }
+
+    /* Option hover and selected (simulating dropdown-item behavior) */
+    #product_category option:hover,
+    #product_category option:checked {
+        background-color: var(--secondary-color);
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* Scroll styling (for long lists) */
+    #product_category::-webkit-scrollbar {
+        width: 6px;
+    }
+    #product_category::-webkit-scrollbar-thumb {
+        background-color: var(--primary-color);
+        border-radius: 10px;
+    }
+    #product_category::-webkit-scrollbar-track {
+        background-color: #f1f1f1;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 576px) {
+        #product_category {
+            padding: 0.65rem 0.75rem;
+            font-size: 13px;
+        }
+    }
     </style>
+
+    
 <div>
     <div class="container-fluid">
         <div class="container">
+
+            <!-- Apply Discount Button (in main inventory page) -->
+            <div class="mb-3 text-end">
+                <button type="button" class="btn btn-primary" onclick="openDiscountModal()">
+                    <i class="fas fa-tags me-2"></i>Apply Discount
+                </button>
+                <button type="button" class="btn btn-warning" onclick="openRevertModal()" id="revertDiscountBtn" style="display: none;">
+                    <i class="fas fa-undo me-2"></i>Revert Discount
+                </button>
+            </div>
+
+            <!-- Apply Discount Modal -->
+            <div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="discountModalLabel">
+                        <i class="fas fa-tags me-2"></i> Apply Discount by Category
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="discountPercentage" class="form-label">
+                        <i class="fas fa-percent me-2"></i> Discount Percentage
+                        </label>
+                        <input type="number" class="form-control" id="discountPercentage" 
+                            placeholder="Enter discount percentage (e.g., 10)" 
+                            min="0" max="100" step="1">
+                        <small class="text-muted">Enter whole numbers only (decimals will be ignored)</small>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label class="form-label">
+                        <i class="fas fa-list me-2"></i> Select Categories
+                        </label>
+                        <div id="categoryCheckboxList" class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                        {% for category in categories %}
+                            <div class="form-check mb-2">
+                            <input class="form-check-input discount-category-check" 
+                                    type="checkbox" 
+                                    value="{{ category.id }}" 
+                                    id="discountCat{{ category.id }}">
+                            <label class="form-check-label" for="discountCat{{ category.id }}">
+                                {{ category.name }}
+                            </label>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+            
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> This will update the prices of all products in the selected categories. 
+                        The discount will be applied to the current price.
+                    </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="applyDiscount()">
+                        <i class="fas fa-check me-2"></i>Apply Discount
+                    </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- NEW: Revert Discount Modal -->
+            <div class="modal fade" id="revertModal" tabindex="-1" aria-labelledby="revertModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning">
+                            <h5 class="modal-title" id="revertModalLabel">
+                                <i class="fas fa-undo me-2"></i> Revert Discount by Category
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-list me-2"></i> Select Categories to Revert
+                                </label>
+                                <div id="revertCategoryCheckboxList" class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                    {% for category in categories %}
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input revert-category-check" 
+                                                    type="checkbox" 
+                                                    value="{{ category.id }}" 
+                                                    id="revertCat{{ category.id }}">
+                                            <label class="form-check-label" for="revertCat{{ category.id }}">
+                                                {{ category.name }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                    
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Warning:</strong> This will restore products to their original prices before any discounts were applied.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-warning" onclick="revertDiscount()">
+                                <i class="fas fa-undo me-2"></i>Revert to Original Prices
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Add Product Form -->
             <div class="form-section fade-in">
                 <h3 class="section-title">
@@ -1044,21 +1306,42 @@
                                     <label for="product_category" class="form-label">
                                         <i class="fas fa-tags"></i> Product Category
                                     </label>
-                                    <select id="product_category" name="product_category" class="form-select" 
-                                            required onchange="checkAddNewCategory()">
-                                        <option value="">-- Select Category --</option>
-                                        {% for category in categories %}
-                                            <option value="{{ category.id }}"
-                                                {% if form_data.product_category == category.id|stringformat:"s" %}selected{% endif %}>
-                                                {{ category.name }}
-                                            </option>
-                                        {% endfor %}
-                                        <option value="add_new"
-                                            {% if form_data.product_category == 'add_new' %}selected{% endif %}>
-                                            ➕ Add New Category
-                                        </option>
-                                    </select>
+
+                                    <div class="dropdown w-100">
+                                        <button class="form-select text-start d-flex justify-content-between align-items-center"
+                                                type="button"
+                                                id="categoryDropdown"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <span id="selectedCategoryText">-- Select Category --</span>
+                                            <i class="fas fa-chevron-down ms-2"></i>
+                                        </button>
+
+                                        <ul class="dropdown-menu w-100 slim-dropdown" aria-labelledby="categoryDropdown" id="categoryList">
+                                            {% for category in categories %}
+                                                <li class="d-flex justify-content-between align-items-center dropdown-item-slim">
+                                                    <span class="category-name" data-id="{{ category.id }}">{{ category.name }}</span>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-danger btn-delete-slim"
+                                                            title="Delete category"
+                                                            onclick="deleteCategory({{ category.id }}, '{{ category.name }}')">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </li>
+                                            {% endfor %}
+                                            <li><hr class="dropdown-divider my-1"></li>
+                                            <li>
+                                                <button class="dropdown-item text-success py-2" type="button" onclick="openAddCategoryModal()">
+                                                    <i class="fas fa-plus-circle me-2"></i> Add New Category
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <input type="hidden" name="product_category" id="selectedCategoryId" required>
                                 </div>
+
+
 
                                 <div class="col-12 col-md-12 col-lg-6" id="default_stocks_section">
                                     <label for="product_stocks" class="form-label">
@@ -1124,24 +1407,50 @@
 
             <!-- Card Containing Search Functionality and Category Tabs -->
             <div class="sc-card">
-                <!-- Search Bar -->
-                <div class="mb-2">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search products..." onkeyup="searchProducts()">
-                </div>
+                <div class="row g-2 align-items-center">
+                    <!-- Search Bar -->
+                    <div class="col-12 col-md-7">
+                        <div class="search-wrapper mb-1 mb-md-0">
+                            <input
+                                type="text"
+                                id="searchInput"
+                                class="form-control search-input"
+                                placeholder="Search products..."
+                                onkeyup="searchProducts()"
+                            >
+                        </div>
+                    </div>
 
-                <!-- Category Tabs -->
-                <div class="category-tabs fade-in mb-0">
-                    <button class="tab-btn active" onclick="filterProductsByCategory('all', this)">
-                        <i class="fas fa-th-large me-2"></i>ALL
-                    </button>
-                    {% for category in categories %}
-                        <button class="tab-btn" onclick="filterProductsByCategory('{{ category.id }}', this)">
-                            <i class="fas fa-tag me-2"></i>{{ category.name}}
-                        </button>
-                    {% endfor %}
+                    <!-- Category Dropdown -->
+                    <div class="col-12 col-md-5">
+                        <div class="dropdown category-dropdown">
+                            <button
+                                class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="categoryDropdownTabs" data-bs-toggle="dropdown" aria-expanded="false" title="All">
+                                <span id="categoryDropdownLabel">All</span>
+                            </button>
+
+                            <ul class="dropdown-menu w-100" aria-labelledby="categoryDropdownTabs">
+                                <li>
+                                    <input type="text" id="categorySearchInput" class="form-control" placeholder="Search category..." onkeyup="filterCategoryList()"
+                                    >
+                                </li>
+                                <li>
+                                    <a class="dropdown-item active" onclick="filterProductsByCategory('all', this)">
+                                        All
+                                    </a>
+                                </li>
+                                {% for category in categories %}
+                                    <li>
+                                        <a class="dropdown-item" onclick="filterProductsByCategory('{{ category.id }}', this)">
+                                            {{ category.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-
 
             <!-- Products Display -->
             <div id="product_container">
@@ -1196,10 +1505,10 @@
                                                             </div>
                                                         </td>
 
-                                                        <td rowspan="{{ items|length }}" class="align-middle" style="background-color: #f0f0f0de;">{{ group.grouper|title }}</td>
-                                                        <td rowspan="{{ items|length }}" class="align-middle" style="background-color: #f0f0f0de;">{{ items.0.category.name|title }}</td>
+                                                        <td rowspan="{{ items|length }}" class="align-middle" style="background-color: #f0f0f0de;">{{ group.grouper}}</td>
+                                                        <td rowspan="{{ items|length }}" class="align-middle" style="background-color: #f0f0f0de;">{{ items.0.category.name}}</td>
                                                     {% endif %}
-                                                    <td class="align-middle" style="background-color: #f0f0f0ff;">{{ product.variation_name|title }}</td>
+                                                    <td class="align-middle" style="background-color: #f0f0f0ff;">{{ product.variation_name}}</td>
                                                     <td class="align-middle product-price" style="background-color: #f0f0f0ff;">₱{{ product.price|floatformat:2 }}</td>
                                                     <td class="align-middle" style="background-color: #f0f0f0ff;">
                                                         {% if product.track_stocks %}
@@ -1209,19 +1518,19 @@
                                                         {% endif %}
                                                     </td>
                                                     <td class="align-middle text-center" style="background-color: #f0f0f0ff;">
-                                                        <form method="post" action="{% url 'toggle_availability' product.id %}" class="d-inline">
-                                                            {% csrf_token %}
-                                                            <div class="form-check form-switch d-flex justify-content-center">
-                                                                <input class="form-check-input" type="checkbox" onchange="this.form.submit()" {% if product.available %}checked{% endif %}>
-                                                                <label class="form-check-label">
-                                                                    {% if product.available %}
-                                                                        <span class="available-color">Available</span>
-                                                                    {% else %}
-                                                                        <span class="text-muted">Unavailable</span>
-                                                                    {% endif %}
-                                                                </label>
-                                                            </div>
-                                                        </form>
+                                                        <div class="form-check form-switch d-flex justify-content-center">
+                                                            <input class="form-check-input availability-toggle" 
+                                                                   type="checkbox" 
+                                                                   data-product-id="{{ product.id }}"
+                                                                   {% if product.available %}checked{% endif %}>
+                                                            <label class="form-check-label availability-label-{{ product.id }}">
+                                                                {% if product.available %}
+                                                                    <span class="available-color">Available</span>
+                                                                {% else %}
+                                                                    <span class="text-muted">Unavailable</span>
+                                                                {% endif %}
+                                                            </label>
+                                                        </div>
                                                     </td>
 
 
@@ -1243,11 +1552,9 @@
                                                                 <i class="fas fa-edit"></i>
                                                             </a>
                                                             <a href="#"
-                                                               class="btn btn-outline-danger btn-sm"
-                                                               data-bs-toggle="modal"
-                                                               data-bs-target="#deleteModal"
-                                                               data-url="{% url 'delete_product' product.id %}"
-                                                               data-name="{{ product.name }}">
+                                                            class="btn btn-outline-danger btn-sm delete-product-btn"
+                                                            data-product-id="{{ product.id }}"
+                                                            data-product-name="{{ product.name }}">
                                                                 <i class="fas fa-trash"></i>
                                                             </a>
                                                         </div>
@@ -1275,15 +1582,15 @@
                                                                     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
                                                                 ">
                                                                     <span style="font-size: 1.5rem; font-weight: 700; color: #fff;">
-                                                                        {{ product.name|first}}
+                                                                        {{ product.name}}
                                                                     </span>
                                                                 </div>
                                                             {% endif %}
                                                         </div>
                                                     </td>
-                                                    <td class="align-middle">{{ product.name|title }}</td>
+                                                    <td class="align-middle">{{ product.name}}</td>
                                                     <td class="align-middle">{{ items.0.category.name }}</td>
-                                                    <td class="align-middle"><span>None</span></td>
+                                                    <td class="align-middle">{{ product.variation_name}}</td>
                                                     <td class="align-middle">₱{{ product.price|floatformat:2 }}</td>
                                                     <td class="align-middle">
                                                         {% if product.track_stocks %}
@@ -1293,19 +1600,19 @@
                                                         {% endif %}
                                                     </td>
                                                     <td class="align-middle text-center">
-                                                        <form method="post" action="{% url 'toggle_availability' product.id %}" class="d-inline">
-                                                            {% csrf_token %}
-                                                            <div class="form-check form-switch d-flex justify-content-center">
-                                                                <input class="form-check-input" type="checkbox" onchange="this.form.submit()" {% if product.available %}checked{% endif %}>
-                                                                <label class="form-check-label">
-                                                                    {% if product.available %}
-                                                                        <span class="available-color">Available</span>
-                                                                    {% else %}
-                                                                        <span class="text-muted">Unavailable</span>
-                                                                    {% endif %}
-                                                                </label>
-                                                            </div>
-                                                        </form>
+                                                        <div class="form-check form-switch d-flex justify-content-center">
+                                                            <input class="form-check-input availability-toggle" 
+                                                                   type="checkbox" 
+                                                                   data-product-id="{{ product.id }}"
+                                                                   {% if product.available %}checked{% endif %}>
+                                                            <label class="form-check-label availability-label-{{ product.id }}">
+                                                                {% if product.available %}
+                                                                    <span class="available-color">Available</span>
+                                                                {% else %}
+                                                                    <span class="text-muted">Unavailable</span>
+                                                                {% endif %}
+                                                            </label>
+                                                        </div>
                                                     </td>
 
 
@@ -1327,11 +1634,9 @@
                                                                 <i class="fas fa-edit"></i>
                                                             </a>
                                                             <a href="#"
-                                                            class="btn btn-outline-danger btn-sm"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#deleteModal"
-                                                            data-url="{% url 'delete_product' product.id %}"
-                                                            data-name="{{ product.name }}">
+                                                               class="btn btn-outline-danger btn-sm delete-product-btn"
+                                                               data-product-id="{{ product.id }}"
+                                                               data-product-name="{{ product.name }}">
                                                                 <i class="fas fa-trash"></i>
                                                             </a>
                                                         </div>
@@ -1375,61 +1680,56 @@
             </div>
 
             <!-- Edit Product Modal -->
-            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <form method="post" action="{% url 'edit_product_price' %}">
-                        {% csrf_token %}
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editModalLabel">
-                                    <i class="fas fa-edit me-2"></i> Edit Product
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-            
-                            <div class="modal-body">
-                                <!-- Hidden Inputs -->
-                                <input type="hidden" name="product_id" id="editProductId">
-                                <input type="hidden" name="edit_type" id="editType">
-            
-                                <!-- Product Name -->
-                                <div class="mb-3">
-                                    <label for="editProductName" class="form-label">Product Name</label>
-                                    <input type="text" class="form-control" name="new_name" id="editProductName" required>
-                                </div>
-            
-                                <!-- Variation -->
-                                <div class="mb-3">
-                                    <label for="editVariationName" class="form-label">Variation</label>
-                                    <input type="text" class="form-control" id="editVariationName" disabled>
-                                </div>
-            
-                                <!-- Price -->
-                                <div class="mb-3">
-                                    <label for="editProductPrice" class="form-label">Price (₱)</label>
-                                    <input type="number" class="form-control" name="new_price" id="editProductPrice" required>
-                                </div>
-            
-                                <!-- Stocks -->
-                                <div class="mb-3" id="editProductStocksGroup">
-                                    <label for="editProductStocks" class="form-label">Stocks</label>
-                                    <input type="number" class="form-control" name="new_stocks" id="editProductStocks" min="0" required>
-                                </div>
-            
-                                <!-- ✅ Description -->
-                                <div class="mb-3">
-                                    <label for="editProductDescription" class="form-label">Description</label>
-                                    <textarea class="form-control" name="new_description" id="editProductDescription" rows="3"></textarea>
-                                </div>
-                            </div>
-            
-                            <!-- Modal Footer -->
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
-                            </div>
-                        </div>
-                    </form>
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">
+                    <i class="fas fa-edit me-2"></i> Edit Product
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Hidden Inputs -->
+                <input type="hidden" id="editProductId">
+                <input type="hidden" id="editType">
+
+                <!-- Product Name -->
+                <div class="mb-3">
+                    <label for="editProductName" class="form-label">Product Name</label>
+                    <input type="text" class="form-control" id="editProductName" required>
                 </div>
+
+                <!-- Variation -->
+                <div class="mb-3">
+                    <label for="editVariationName" class="form-label">Variation</label>
+                    <input type="text" class="form-control" id="editVariationName" disabled>
+                </div>
+
+                <!-- Price -->
+                <div class="mb-3">
+                    <label for="editProductPrice" class="form-label">Price (₱)</label>
+                    <input type="number" class="form-control" id="editProductPrice" step="0.01" required>
+                </div>
+
+                <!-- Stocks -->
+                <div class="mb-3" id="editProductStocksGroup">
+                    <label for="editProductStocks" class="form-label">Stocks</label>
+                    <input type="number" class="form-control" id="editProductStocks" min="0" required>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label for="editProductDescription" class="form-label">Description</label>
+                    <textarea class="form-control" id="editProductDescription" rows="3"></textarea>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveEditBtn">Save Changes</button>
             </div>
         </div>
     </div>
@@ -1457,6 +1757,8 @@
 </div>
 
 <script>
+
+    
 
     document.addEventListener('DOMContentLoaded', function () {
         const productNameInput = document.getElementById('product_name');
@@ -1489,64 +1791,116 @@
         });
     });
 
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const productNameInput = document.getElementById('product_name');
+
+        // Block typing '-'
+        productNameInput.addEventListener('keydown', function (e) {
+            if (e.key === '-') e.preventDefault();
+        });
+
+        // Remove any pasted '-'
+        productNameInput.addEventListener('input', function () {
+            this.value = this.value.replace(/-/g, '');
+        });
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteModal = document.getElementById('deleteModal');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const productNameToDelete = document.getElementById('productNameToDelete');
+
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; // Button that triggered modal
+            const url = button.getAttribute('data-url');
+            const name = button.getAttribute('data-name');
+
+            // Update modal content
+            confirmDeleteBtn.setAttribute('href', url);
+            productNameToDelete.textContent = name;
+        });
+    });
+
+
     let currentCategoryId = 'all';  // Default
 
     function filterProductsByCategory(categoryId, buttonElement) {
-        currentCategoryId = categoryId; // store selected category globally
+        // Store selected category globally
+        window.currentCategoryId = categoryId;
 
-        // Toggle active class
-        const allTabButtons = document.querySelectorAll('.tab-btn');
-        allTabButtons.forEach(btn => btn.classList.remove('active'));
-        buttonElement.classList.add('active');
+        // Remove active class from all category buttons and dropdown items
+        document.querySelectorAll('.tab-btn, .dropdown-item').forEach(btn => 
+            btn.classList.remove('active')
+        );
 
-        // Re-run search so category + search are applied together
+        // Set the clicked element as active
+        if (buttonElement) buttonElement.classList.add('active');
+
+        // If there's a dropdown button, update its text and tooltip
+        const dropdownButton = document.getElementById('categoryDropdownTabs');
+        if (dropdownButton && buttonElement) {
+            const fullText = buttonElement.textContent.trim();
+            const maxLength = window.innerWidth <= 768 ? 10 : 45; // shorter text on small screens
+            const displayText =
+                fullText.length > maxLength
+                    ? fullText.substring(0, maxLength) + '...'
+                    : fullText;
+
+            dropdownButton.innerHTML = `<i class="fas fa-tag me-2"></i> ${displayText}`;
+            dropdownButton.title = fullText;
+        }
+
+        // Apply category + search filter together
         searchProducts();
     }
 
     function searchProducts() {
         const searchInput = document.getElementById('searchInput');
-        const searchTerm = searchInput.value.toLowerCase().trim();
+        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
         const rows = document.querySelectorAll('.product-row');
         const groups = {};
 
+        // Safety: default to 'all' if currentCategoryId is not set
+        const selectedCategory = window.currentCategoryId || 'all';
+
+        // Group rows by product group
         rows.forEach(row => {
             const groupId = row.getAttribute('data-group');
-            if (!groups[groupId]) {
-                groups[groupId] = [];
-            }
+            if (!groups[groupId]) groups[groupId] = [];
             groups[groupId].push(row);
         });
 
         let visibleGroups = 0;
+
         Object.keys(groups).forEach(groupId => {
             const groupRows = groups[groupId];
-            // Get product name from the second cell of the first row in the group
-            let productName = "";
-            const cells = groupRows[0].querySelectorAll('td');
-            if (cells.length >= 2) {
-                productName = cells[1].textContent.toLowerCase();
-            }
-            const matchesSearch = searchTerm === "" || productName.includes(searchTerm);
+            const firstRow = groupRows[0];
+            const cells = firstRow.querySelectorAll('td');
 
-            // Still checking category filter if needed
-            const groupCategory = groupRows[0].getAttribute('data-category');
-            const belongsToCategory = currentCategoryId === 'all' || groupCategory === currentCategoryId;
+            // Product name (from 2nd cell)
+            const productName = cells.length >= 2 ? cells[1].textContent.toLowerCase() : "";
 
-            if (belongsToCategory && matchesSearch) {
-                groupRows.forEach(row => row.style.display = '');
-                visibleGroups++;
-            } else {
-                groupRows.forEach(row => row.style.display = 'none');
-            }
+            // Match filters
+            const matchesSearch = !searchTerm || productName.includes(searchTerm);
+            const groupCategory = firstRow.getAttribute('data-category');
+            const matchesCategory = selectedCategory === 'all' || groupCategory === selectedCategory;
+
+            // Show or hide based on both filters
+            const isVisible = matchesSearch && matchesCategory;
+            groupRows.forEach(row => (row.style.display = isVisible ? '' : 'none'));
+            if (isVisible) visibleGroups++;
         });
 
+        // Show or hide "no results" message
         if (visibleGroups === 0) {
             showNoResultsMessage();
         } else {
             hideNoResultsMessage();
         }
     }
-
 
     
     // Helper function to show no results message
@@ -1591,6 +1945,7 @@
             noResultsDiv.style.display = 'none';
         }
     }
+
     // Enhanced search with Enter key support
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('searchInput');
@@ -1873,6 +2228,7 @@
         document.getElementById("editType").value = type;
         document.getElementById("editProductName").value = name;
         document.getElementById("editVariationName").value = variation;
+        document.getElementById("editVariationName").disabled = false;
         document.getElementById("editProductPrice").value = price;
         document.getElementById("editProductStocks").value = stocks;
     
@@ -1988,4 +2344,603 @@
     }
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle all availability toggles
+    document.querySelectorAll('.availability-toggle').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const productId = this.getAttribute('data-product-id');
+            const isChecked = this.checked;
+            const label = document.querySelector(`.availability-label-${productId}`);
+            
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Send AJAX request
+            fetch(`/toggle-availability/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    available: isChecked
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update label text
+                    if (isChecked) {
+                        label.innerHTML = '<span class="available-color">Available</span>';
+                        toastr.success('Product marked as available');
+                    } else {
+                        label.innerHTML = '<span class="text-muted">Unavailable</span>';
+                        toastr.info('Product marked as unavailable');
+                    }
+                } else {
+                    // Revert toggle if failed
+                    toggle.checked = !isChecked;
+                    toastr.error('Failed to update availability');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert toggle on error
+                toggle.checked = !isChecked;
+                toastr.error('An error occurred');
+            });
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let productIdToDelete = null;
+    let productNameToDelete = null;
+    let buttonElement = null; // Store the button that was clicked
+    
+    const deleteModal = document.getElementById('deleteModal');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const productNameDisplay = document.getElementById('productNameToDelete');
+    
+    // Handle delete button clicks
+    document.querySelectorAll('.delete-product-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            productIdToDelete = this.getAttribute('data-product-id');
+            productNameToDelete = this.getAttribute('data-product-name');
+            buttonElement = this; // Store reference to the clicked button
+            
+            // Update modal content
+            productNameDisplay.textContent = productNameToDelete;
+            
+            // Show modal
+            const modal = new bootstrap.Modal(deleteModal);
+            modal.show();
+        });
+    });
+    
+    // Handle confirm delete
+    confirmDeleteBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (!productIdToDelete || !buttonElement) return;
+        
+        // Get CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Send AJAX request
+        fetch(`/delete-product/${productIdToDelete}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(deleteModal);
+                modal.hide();
+                
+                toastr.success(data.message);
+                
+                // Find the row that contains the delete button
+                const row = buttonElement.closest('tr.product-row');
+                if (row) {
+                    const groupId = row.getAttribute('data-group');
+                    
+                    // Check if this is a single product or a variation
+                    if (groupId.startsWith('single-')) {
+                        // Single product - just remove this row
+                        row.remove();
+                    } else {
+                        // Product with variations
+                        // Get all rows in this group
+                        const groupRows = document.querySelectorAll(`tr[data-group="${groupId}"]`);
+                        
+                        if (groupRows.length === 1) {
+                            // Last variation - remove the entire group
+                            row.remove();
+                        } else {
+                            // Multiple variations - only remove the clicked row
+                            // But we need to adjust rowspan if this is the first row
+                            const isFirstRow = row.querySelector('td[rowspan]');
+                            
+                            if (isFirstRow) {
+                                // This is the first row with the image/product name
+                                // Transfer the rowspan cells to the next row
+                                const nextRow = row.nextElementSibling;
+                                if (nextRow && nextRow.getAttribute('data-group') === groupId) {
+                                    // Get all rowspan cells from current row
+                                    const rowspanCells = row.querySelectorAll('td[rowspan]');
+                                    rowspanCells.forEach(cell => {
+                                        const currentRowspan = parseInt(cell.getAttribute('rowspan'));
+                                        const newRowspan = currentRowspan - 1;
+                                        
+                                        // Clone the cell and insert it at the beginning of next row
+                                        const clonedCell = cell.cloneNode(true);
+                                        clonedCell.setAttribute('rowspan', newRowspan);
+                                        nextRow.insertBefore(clonedCell, nextRow.firstChild);
+                                    });
+                                }
+                            } else {
+                                // This is not the first row
+                                // Find the first row with rowspan and decrease it
+                                let firstRowInGroup = null;
+                                for (let i = 0; i < groupRows.length; i++) {
+                                    if (groupRows[i].querySelector('td[rowspan]')) {
+                                        firstRowInGroup = groupRows[i];
+                                        break;
+                                    }
+                                }
+                                
+                                if (firstRowInGroup) {
+                                    const rowspanCells = firstRowInGroup.querySelectorAll('td[rowspan]');
+                                    rowspanCells.forEach(cell => {
+                                        const currentRowspan = parseInt(cell.getAttribute('rowspan'));
+                                        cell.setAttribute('rowspan', currentRowspan - 1);
+                                    });
+                                }
+                            }
+                            
+                            // Now remove the row
+                            row.remove();
+                        }
+                    }
+                }
+                
+                // Check if table is now empty
+                const remainingRows = document.querySelectorAll('.product-row');
+                if (remainingRows.length === 0) {
+                    showNoResultsMessage();
+                }
+                
+                // Reset
+                productIdToDelete = null;
+                productNameToDelete = null;
+                buttonElement = null;
+            } else {
+                toastr.error(data.error || 'Failed to delete product');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            toastr.error('An error occurred while deleting the product');
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Handle selecting category from dropdown
+    document.querySelectorAll(".category-name").forEach(item => {
+        item.addEventListener("click", function () {
+            const categoryId = this.dataset.id;
+            const categoryName = this.textContent.trim();
+
+            document.getElementById("selectedCategoryId").value = categoryId;
+            document.getElementById("selectedCategoryText").textContent = categoryName;
+        });
+    });
+});
+
+function deleteCategory(categoryId, categoryName) {
+    if (!confirm(`Are you sure you want to delete category "${categoryName}"?`)) return;
+
+    fetch(`/delete_category/${categoryId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(err => {
+        console.error("Error deleting category:", err);
+        alert("Something went wrong. Please try again.");
+    });
+}
+
+function openAddCategoryModal() {
+    document.getElementById('addCategoryModal').style.display = 'block';
+    document.getElementById('modalOverlay').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const saveEditBtn = document.getElementById('saveEditBtn');
+    
+    if (saveEditBtn) {
+        saveEditBtn.addEventListener('click', function() {
+            const productId = document.getElementById('editProductId').value;
+            const productName = document.getElementById('editProductName').value;
+            const productPrice = document.getElementById('editProductPrice').value;
+            const productStocks = document.getElementById('editProductStocks').value;
+            const productDescription = document.getElementById('editProductDescription').value;
+            const productVariation = document.getElementById('editVariationName').value;
+
+            if (!productName || !productPrice) {
+                toastr.error('Please fill in all required fields');
+                return;
+            }
+            
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch("{% url 'edit_product_price' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    new_name: productName,
+                    new_price: productPrice,
+                    new_stocks: productStocks,
+                    new_description: productDescription,
+                    new_variation: productVariation
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                    modal.hide();
+                    toastr.success(data.message);
+                    
+                    // Find the EXACT row for this specific product ID
+                    const allRows = document.querySelectorAll('.product-row');
+                    allRows.forEach(row => {
+                        // Find the edit button that contains this exact product ID
+                        const editBtn = row.querySelector(`[onclick*="'${productId}'"]`);
+                        if (!editBtn) return; // Skip if this isn't the right row
+                        
+                        const cells = Array.from(row.querySelectorAll('td'));
+                        
+                        // Determine if this is the first row with rowspan (has image/name cells)
+                        const hasRowspan = row.querySelector('td[rowspan]') !== null;
+                        
+                        // Update Product Name (only for rows with rowspan - grouped products)
+                        if (hasRowspan) {
+                            cells.forEach(cell => {
+                                if (cell.hasAttribute('rowspan') && 
+                                    !cell.querySelector('img') && 
+                                    !cell.querySelector('div[style*="background"]')) {
+                                    cell.textContent = productName.charAt(0).toUpperCase() + productName.slice(1);
+                                }
+                            });
+                        } else {
+                            // For single products or non-first variation rows
+                            if (cells[1] && !cells[1].querySelector('img') && 
+                                !cells[1].querySelector('div') && 
+                                !cells[1].hasAttribute('rowspan') &&
+                                !cells[1].querySelector('.form-check')) {
+                                cells[1].textContent = productName.charAt(0).toUpperCase() + productName.slice(1);
+                            }
+                        }
+
+                        // Find cells by their content/class, not by index
+                        // This works regardless of rowspan
+                        cells.forEach((cell, index) => {
+                            const text = cell.textContent.trim();
+                            const hasInput = cell.querySelector('input');
+                            const hasButton = cell.querySelector('button') || cell.querySelector('a');
+                            const hasFormCheck = cell.querySelector('.form-check');
+                            const hasImage = cell.querySelector('img');
+                            const hasRowspanAttr = cell.hasAttribute('rowspan');
+                            
+                            // Update Variation Name
+                            if (!hasInput && !hasButton && !hasFormCheck && !hasImage && 
+                                !hasRowspanAttr && !text.includes('₱') && 
+                                !text.includes('/') && !text.includes('•') &&
+                                !text.toLowerCase().includes('available') &&
+                                !text.toLowerCase().includes('not tracked') &&
+                                !text.match(/^\d+$/) && // Not just a number (stock)
+                                text.toLowerCase() !== productName.toLowerCase() && // Not the product name
+                                cell.getAttribute('style')?.includes('background-color: #f0f0f0ff')) {
+                                
+                                // This is likely the variation cell
+                                const prevCell = cells[index - 1];
+                                if (prevCell && (prevCell.hasAttribute('rowspan') || 
+                                    prevCell.textContent.trim().toLowerCase() === productName.toLowerCase())) {
+                                    cell.textContent = (productVariation || 'None').charAt(0).toUpperCase() + 
+                                                      (productVariation || 'None').slice(1);
+                                }
+                            }
+                            
+                            // Update Price
+                            if (cell.classList.contains('product-price') || 
+                                (text.includes('₱') && !hasInput && !hasButton)) {
+                                cell.textContent = `₱${parseFloat(productPrice).toFixed(2)}`;
+                            }
+                            
+                            // Update Stocks
+                            if (data.product.track_stocks && !hasInput && !hasButton && 
+                                !hasFormCheck && !text.includes('₱') && 
+                                !text.includes('/') && !text.includes('•') &&
+                                !text.toLowerCase().includes('available') &&
+                                (text.match(/^\d+$/) || text.toLowerCase().includes('not tracked'))) {
+                                
+                                // Check if the next cell is the availability toggle (to confirm this is stock cell)
+                                const nextCell = cells[index + 1];
+                                if (nextCell && nextCell.querySelector('.form-check-input')) {
+                                    cell.textContent = productStocks;
+                                }
+                            }
+                        });
+
+                        // Update edit button onclick with proper escaping
+                        const editButton = row.querySelector('.btn-outline-primary');
+                        if (editButton) {
+                            const variationName = (data.product.variation_name || '').replace(/'/g, "\\'");
+                            const trackStocks = data.product.track_stocks;
+                            const description = (data.product.description || '').replace(/`/g, '\\`').replace(/'/g, "\\'");
+                            const escapedName = productName.replace(/'/g, "\\'");
+
+                            editButton.setAttribute(
+                                'onclick', 
+                                `openEditModal('${productId}', '${productPrice}', '${variationName}', '${escapedName}', 'product', '${productStocks}', '${trackStocks}', \`${description}\`)`
+                            );
+                        }
+                    });
+                } else {
+                    toastr.error(data.error || 'Failed to update product');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toastr.error('An error occurred while updating the product');
+            });
+        });
+    }
+});
+</script>   
+
+<script>
+// Open Revert Modal
+function openRevertModal() {
+    const modal = new bootstrap.Modal(document.getElementById('revertModal'));
+    modal.show();
+}
+
+// Check if there are original prices stored and show/hide revert button
+function checkOriginalPrices() {
+    fetch('/check-original-prices/', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const revertBtn = document.getElementById('revertDiscountBtn');
+        if (data.has_original_prices) {
+            revertBtn.style.display = 'inline-block';
+        } else {
+            revertBtn.style.display = 'none';
+        }
+    })
+    .catch(error => console.error('Error checking original prices:', error));
+}
+
+// Open Discount Modal
+function openDiscountModal() {
+    const modal = new bootstrap.Modal(document.getElementById('discountModal'));
+    modal.show();
+}
+
+// Updated Apply Discount Function
+function applyDiscount() {
+    const discountPercentage = parseInt(document.getElementById('discountPercentage').value);
+    const selectedCategories = [];
+    
+    document.querySelectorAll('.discount-category-check:checked').forEach(checkbox => {
+        selectedCategories.push(checkbox.value);
+    });
+    
+    if (!discountPercentage || discountPercentage <= 0 || discountPercentage > 100) {
+        toastr.error('Please enter a valid discount percentage between 1 and 100');
+        return;
+    }
+    
+    if (selectedCategories.length === 0) {
+        toastr.error('Please select at least one category');
+        return;
+    }
+    
+    if (!confirm(`Are you sure you want to apply ${discountPercentage}% discount to ${selectedCategories.length} categor${selectedCategories.length > 1 ? 'ies' : 'y'}?`)) {
+        return;
+    }
+    
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch('/apply-category-discount/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({
+            discount_percentage: discountPercentage,
+            category_ids: selectedCategories
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('discountModal'));
+            modal.hide();
+            
+            document.getElementById('discountPercentage').value = '';
+            document.querySelectorAll('.discount-category-check').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            toastr.success(data.message);
+            
+            // Update prices in the table
+            if (data.updated_products && data.updated_products.length > 0) {
+                data.updated_products.forEach(product => {
+                    const allRows = document.querySelectorAll('.product-row');
+                    allRows.forEach(row => {
+                        const editBtn = row.querySelector(`[onclick*="'${product.id}'"]`);
+                        if (!editBtn) return;
+                        
+                        const cells = Array.from(row.querySelectorAll('td'));
+                        cells.forEach(cell => {
+                            if (cell.classList.contains('product-price') || 
+                                (cell.textContent.includes('₱') && !cell.querySelector('input') && !cell.querySelector('button'))) {
+                                cell.textContent = `₱${parseFloat(product.new_price).toFixed(2)}`;
+                            }
+                        });
+                        
+                        const editButton = row.querySelector('.btn-outline-primary');
+                        if (editButton) {
+                            const onclickAttr = editButton.getAttribute('onclick');
+                            const updatedOnclick = onclickAttr.replace(
+                                /openEditModal\('([^']+)',\s*'([^']+)'/,
+                                `openEditModal('$1', '${product.new_price}'`
+                            );
+                            editButton.setAttribute('onclick', updatedOnclick);
+                        }
+                    });
+                });
+            }
+            
+            // Show revert button if we have original prices
+            if (data.has_original_prices) {
+                document.getElementById('revertDiscountBtn').style.display = 'inline-block';
+            }
+        } else {
+            toastr.error(data.error || 'Failed to apply discount');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        toastr.error('An error occurred while applying discount');
+    });
+}
+
+// NEW: Revert Discount Function
+function revertDiscount() {
+    const selectedCategories = [];
+    
+    document.querySelectorAll('.revert-category-check:checked').forEach(checkbox => {
+        selectedCategories.push(checkbox.value);
+    });
+    
+    if (selectedCategories.length === 0) {
+        toastr.error('Please select at least one category');
+        return;
+    }
+    
+    if (!confirm(`Are you sure you want to revert prices for ${selectedCategories.length} categor${selectedCategories.length > 1 ? 'ies' : 'y'} to original prices?`)) {
+        return;
+    }
+    
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch('/revert-category-discount/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({
+            category_ids: selectedCategories
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('revertModal'));
+            modal.hide();
+            
+            document.querySelectorAll('.revert-category-check').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            toastr.success(data.message);
+            
+            // Update prices in the table
+            if (data.reverted_products && data.reverted_products.length > 0) {
+                data.reverted_products.forEach(product => {
+                    const allRows = document.querySelectorAll('.product-row');
+                    allRows.forEach(row => {
+                        const editBtn = row.querySelector(`[onclick*="'${product.id}'"]`);
+                        if (!editBtn) return;
+                        
+                        const cells = Array.from(row.querySelectorAll('td'));
+                        cells.forEach(cell => {
+                            if (cell.classList.contains('product-price') || 
+                                (cell.textContent.includes('₱') && !cell.querySelector('input') && !cell.querySelector('button'))) {
+                                cell.textContent = `₱${parseFloat(product.reverted_price).toFixed(2)}`;
+                            }
+                        });
+                        
+                        const editButton = row.querySelector('.btn-outline-primary');
+                        if (editButton) {
+                            const onclickAttr = editButton.getAttribute('onclick');
+                            const updatedOnclick = onclickAttr.replace(
+                                /openEditModal\('([^']+)',\s*'([^']+)'/,
+                                `openEditModal('$1', '${product.reverted_price}'`
+                            );
+                            editButton.setAttribute('onclick', updatedOnclick);
+                        }
+                    });
+                });
+            }
+            
+            // Hide revert button if no more original prices
+            if (!data.has_original_prices) {
+                document.getElementById('revertDiscountBtn').style.display = 'none';
+            }
+        } else {
+            toastr.error(data.error || 'Failed to revert discount');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        toastr.error('An error occurred while reverting discount');
+    });
+}
+
+// Check for original prices on page load
+document.addEventListener('DOMContentLoaded', function() {
+    checkOriginalPrices();
+});
+</script>
 {% endblock %}
